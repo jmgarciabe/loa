@@ -1,9 +1,18 @@
-*.class
+ignore target
+**/target
 
-# Package Files #
-*.jar
-*.war
-*.ear
+# ignore eclipse especific files
+**/settings
+**/classpath
+**/settings
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# ignore dpsace overlay which needed to be modified
+lni/
+oai/
+rdf/
+rest/
+solr/
+sword/
+swordv2/
+xmlui/
+xmlui-mirage2/
