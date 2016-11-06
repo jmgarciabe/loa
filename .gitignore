@@ -2,9 +2,9 @@ ignore target
 **/target
 
 # ignore eclipse especific files
-**/settings
-**/classpath
-**/settings
+**/.settings
+**/.classpath
+**/.project
 
 # ignore dpsace overlay which needed to be modified
 lni/
