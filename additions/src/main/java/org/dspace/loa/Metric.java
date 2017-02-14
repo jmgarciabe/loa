@@ -53,7 +53,7 @@ public class Metric extends DSpaceObject {
     		throws SQLException
     {
     	String dbquery = "UPDATE assessment_result " + 
-        		"SET assessment_metric_id= ?, item_id= ? " +
+        		"SET assessment_metric_id = ?, item_id = ? " +
         		"WHERE assessment_result_id = ? ";
     	
     	try
@@ -117,7 +117,37 @@ public class Metric extends DSpaceObject {
 			e.printStackTrace();
 		}
     }
-
+    
+    /**
+     * Deletes all assessment values attached to an item in DB 
+     * 
+     * @param context
+     *            DSpace context object
+     */
+    public static int DeleteAssessValues(Context context, int itemID) 
+    		throws SQLException
+    {
+    	int rowsAffected = 0;
+    	
+    	String dbquery = "DELETE FROM assessment_result " + 
+        		"WHERE item_id = ? ";
+    	
+    	try
+    	{   
+            // Deletes rows with data from frontend
+            rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
+            
+            // Make sure all changes are committed
+            context.commit();
+    	}
+    	catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return rowsAffected;
+    }
 	
 	/**
      * Finds all criteria attached to a specific dimension - assumes name is unique

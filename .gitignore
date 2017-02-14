@@ -6,7 +6,7 @@ ignore target
 **/.classpath
 **/.project
 
-# ignore dpsace overlay which needed to be modified
+# ignore dpsace overlay which  needn't to be modified
 lni/
 oai/
 rdf/

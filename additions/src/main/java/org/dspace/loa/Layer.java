@@ -94,6 +94,37 @@ public class Layer extends DSpaceObject {
 			e.printStackTrace();
 		}	
     }
+    
+    /**
+     * Deletes all assessment indexes attached to an item in DB 
+     * 
+     * @param context
+     *            DSpace context object
+     */
+    public static int DeleteAssessIndexes(Context context, int itemID) 
+    		throws SQLException
+    {
+    	int rowsAffected = 0;
+    	
+    	String dbquery = "DELETE FROM assessment_history " + 
+        		"WHERE item_id = ? ";
+    	
+    	try
+    	{   
+            // Deletes rows with data from frontend
+            rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
+            
+            // Make sure all changes are committed
+            context.commit();
+    	}
+    	catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return rowsAffected;
+    }
        
     /**
      * Finds all layers in DB 

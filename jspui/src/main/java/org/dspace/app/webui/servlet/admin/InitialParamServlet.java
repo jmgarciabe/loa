@@ -67,13 +67,10 @@ public class InitialParamServlet extends DSpaceServlet
     	int action = UIUtil.getIntParameter(request, "action");
     	
         Item item = Item.find(context, UIUtil.getIntParameter(request, "item_id"));
-        
         String handle = HandleManager.findHandle(context, item);
         
         Vector dimensionList = (Vector)session.getAttribute("LOA.dimensionList");
-        
     	Vector metricList = (Vector)session.getAttribute("LOA.metricList");
-    	
     	Vector checkedDimensions = (Vector)session.getAttribute("LOA.ckDimensionList");
     	    	
     	/*
@@ -483,10 +480,8 @@ public class InitialParamServlet extends DSpaceServlet
     		session.setAttribute("LOA.adminAvailAssess", adminAvailAssess);
             
             JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");        	
-        }else{
-        	// show get item id jsp page, to look for other object in repository
+        }else
         	JSPManager.showJSP(request, response, "/tools/success-page.jsp");
-        }
     }
 
 	private Vector setDimensions(Context context, Vector dimensionList, 

@@ -44,6 +44,12 @@ import org.dspace.loa.VisibilityAssess;
  */
 public class AdminAssessServlet extends DSpaceServlet
 {
+	/** User selects show assessment result report */
+    public static final int SHOW_RESULTS = 10;
+	
+	/** User selects delete all assessment data */
+    public static final int DELETE_ASSESS = 15;
+	
 	/** assess completed successfully */
     public static boolean ASSESS_SUCCESS = false;
     
@@ -201,112 +207,116 @@ public class AdminAssessServlet extends DSpaceServlet
     	if(session==null)
     		JSPManager.showInternalError(request, response);
 		
-		int itemID = UIUtil.getIntParameter(request,"item_id");
+    	int action = UIUtil.getIntParameter(request, "action");
+    	
+    	int itemID = UIUtil.getIntParameter(request,"item_id");
 		Item item = Item.find(context, itemID);
 		
-		double adminIndex, expIndex, stdIndex, totalIndex;
-		boolean metricIsNull = false;
-		
-		Vector assessParamList = AssessItemServlet.loadAssessParam(context, request, response, itemID);
-		
-		if(assessParamList != null && !assessParamList.isEmpty())
+		switch (action)
 		{
-			for (int i = 0;i < assessParamList.size(); i++)
-    		{
-    			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-    			
-    			if (assessParam.getMetricValue() == null)
-    				metricIsNull = true;
-    			else{
-    				String layer, dimensionName, metricName, mtrVal = null;
-    				double metricValue = 0;
-    				Vector results = new Vector();
-    				
-    				if (assessParam.getLayerID() == 1)
-    				{
-    					layer = "Administrator";
-    					dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-    					metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-    					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
-    					mtrVal = new DecimalFormat("#.##").format(metricValue);
-    					results.addElement(layer + "," + dimensionName + "," + metricName + "," + mtrVal);
-    				}
-    				
-    				if (assessParam.getLayerID() == 2)
-    				{
-    					layer = "Expert";
-    					dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-    					metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-    					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
-    					mtrVal = new DecimalFormat("#.##").format(metricValue);
-    					results.addElement(layer + "," + dimensionName + "," + metricName + "," + mtrVal);
-    				}
-    				
-    				if (assessParam.getLayerID() == 3)
-    				{
-    					layer = "Student";
-    					dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-    					metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-    					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
-    					mtrVal = new DecimalFormat("#.##").format(metricValue);
-    					results.addElement(layer + "," + dimensionName + "," + metricName + "," + mtrVal);
-    				}
-    				
-    				session.setAttribute("LOA.results", results);
-    			
-    			}
-    		}
-		}
 		
-		request.setAttribute("item", item);
-		
-		if (metricIsNull)
-			JSPManager.showJSP(request, response, "/tools/layer-index-error.jsp");
-		else{
-			adminIndex = calculateLayerIndex(assessParamList, 1);
-			expIndex = calculateLayerIndex(assessParamList, 2);
-			stdIndex = calculateLayerIndex(assessParamList, 3);
-			int indexID = Layer.findIndexByItem(context, itemID);
-			if (indexID > 0)
-			{
-				totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
-				Layer.updateAssessIndexes(context, adminIndex, expIndex, stdIndex, totalIndex, indexID);
-			}else{
-				totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
-				try {
-					Layer.addAssessIndexes(context, itemID, adminIndex, expIndex, stdIndex, totalIndex);
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			case SHOW_RESULTS:
+				
+				double adminIndex, expIndex, stdIndex, totalIndex;
+				boolean metricIsNull = false;
+				
+				Vector assessParamList = AssessItemServlet.loadAssessParam(context, request, response, itemID);
+				Vector results = new Vector();
+				
+				if(assessParamList != null && !assessParamList.isEmpty())
+				{
+					for (int i = 0;i < assessParamList.size(); i++)
+		    		{
+		    			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
+		    			
+		    			if (assessParam.getMetricValue() == null)
+		    				metricIsNull = true;
+		    			else{
+		    				String dimensionName, metricName, mtrVal, data = null;
+		    				double metricValue = 0;
+		    				
+		    				dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
+							metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
+							metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
+							mtrVal = new DecimalFormat("###.##").format(metricValue);
+		    				data = assessParam.getLayerID() + "," + dimensionName + "," + metricName + "," + mtrVal;
+		    				results.addElement(data);
+		    					
+		    				session.setAttribute("LOA.results", results);
+		    			}
+		    		}
 				}
-			}
-			
-			if (adminIndex != 0){
-				adminIndex = adminIndex * 100;
-				String admIndex = new DecimalFormat("#.##").format(adminIndex);
-				request.setAttribute("adminIndex", admIndex);
-			}
 				
-			if (expIndex != 0)
-			{
-				expIndex = expIndex * 100;
-				String expertIndex = new DecimalFormat("#.##").format(expIndex);
-				request.setAttribute("expIndex", expertIndex);
-			}
+				request.setAttribute("item", item);
 				
-			if (stdIndex != 0)
-			{
-				stdIndex = stdIndex * 100;
-				String stuIndex = new DecimalFormat("#.##").format(stdIndex);
-				request.setAttribute("stdIndex", stuIndex);
-			}
+				if (metricIsNull)
+					JSPManager.showJSP(request, response, "/tools/layer-index-error.jsp");
+				else{
+					adminIndex = calculateLayerIndex(assessParamList, 1);
+					expIndex = calculateLayerIndex(assessParamList, 2);
+					stdIndex = calculateLayerIndex(assessParamList, 3);
+					int indexID = Layer.findIndexByItem(context, itemID);
+					if (indexID > 0)
+					{
+						totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
+						Layer.updateAssessIndexes(context, adminIndex, expIndex, stdIndex, totalIndex, indexID);
+					}else{
+						totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
+						try {
+							Layer.addAssessIndexes(context, itemID, adminIndex, expIndex, stdIndex, totalIndex);
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					
+					if (adminIndex != 0){
+						adminIndex = adminIndex * 100;
+						String admIndex = new DecimalFormat("###").format(adminIndex);
+						request.setAttribute("adminIndex", admIndex);
+					}
+						
+					if (expIndex != 0)
+					{
+						expIndex = expIndex * 100;
+						String expertIndex = new DecimalFormat("###").format(expIndex);
+						request.setAttribute("expIndex", expertIndex);
+					}
+						
+					if (stdIndex != 0)
+					{
+						stdIndex = stdIndex * 100;
+						String stuIndex = new DecimalFormat("###").format(stdIndex);
+						request.setAttribute("stdIndex", stuIndex);
+					}
+					
+					String totIndex = new DecimalFormat("##.##").format(totalIndex);
+					request.setAttribute("totalIndex", totIndex);
+					
+					JSPManager.showJSP(request, response, "/tools/results-report.jsp");
+				}
+				
+			break;
 			
-			String totIndex = new DecimalFormat("##.##").format(totalIndex);
-			request.setAttribute("totalIndex", totIndex);
+			case DELETE_ASSESS:
+				
+				request.setAttribute("item", item);
+
+				if (request.getParameter("submit_no") != null)
+				            JSPManager.showJSP(request, response, "/tools/param-form.jsp");
+				else{
+					int layerDel = Layer.DeleteAssessIndexes(context, itemID);
+					int dimDel = Dimension.DeleteAssessWeights(context, itemID);
+					int metDel = Metric.DeleteAssessValues(context, itemID);
+					
+					if ((layerDel + dimDel + metDel) > 0)
+						JSPManager.showJSP(request, response, "/tools/success-page.jsp");
+				}
+				
+			break;
 			
-			JSPManager.showJSP(request, response, "/tools/results-report.jsp");
 		}
-		
+			
     }
 
 	public double calculateLayerIndex(Vector assessParamList, int layerID)

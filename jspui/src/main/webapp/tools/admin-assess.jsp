@@ -18,6 +18,7 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
+<%@ page import="org.dspace.app.webui.servlet.admin.AdminAssessServlet" %>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet" %>
 <%@ page import="org.dspace.app.webui.util.AssessResult" %>
 <%@ page import="java.util.Vector" %>
@@ -104,6 +105,7 @@
 				<form method="post"
 					action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
 					<input type="hidden" name="item_id" value="<%=itemID%>" />
+					<input type="hidden" name="action" value="<%=AdminAssessServlet.SHOW_RESULTS%>" />
 					<input class="btn btn-info btn-lg" type="submit"
 					name="show_results" value="Show Results">
 				</form>

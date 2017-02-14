@@ -87,6 +87,38 @@ public class Dimension extends DSpaceObject {
     	
     }
     
+    /**
+     * Deletes all assessment weights attached to an item in DB 
+     * 
+     * @param context
+     *            DSpace context object
+     */
+    public static int DeleteAssessWeights(Context context, int itemID) 
+    		throws SQLException
+    {
+    	int rowsAffected = 0;
+    	
+    	String dbquery = "DELETE FROM dimension_weighting " + 
+        		"WHERE item_id = ? ";
+    	
+    	try
+    	{   
+            // Deletes rows with data from frontend
+            rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
+            
+            // Make sure all changes are committed
+            context.commit();
+    	}
+    	catch (SQLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	return rowsAffected;
+    }
+    
+    
 	/**
      * Finds all dimensions attached to a specific layer - assumes name is unique
      * 
