@@ -1,4 +1,4 @@
-ignore target
+#ignore target
 **/target
 
 # ignore eclipse especific files
