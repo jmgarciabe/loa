@@ -1,6 +1,12 @@
 #ignore target
 **/target
 
+#ignore bin from addtions
+additions/bin/
+
+#ignore main pom - not changed in any way
+pom.xml
+
 # ignore eclipse especific files
 **/.settings
 **/.classpath

@@ -3,9 +3,11 @@ package org.dspace.loa;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
@@ -18,6 +20,8 @@ public class Metric extends DSpaceObject {
 	
 	/** The row in the table representing this object */
     private final TableRow myRow;
+    /** log4j logger */
+    private static final Logger log = Logger.getLogger(Metric.class);
     
 	/**
      * Construct a Metric from a given context and tablerow
@@ -63,9 +67,13 @@ public class Metric extends DSpaceObject {
             int rowID = newRow.getIntColumn("assessment_result_id");
             rowID += 1;
             
+            
+            log.debug("########################");
+            log.debug("Valores ingresados antes de llamar al log...");
+            log.debug("\t\tmetrica: " + metricID + " item: " +itemID+" rowId: "+rowID);
             // Populates the new row with data from frontend
             int rowsAffected = DatabaseManager.updateQuery(context, dbquery, metricID, itemID, rowID);
-            
+            log.debug("\t\tfilas actualizadas: "+ rowsAffected);
             // Save changes to the database
             DatabaseManager.update(context, newRow);
             
