@@ -5,7 +5,7 @@
 additions/bin/
 
 #ignore main pom - not changed in any way
-pom.xml
+/pom.xml
 
 # ignore eclipse especific files
 **/.settings
