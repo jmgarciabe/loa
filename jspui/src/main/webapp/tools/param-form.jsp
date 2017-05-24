@@ -9,78 +9,79 @@
 --%>
 <%--
   --%>
-  
-<%@ page contentType="text/html;charset=UTF-8" %>
 
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
-    prefix="fmt" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 
-<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
-	
-<%@ page import="org.dspace.app.webui.servlet.admin.InitialParamServlet" %>
-<%@ page import="java.util.Vector" %>
-<%@ page import="org.dspace.content.Item" %>
-<%@ page import="org.dspace.core.ConfigurationManager" %>
-<%@ page import="org.dspace.eperson.EPerson" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+
+<%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace"%>
+
+<%@ page import="org.dspace.app.webui.servlet.admin.InitialParamServlet"%>
+<%@ page import="java.util.Vector"%>
+<%@ page import="org.dspace.content.Item"%>
+<%@ page import="org.dspace.core.ConfigurationManager"%>
+<%@ page import="org.dspace.eperson.EPerson"%>
 
 <%
-    Item item = (Item) request.getAttribute("item");
-	
+	Item item = (Item) request.getAttribute("item");
+
 	// Is anyone logged in?
-    EPerson user = (EPerson) request.getAttribute("dspace.current.user");
+	EPerson user = (EPerson) request
+			.getAttribute("dspace.current.user");
 %>
 
-<dspace:layout style="submission" titlekey="Learning Object Assessment Parametrization"
-               navbar="admin"
-               locbar="link"
-               parenttitlekey="jsp.administer"
-               parentlink="/dspace-admin"
-               nocache="true">
-	
-	<h1>Item: <small><%= item.getName() %> </small></h1>
-	
-	<h1>Item ID: <small><%= item.getID() %> </small></h1>
+<dspace:layout style="submission" title="Learning Object Assessment Parametrization" navbar="admin"
+	locbar="link" parenttitlekey="jsp.administer" parentlink="/dspace-admin" nocache="true">
 
-	<form class="form-inline" method="get" action="<%= request.getContextPath() %>/tools/LOAssessment/assess-param">
-	
-		<input type="hidden" name="item_id" value="<%=item.getID()%>" />
-		<input type="hidden" name="action" value="<%=InitialParamServlet.LAYER_PARAM%>" />
-		
-		<div class="form-group">
-			<label for="selectLayer" class="control-label">Please select the
-				layer to parameterize:</label> 
-			<select class="form-control" id="selectLayer" name="layer_name">
-				<%
-					Vector adminAssessOpt = (Vector) session
-								.getAttribute("LOA.adminAssessOpt");
-						if (adminAssessOpt != null && !adminAssessOpt.isEmpty()) {
-				%>
-				<%
+	<h1 class="col-md-12">
+		Item name: <small><%=item.getName()%> </small>
+	</h1>
+
+	<h1 class="col-md-12">
+		Item ID: <small><%=item.getID()%> </small>
+	</h1>
+	<br>
+	<br>
+	<div class="col-md-5 col-lg-4">
+		<form method="get" action="<%=request.getContextPath()%>/tools/LOAssessment/assess-param">
+
+			<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input type="hidden"
+				name="action" value="<%=InitialParamServlet.LAYER_PARAM%>" />
+
+			<div class="form-group">
+				<label for="selectLayer" class="control-label">Please select the layer to set parameters</label>
+				<select class="form-control" id="selectLayer" name="layer_name">
+					<%
+						Vector adminAssessOpt = (Vector) session
+									.getAttribute("LOA.adminAssessOpt");
+							if (adminAssessOpt != null && !adminAssessOpt.isEmpty()) {
+					%>
+					<%
 						for (int index = 0; index < adminAssessOpt.size(); index++) {
 									String layers = (String) adminAssessOpt
 											.elementAt(index);
-				%>
-				<%=layers%>
-				<%
+					%>
+					<%=layers%>
+					<%
 						}
-				%>
-				<%
-					}
-				%>
-			</select>
-			<div class="btn-group" role="group" aria-label="...">
-				<input class="btn btn-success btn-lg" type="submit"
-					name="send_assess" value="Send" />
+					%>
+					<%
+						}
+					%>
+				</select>
+
 			</div>
-		</div>
-	</form>
-	
-	<div class="btn-group" role="group" aria-label="...">
-		<form method="get"
-			action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
-			<input class="btn btn-primary btn-lg" type="submit"
-				name="submit_cancel"
-				value="<fmt:message key="jsp.tools.general.cancel"/>" />
+			<br>
+			<div class="btn-group pull-left" role="group" aria-label="...">
+				<input class="btn btn-success btn-lg" type="submit" name="send_assess" value="Send" />
+			</div>
 		</form>
-	</div>	
+
+		<div class="btn-group pull-left" style="padding-left: 5px;" role="group" aria-label="...">
+			<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
+				<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
+					value="<fmt:message key="jsp.tools.general.cancel"/>" />
+			</form>
+		</div>
+	</div>
 </dspace:layout>

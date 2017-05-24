@@ -143,7 +143,13 @@ public class AssessParam extends DSpaceObject {
 	}
 
 
-
+	/**
+	 * Ckeck for weighting values, if not set weighting setting should be carry on  
+	 * @param context Dspace context
+	 * @param itemID id of item
+	 * @return list of assessment parameters 
+	 * @throws SQLException
+	 */
 	public static AssessParam[] findParam(Context context, int itemID) 
 			throws SQLException
 	{
