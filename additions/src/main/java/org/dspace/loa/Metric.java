@@ -56,24 +56,23 @@ public class Metric extends DSpaceObject {
     public static void addAssessMetric(Context context, int metricID, int itemID) 
     		throws SQLException
     {
-    	String dbquery = "UPDATE assessment_result " + 
-        		"SET assessment_metric_id = ?, item_id = ? " +
-        		"WHERE assessment_result_id = ? ";
+//    	String dbquery = "UPDATE assessment_result " + 
+//        		"SET assessment_metric_id = ?, item_id = ? " +
+//        		"WHERE assessment_result_id = ? ";
     	
     	try
     	{
     		// Create a new row, and assign a primary key
             TableRow newRow = DatabaseManager.create(context, "assessment_result");
-            int rowID = newRow.getIntColumn("assessment_result_id");
-            rowID += 1;
+            newRow.setColumn("assessment_metric_id", metricID );
+            newRow.setColumn("item_id",itemID);
+//            int rowID = newRow.getIntColumn("assessment_result_id");
+//            rowID += 1;
             
             
-            log.debug("########################");
-            log.debug("Valores ingresados antes de llamar al log...");
-            log.debug("\t\tmetrica: " + metricID + " item: " +itemID+" rowId: "+rowID);
             // Populates the new row with data from frontend
-            int rowsAffected = DatabaseManager.updateQuery(context, dbquery, metricID, itemID, rowID);
-            log.debug("\t\tfilas actualizadas: "+ rowsAffected);
+//            int rowsAffected = DatabaseManager.updateQuery(context, dbquery, metricID, itemID, rowID);
+//            log.debug("\t\tfilas actualizadas: "+ rowsAffected);
             // Save changes to the database
             DatabaseManager.update(context, newRow);
             

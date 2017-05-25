@@ -59,22 +59,37 @@ public class Dimension extends DSpaceObject {
     public static void addDimensionWeight(Context context, int dimID, int layID, int itemID, String dimWeight) 
     		throws SQLException
     {
-    	String dbquery =  "UPDATE dimension_weighting " + 
-        		"SET dimension_id= ?,layer_id= ?,item_id= ?,admin_weight= ? " +
-        		"WHERE dimension_weighting_id = ? ";
-    	
+//    	String dbquery =  "UPDATE dimension_weighting " + 
+//        		"SET dimension_id= ?,layer_id= ?,item_id= ?,admin_weight= ? " +
+//        		"WHERE dimension_weighting_id = ? ";
+//    	
     	try
     	{
     		// Create a new row, and assign a primary key
-            TableRow newRow = DatabaseManager.create(context, "dimension_weighting");
-            int rowID = newRow.getIntColumn("dimension_weighting_id");
-            rowID += 1;
+//            TableRow newRow = DatabaseManager.create(context, "dimension_weighting");
+//            int rowID = newRow.getIntColumn("dimension_weighting_id");
+//            rowID += 1;
             
             // Populates the new row with data from frontend
-            int rowsAffected = DatabaseManager.updateQuery(context, dbquery, dimID, layID, itemID, dimWeight, rowID);
+//            int rowsAffected = DatabaseManager.updateQuery(context, dbquery, dimID, layID, itemID, dimWeight, rowID);
             
-            // Save changes to the database
-            DatabaseManager.update(context, newRow);
+            //Esto es para verificar si ya existe la fila y actualizarla o crearla
+    		TableRow row;
+            String query = "select * from dimension_weighting where layer_id = ?"
+            			+ " and dimension_id = ? and item_id = ? ";
+            row = DatabaseManager.querySingleTable(context,"dimension_weighting", query, layID, dimID, itemID);
+            if(row == null){
+            	row = DatabaseManager.create(context, "dimension_weighting");
+            	row.setColumn("layer_id", layID);
+                row.setColumn("dimension_id", dimID);
+                row.setColumn("item_id", itemID);
+            
+            }else{
+            	System.out.println("######################");
+            	System.out.println("Se encontró una fila con id: "+ row.getIntColumn("dimension_weighting_id"));
+            }
+            row.setColumn("admin_weight", dimWeight);
+            DatabaseManager.update(context, row);
             
             // Make sure all changes are committed
             context.commit();
