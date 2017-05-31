@@ -57,8 +57,8 @@
 			<input type="hidden" name="item_id" value="<%=itemID%>" />
 
 			<div class="form-group">
-				<label class="col-md-3 col-lg-2" for="admin_assess">Select available assessments:</label>
-				<div class="col-md-9 col-lg-10">
+				<label class="col-md-4 col-lg-3" for="admin_assess">Select assessment:</label>
+				<div class="col-md-4 col-lg-3">
 					<select class="form-control" name="admin_assess" id="admin_assess">
 						<%
 							Vector adminAvailAssess = (Vector) session
@@ -81,14 +81,18 @@
 				</div>
 
 			</div>
-			<br> <input class="btn btn-success btn-lg pull-left" type="submit" name="submit_item_assess"
+			<div class="row"></div>
+			<br>
+			<div class="pull-left">
+			 <input class="btn btn-success btn-lg pull-left" type="submit" name="submit_item_assess"
 				value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
+				</div>
 
 		</form>
-	</div>
 	<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
-		<input class="btn btn-primary btn-lg pull-left" style="padding-left: 5px;" type="submit"
-			name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" />
+		<div class="pull-left" style="padding-left: 5px;">
+		<input class="btn btn-primary btn-lg" type="submit"
+			name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" /></div>
 	</form>
 
 	<%
@@ -99,8 +103,9 @@
 		<input type="hidden" name="item_id" value="<%=itemID%>" /> 
 		<input type="hidden" name="action"
 			value="<%=AdminAssessServlet.SHOW_RESULTS%>" />
-			 <input class="btn btn-info btn-lg pull-left" style="padding-left: 5px;" type="submit"
-			name="show_results" value="Show Results">
+			<div class="pull-left" style="padding-left: 5px;">
+			 <input class="btn btn-info btn-lg" type="submit"
+			name="show_results" value="Show Results"></div>
 	</form>
 
 	<%
@@ -108,9 +113,11 @@
 	%>
 
 	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
-		<input class="btn btn-info btn-lg disabled pull-left" style="padding-left: 5px;" type="submit" name="show_results" value="Show Results">
+	<div class="pull-left" style="padding-left: 5px;">
+		<input class="btn btn-info btn-lg disabled" type="submit" name="show_results" value="Show Results"></div>
 	</form>
 	<%
 		}
 	%>
+	</div>
 </dspace:layout>
