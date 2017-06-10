@@ -30,7 +30,7 @@
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 %>
 
-<dspace:layout style="submission" titlekey="Learning Object Assessment parameterization"
+<dspace:layout style="submission" title="Learning Object Assessment parameterization"
                locbar="link"
                nocache="true">
 
@@ -58,7 +58,7 @@
 	<div class="btn-group" role="group" aria-label="...">
 		<form method="get"
 			action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
-			<input class="btn btn-info btn-lg" type="submit"
+			<input class="btn btn-success btn-lg" type="submit"
 				name="submit_ok" value="OK" />
 		</form>
 	</div>

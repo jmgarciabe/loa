@@ -59,24 +59,13 @@ public class Dimension extends DSpaceObject {
     public static void addDimensionWeight(Context context, int dimID, int layID, int itemID, String dimWeight) 
     		throws SQLException
     {
-//    	String dbquery =  "UPDATE dimension_weighting " + 
-//        		"SET dimension_id= ?,layer_id= ?,item_id= ?,admin_weight= ? " +
-//        		"WHERE dimension_weighting_id = ? ";
-//    	
     	try
     	{
-    		// Create a new row, and assign a primary key
-//            TableRow newRow = DatabaseManager.create(context, "dimension_weighting");
-//            int rowID = newRow.getIntColumn("dimension_weighting_id");
-//            rowID += 1;
-            
-            // Populates the new row with data from frontend
-//            int rowsAffected = DatabaseManager.updateQuery(context, dbquery, dimID, layID, itemID, dimWeight, rowID);
-            
-            //Esto es para verificar si ya existe la fila y actualizarla o crearla
+            //Verificar si ya existe la fila y actualizarla o crearla
     		TableRow row;
             String query = "select * from dimension_weighting where layer_id = ?"
             			+ " and dimension_id = ? and item_id = ? ";
+            
             row = DatabaseManager.querySingleTable(context,"dimension_weighting", query, layID, dimID, itemID);
             if(row == null){
             	row = DatabaseManager.create(context, "dimension_weighting");
@@ -84,13 +73,9 @@ public class Dimension extends DSpaceObject {
                 row.setColumn("dimension_id", dimID);
                 row.setColumn("item_id", itemID);
             
-            }else{
-            	System.out.println("######################");
-            	System.out.println("Se encontró una fila con id: "+ row.getIntColumn("dimension_weighting_id"));
             }
             row.setColumn("admin_weight", dimWeight);
             DatabaseManager.update(context, row);
-            
             // Make sure all changes are committed
             context.commit();
     	}
@@ -255,21 +240,13 @@ public class Dimension extends DSpaceObject {
     public static void updateExpertWeight(Context context, int dimWghtID,
 			int itemID, int weight) {
 		// TODO Auto-generated method stub
-		String dbquery = "SELECT * FROM dimension_weighting " +
-        		"WHERE dimension_weighting_id = ? " +   
-        		"AND item_id = ? ";
-
-    	try
+		String dbquery = "update dimension_weighting set expert_weight = ?" +
+        		"where dimension_weighting_id = ? " +   
+        		"and item_id = ? ";
+		try
     	{
-    		TableRow updateable = DatabaseManager.querySingle(context, dbquery, dimWghtID, itemID);
-    		updateable.setTable("dimension_weighting");
-    		updateable.setColumn("expert_weight", weight);
-            
-            // Save changes to the database
-            DatabaseManager.update(context, updateable);
-            
-            // Make sure all changes are committed
-            context.commit();
+    		int numOfRowsUpdated =DatabaseManager.updateQuery(context, dbquery, weight, dimWghtID, itemID);
+    	    context.commit();
     	}
     	catch (SQLException e) 
 		{
