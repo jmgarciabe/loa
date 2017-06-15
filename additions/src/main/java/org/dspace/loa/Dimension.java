@@ -239,13 +239,12 @@ public class Dimension extends DSpaceObject {
      */
     public static void updateExpertWeight(Context context, int dimWghtID,
 			int itemID, int weight) {
-		// TODO Auto-generated method stub
 		String dbquery = "update dimension_weighting set expert_weight = ?" +
         		"where dimension_weighting_id = ? " +   
         		"and item_id = ? ";
 		try
     	{
-    		int numOfRowsUpdated =DatabaseManager.updateQuery(context, dbquery, weight, dimWghtID, itemID);
+    		DatabaseManager.updateQuery(context, dbquery, weight, dimWghtID, itemID);
     	    context.commit();
     	}
     	catch (SQLException e) 

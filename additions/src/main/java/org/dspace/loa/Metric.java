@@ -84,33 +84,19 @@ public class Metric extends DSpaceObject {
      */
     public static void addAssessValue(Context context, double result, String metric, int layerID, int itemID)
     {
-    	String dbquery = "SELECT a.* FROM assessment_result a " +
-    			"WHERE a.assessment_metric_id = " +
-    			"(SELECT b.assessment_metric_id FROM assessment_metric b " + 
-    			"INNER JOIN criteria c " + 
-    			"ON b.criteria_id = c.criteria_id " + 
-    			"AND c.criteria_name = ? " +
-    			"AND b.layer_id = ?) " +
-        		"AND a.item_id = ? ";
-    	
-    	Double value = new Double(result);
-    	String assessVal = value.toString();
+    	String dbupdate =  "UPDATE assessment_result SET metric_value = ? "+
+    			"WHERE assessment_metric_id = "+ 
+    			"( SELECT b.assessment_metric_id "+
+    			"  FROM assessment_metric b INNER JOIN criteria c ON b.criteria_id = c.criteria_id "+
+    			"  WHERE c.criteria_name = ? AND b.layer_id = ? " +
+    			") " +
+    			"AND item_id = ? ";
+    	String assessVal = String.valueOf(result);
 		
-    	try
-    	{
-    		TableRow updateable = DatabaseManager.querySingle(context, dbquery, metric, layerID, itemID);
-    		updateable.setTable("assessment_result");
-    		updateable.setColumn("metric_value", assessVal);
-            
-            // Save changes to the database
-            DatabaseManager.update(context, updateable);
-            
-            // Make sure all changes are committed
-            context.commit();
-    	}
-    	catch (SQLException e) 
-		{
-			// TODO Auto-generated catch block
+    	try{
+    		DatabaseManager.updateQuery(context, dbupdate, assessVal, metric, layerID, itemID);
+    	    context.commit();
+    	}catch (SQLException e)	{
 			e.printStackTrace();
 		}
     }

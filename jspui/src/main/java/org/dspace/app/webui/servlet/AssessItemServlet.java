@@ -247,6 +247,8 @@ public class AssessItemServlet extends DSpaceServlet
 
     	return initParamList;
 	}
+    
+	
 	
 	/**
      * Shows the item assessment parametrization form for a particular item

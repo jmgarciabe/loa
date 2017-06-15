@@ -1,8 +1,16 @@
 package org.dspace.loa;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Vector;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
@@ -46,7 +54,45 @@ public class AssessParam extends DSpaceObject {
         admWeight = row.getStringColumn("admin_weight");
 	}
 
+    
+    /**
+	 * Ckeck for weighting values, if not set weighting setting should be carry on  
+	 * @param context Dspace context
+	 * @param itemID id of item
+	 * @return list of assessment parameters 
+	 * @throws SQLException
+	 */
+	public static AssessParam[] findParam(Context context, int itemID) 
+			throws SQLException
+	{
+		String dbquery = "SELECT k.assessment_metric_id,k.layer_id,k.dimension_id,k.item_id,k.metric_value," +
+				"d.dimension_weighting_id,d.admin_weight,d.expert_weight " +
+        		"FROM (SELECT m.layer_id,m.dimension_id,r.assessment_metric_id,r.item_id,r.metric_value FROM " +
+				"assessment_metric m INNER JOIN assessment_result r ON m.assessment_metric_id=r.assessment_metric_id) k " +
+        		"INNER JOIN dimension_weighting d ON k.item_id=d.item_id " +
+				"AND k.layer_id=d.layer_id AND k.dimension_id=d.dimension_id AND k.item_id= ?";
+		
+    	TableRowIterator rows = DatabaseManager.query(context, dbquery, itemID);
 
+        try
+        {
+            List<TableRow> dRows = rows.toList();
+            AssessParam[] param = new AssessParam[dRows.size()];
+
+            for (int i = 0; i < dRows.size(); i++)
+            {
+                TableRow row = dRows.get(i);                
+                param[i] = new AssessParam(context, row);
+            }
+
+            return param;
+        }
+        finally
+        {
+            if (rows != null)
+                rows.close();
+        }
+	}        
 
 	public int getAssessMetricID() {
 		return assessMetricID;
@@ -141,46 +187,6 @@ public class AssessParam extends DSpaceObject {
 	public void setAdmWeight(String admWeight) {
 		this.admWeight = admWeight;
 	}
-
-
-	/**
-	 * Ckeck for weighting values, if not set weighting setting should be carry on  
-	 * @param context Dspace context
-	 * @param itemID id of item
-	 * @return list of assessment parameters 
-	 * @throws SQLException
-	 */
-	public static AssessParam[] findParam(Context context, int itemID) 
-			throws SQLException
-	{
-		String dbquery = "SELECT k.assessment_metric_id,k.layer_id,k.dimension_id,k.item_id,k.metric_value," +
-				"d.dimension_weighting_id,d.admin_weight,d.expert_weight " +
-        		"FROM (SELECT m.layer_id,m.dimension_id,r.assessment_metric_id,r.item_id,r.metric_value FROM " +
-				"assessment_metric m INNER JOIN assessment_result r ON m.assessment_metric_id=r.assessment_metric_id) k " +
-        		"INNER JOIN dimension_weighting d ON k.item_id=d.item_id " +
-				"AND k.layer_id=d.layer_id AND k.dimension_id=d.dimension_id AND k.item_id= ?";
-		
-    	TableRowIterator rows = DatabaseManager.query(context, dbquery, itemID);
-
-        try
-        {
-            List<TableRow> dRows = rows.toList();
-            AssessParam[] param = new AssessParam[dRows.size()];
-
-            for (int i = 0; i < dRows.size(); i++)
-            {
-                TableRow row = dRows.get(i);                
-                param[i] = new AssessParam(context, row);
-            }
-
-            return param;
-        }
-        finally
-        {
-            if (rows != null)
-                rows.close();
-        }
-	}        
 
 	@Override
 	public int getType() {
