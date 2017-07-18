@@ -9,6 +9,8 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -16,8 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.dspace.app.webui.servlet.AssessItemServlet;
-import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -29,172 +29,82 @@ import org.dspace.loa.Metric;
 
 /**
  * Servlet for perform the assessment logic of each of the student layer metrics
- *
+ * 
  * @author Andres Salazar
  * @version $Revision$
  */
-public class StudentAssessServlet extends DSpaceServlet
-{
-   
-  
-    protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-    		    	
-    }
+public class StudentAssessServlet extends DSpaceServlet {
 
-    
-	protected void doDSPost(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
+	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException, SQLException, AuthorizeException {
+
+	}
+
+	protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException, SQLException, AuthorizeException {
 		HttpSession session = request.getSession(false);
-    	
-    	if(session==null)
-    	{
-    		JSPManager.showInternalError(request, response);
-    	}
-    	
-		int itemID = UIUtil.getIntParameter(request,"item_id");
-		
-        Item item = Item.find(context, itemID);
-        
-        String handle = HandleManager.findHandle(context, item);
-        
-        Vector assessParamList = AssessItemServlet.loadAssessParam(context, request, response, itemID);
-        
-        double relev = 0.0;
-        double rel1 = 0.0;
-        
-        double motiv = 0.0;
-        double mot1 = 0.0;
-        
-        double effect = 0.0;
-        double eff1 = 0.0;
-        
-        double visual = 0.0;
-        double vid1 = 0.0;
-        double vid2 = 0.0;
-        
-        double avail = 0.0;
-        double ava1 = 0.0;
-        
-        double use = 0.0;
-        double eou1 = 0.0;
-        
-        double accuracy = 0.0;
-        double acc1 = 0.0;
-		
-		if(assessParamList != null && !assessParamList.isEmpty())
-		{
-			for (int i = 0;i < assessParamList.size(); i++)
-    		{
-    			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-    			
-    			if (assessParam.getMetricValue() != null && assessParam.getLayerID() == 3)
-    			{
-    				if (request.getParameter("rel1") != null && assessParam.getAssessMetricID() == 15)
-    				{
-    					rel1 = Double.valueOf(request.getParameter("rel1")).doubleValue();
-    					relev = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    					relev = (relev + (rel1 / 5)) / 2;
-            			Metric.addAssessValue(context, relev, "Relevance", 3, itemID);
-    				}		
-            		if (request.getParameter("mot1") != null && assessParam.getAssessMetricID() == 16)
-            		{
-            			mot1 = Double.valueOf(request.getParameter("mot1")).doubleValue();
-    					motiv = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    					motiv = (motiv + (mot1 / 5)) / 2;
-            			Metric.addAssessValue(context, motiv, "Motivation", 3, itemID);
-            		}
-            		if (request.getParameter("eff1") != null && assessParam.getAssessMetricID() == 17)
-            		{
-            			eff1 = Double.valueOf(request.getParameter("eff1")).doubleValue();
-    					effect = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    					effect = (effect + (eff1 / 5)) / 2;
-            			Metric.addAssessValue(context, effect, "Effectiveness", 3, itemID);
-            		}
-            		if (request.getParameter("vid1") != null && request.getParameter("vid2") != null 
-            				&& assessParam.getAssessMetricID() == 18)
-            		{
-            			vid1 = Double.valueOf(request.getParameter("vid1")).doubleValue();
-            			vid2 = Double.valueOf(request.getParameter("vid2")).doubleValue();
-            			visual = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-            			visual = (visual + ((vid1 + vid2) / 10)) / 2;
-            			Metric.addAssessValue(context, visual, "Visual Design", 3, itemID);
-            		}
-            		if (request.getParameter("ava1") != null && assessParam.getAssessMetricID() == 19)
-            		{
-            			ava1 = Double.valueOf(request.getParameter("ava1")).doubleValue();
-    					avail = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    					avail = (avail + ava1) / 2;
-            			Metric.addAssessValue(context, avail, "Availability", 3, itemID);
-            		}
-            		if (request.getParameter("eou1") != null && assessParam.getAssessMetricID() == 20)
-            		{
-            			eou1 = Double.valueOf(request.getParameter("eou1")).doubleValue();
-    					use = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    					use = (use + (eou1 / 5)) / 2;
-            			Metric.addAssessValue(context, use, "Ease to use", 3, itemID);
-            		}
-            		if (request.getParameter("acc1") != null && assessParam.getAssessMetricID() == 21)
-            		{
-            			acc1 = Double.valueOf(request.getParameter("acc1")).doubleValue();
-    					accuracy = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    					accuracy = (accuracy + (acc1 / 5)) / 2;
-            			Metric.addAssessValue(context, accuracy, "Accuracy", 3, itemID);
-            		}
-    			}else{
-    				if (request.getParameter("rel1") != null)
-    		        {
-    					rel1 = Double.valueOf(request.getParameter("rel1")).doubleValue();
-    					relev = (rel1 / 5) / 2;
-            			Metric.addAssessValue(context, relev, "Relevance", 3, itemID);
-    		        }
-    				if (request.getParameter("mot1") != null)
-    		        {
-    					mot1 = Double.valueOf(request.getParameter("mot1")).doubleValue();
-    					motiv = (mot1 / 5) / 2;
-            			Metric.addAssessValue(context, motiv, "Motivation", 3, itemID);
-    		        }
-    				if (request.getParameter("eff1") != null)
-    		        {
-    					eff1 = Double.valueOf(request.getParameter("eff1")).doubleValue();
-    					effect = (eff1 / 5) / 2;
-            			Metric.addAssessValue(context, effect, "Effectiveness", 3, itemID);
-    		        }
-    				if (request.getParameter("vid1") != null && request.getParameter("vid2") != null)
-    		        {
-    					vid1 = Double.valueOf(request.getParameter("vid1")).doubleValue();
-            			vid2 = Double.valueOf(request.getParameter("vid2")).doubleValue();
-            			visual = ((vid1 + vid2) / 10) / 2;
-            			Metric.addAssessValue(context, visual, "Visual Design", 3, itemID);
-    		        }
-    				if (request.getParameter("ava1") != null)
-    		        {
-    					ava1 = Double.valueOf(request.getParameter("ava1")).doubleValue();
-    					avail = ava1;
-            			Metric.addAssessValue(context, avail, "Availability", 3, itemID);
-    		        }
-    				if (request.getParameter("eou1") != null)
-    		        {
-    					eou1 = Double.valueOf(request.getParameter("eou1")).doubleValue();
-    					use = (eou1 / 5) / 2;
-            			Metric.addAssessValue(context, use, "Ease to use", 3, itemID);
-    		        }
-    				if (request.getParameter("acc1") != null)
-    		        {
-    					acc1 = Double.valueOf(request.getParameter("acc1")).doubleValue();
-    					accuracy = (acc1 / 5) / 2;
-            			Metric.addAssessValue(context, accuracy, "Accuracy", 3, itemID);
-    		        }		
-    			}		
-    		}
+
+		if (session == null) {
+			JSPManager.showInternalError(request, response);
 		}
+
+		int itemID = UIUtil.getIntParameter(request, "item_id");
+
+		Item item = Item.find(context, itemID);
+
+		String handle = HandleManager.findHandle(context, item);
 		
+		// Cargamos solo los asses param de la capa
+		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemID, 3);
+
+		double formValue = 0;
+		double dbValue = 0;
+		// Se crean mapas con información de los variables y ids de las
+		// dimensiones para almacenar respuestas
+		Map<String, String[]> questions = new HashMap<String, String[]>();
+		Map<String, String> criteriaIds = new HashMap<String, String>();
+
+		questions.put("Availability", new String[] { "ava1" });
+		questions.put("Accuracy", new String[] { "acc1" });
+		questions.put("Ease to use", new String[] { "eou1" });
+		questions.put("Effectiveness", new String[] { "eff1" });
+		questions.put("Motivation", new String[] { "mot1" });
+		questions.put("Relevance", new String[] { "rel1" });
+		questions.put("Visual Design", new String[] { "vid1", "vid2" });
+
+		criteriaIds.put("19", "Availability");
+		criteriaIds.put("21", "Accuracy");
+		criteriaIds.put("20", "Ease to use");
+		criteriaIds.put("17", "Effectiveness");
+		criteriaIds.put("16", "Motivation");
+		criteriaIds.put("15", "Relevance");
+		criteriaIds.put("18", "Visual Design");
+
+		// Recorremos los param para actualizar o guardar el valor de la métrica
+		for (AssessParam param : assessParamList) {
+			if (param.getMetricValue() != null && param.getMetricValue() != "") {
+				formValue = Double.valueOf(param.getMetricValue()).doubleValue();
+			}
+			String metricId = String.valueOf(param.getAssessMetricID());
+			String criteria = criteriaIds.get(metricId);
+			String[] questIds = questions.get(criteria);
+			for (String q : questIds) {
+				dbValue += request.getParameter(q) != null ? Double.valueOf(request.getParameter(q)).doubleValue() : 0;
+			}
+			if (questIds.length > 0) {
+				dbValue /= questIds.length;
+			}
+			if (formValue > 0) {
+				dbValue = ((dbValue/5) + formValue) / 2;
+			}
+			if (dbValue > 0) {
+				Metric.addAssessValue(context, dbValue, criteria, 3, itemID);
+			}
+			// Se resetean los valores
+			formValue = 0;
+			dbValue = 0;
+		}
 		request.setAttribute("item", item);
-		
 		JSPManager.showJSP(request, response, "/tools/success-page.jsp");
-    }
+	}
 }

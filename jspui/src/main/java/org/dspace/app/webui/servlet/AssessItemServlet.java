@@ -195,8 +195,8 @@ public class AssessItemServlet extends DSpaceServlet
      * @param item ID
      *            the item id
      */
-    public static Vector loadAssessParam(Context context, HttpServletRequest request,
-			HttpServletResponse response, int itemID) 
+    public static Vector<AssessParam> loadAssessParam(Context context, HttpServletRequest request,
+			HttpServletResponse response, int itemID) throws SQLException
     {
     	HttpSession session = request.getSession(false);
 
@@ -205,7 +205,6 @@ public class AssessItemServlet extends DSpaceServlet
     		try {
     			JSPManager.showInternalError(request, response);
     		} catch (ServletException e) {
-    			// TODO Auto-generated catch block
     			e.printStackTrace();
     		} catch (IOException e) {
     			// TODO Auto-generated catch block
@@ -213,38 +212,8 @@ public class AssessItemServlet extends DSpaceServlet
     		}
     	}
 
-    	Vector initParamList = (Vector)session.getAttribute("LOA.initParamList");
-
-    	AssessParam[] initParam = null;
-
-    	if (initParamList == null) {
-    		try {
-    			initParam = AssessParam.findParam(context, itemID);
-    		} catch (SQLException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}
-
-    		initParamList = new Vector();
-
-    		for (int i = 0;i < initParam.length; i ++)
-    			initParamList.addElement(initParam[i]);
-    	}else{
-    		initParamList.clear();
-    		try {
-    			initParam = AssessParam.findParam(context, itemID);
-    		} catch (SQLException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}
-    		initParamList.ensureCapacity(initParam.length);
-
-    		for (int i = 0;i < initParam.length; i ++)
-    			initParamList.addElement(initParam[i]);
-    	}
-
+    	Vector<AssessParam> initParamList = AssessParam.findParam(context, itemID);
     	session.setAttribute("LOA.initParamList", initParamList);
-
     	return initParamList;
 	}
     
