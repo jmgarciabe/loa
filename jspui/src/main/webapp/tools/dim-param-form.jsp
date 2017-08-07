@@ -54,7 +54,8 @@
 	<div class="alert alert-warning" role="alert">Be aware that for each layer assigned weights
 		must total 100%!</div>
 
-	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/assess-param">
+	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/assess-param"
+		id="param-values-form">
 
 		<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input type="hidden"
 			name="layer" value="<%=layer%>" />
@@ -79,9 +80,9 @@
 				<div class="form-group">
 					<label for="<%=dimensionName%>"><%=dimensionName%></label>
 					<div class="input-group">
-						<input type="text" class="form-control" aria-describedby="percentage"
-							name="<%=dimensionName%>" id="<%=dimensionName%>">
-						<span class="input-group-addon" id="percentage">%</span>
+						<input type="number" class="form-control dim-value" aria-describedby="percentage"
+							name="<%=dimensionName%>" id="<%=dimensionName%>" required> <span
+							class="input-group-addon" id="percentage">%</span>
 					</div>
 				</div>
 				<%
@@ -95,45 +96,30 @@
 		<%
 			}
 		%>
-		<!-- Modal -->
-		<div id="modalInitParam" class="modal fade" role="dialog">
-			<div class="modal-dialog">
+		<script type="text/javascript">
+			function validar() {
+				var sum = 0.0;
+				var nodes = document.querySelectorAll(".dim-value");
+				for (var i = 0; i < nodes.length; i++) {
+					sum += nodes[i].valueAsNumber;
+				}
+				if (sum == 100) {
+					document.getElementById("param-values-form").submit();
+				} else {
+					document.getElementById("error-message").innerHTML = "Invalid input, be aware it must sum up 100!";
+				}
 
-				<!-- Modal content-->
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Confirm assessment parametrization</h4>
-					</div>
-					<div class="modal-body">
-						<div>
-							<strong>Parameterized layer successfully!</strong> Do you want to configure a further layer
-							to this assessment?
-						</div>
-					</div>
-					<div class="modal-footer">
-						<input class="btn btn-success" type="submit" name="submit_yes"
-							value="Yes" /> <input class="btn btn-primary" type="submit"
-							name="submit_no" value="No" />
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div class="btn-group pull-left" role="group" aria-label="...">
-
-			<!-- Trigger the modal with a button -->
-			<button type="button" class="btn btn-success btn-lg" data-toggle="modal"
-				data-target="#modalInitParam">Confirm</button>
-
-
+			}
+		</script>
+		<p id="error-message" style="color: red;"></p>
+		<div class="pull-left">
+			<button type="button" class="btn btn-success btn-lg" onclick="validar()">Confirm</button>
 		</div>
 	</form>
 
-	<div class="btn-group pull-left" style="padding-left: 5px;" role="group" aria-label="...">
+	<div class="pull-left" style="padding-left: 5px;">
 		<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
-			<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
-				value="<fmt:message key="jsp.tools.general.cancel"/>" />
+			<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel" value="Cancel" />
 		</form>
 	</div>
 </dspace:layout>

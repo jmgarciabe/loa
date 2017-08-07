@@ -10,6 +10,8 @@ package org.dspace.app.webui.servlet.admin;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -37,459 +39,270 @@ import org.dspace.loa.ReusabilityAssess;
 import org.dspace.loa.VisibilityAssess;
 
 /**
- * Servlet for perform the assessment logic of each of the administrator layer metrics
- *
+ * Servlet for perform the assessment logic of each of the administrator layer
+ * metrics
+ * 
  * @author Andres Salazar
  * @version $Revision$
  */
-public class AdminAssessServlet extends DSpaceServlet
-{
+public class AdminAssessServlet extends DSpaceServlet {
 	/** User selects show assessment result report */
-    public static final int SHOW_RESULTS = 10;
-	
-	/** User selects delete all assessment data */
-    public static final int DELETE_ASSESS = 15;
-	
-	/** assess completed successfully */
-    public static boolean ASSESS_SUCCESS = false;
-    
-    /** success status */
-    public static final String SUCCESS_STATUS = "Success";
-    
-    /** fail status */
-    public static final String FAIL_STATUS = "Fail";
-    
-    /** counter of assessed metrics */
-    private int metricsCounter = 0;
-    
-    /** variable to set results button in frontend */
-    private String enableResults = null;
-    
-    
-    /** Logger */
-    //private static Logger log = Logger.getLogger(EditCommunitiesServlet.class);
+	public static final int SHOW_RESULTS = 10;
 
-    protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-    	HttpSession session = request.getSession(false);
-    	
-    	if(session==null)
-    		JSPManager.showInternalError(request, response);
-    	
-    	Vector adminAvailAssess = (Vector)session.getAttribute("LOA.adminAvailAssess");
-    	
-    	int itemID = UIUtil.getIntParameter(request,"item_id");
-    	
-    	String assess2Perform = request.getParameter("admin_assess");
-    	
-    	int assessSize =  adminAvailAssess.size();
-    	
-    	Item item = Item.find(context, itemID);
-    	
-    	String handle = item.getHandle();
-    	
-    	double result = -1.0;
-		
-		if (assess2Perform == null)
-			JSPManager.showInternalError(request, response);		
-		
-		if (assess2Perform.equals("Availability"))
-		{
-			metricsCounter ++;
-			result = AvailabilityAssess.perform(item);
-			if (result >= 0.0)
-			{
-				ASSESS_SUCCESS = true;
-				request.setAttribute("task_result", new AssessResult("Availability", handle, SUCCESS_STATUS, new DecimalFormat("#.##").format(result) + ". " + AvailabilityAssess.getResults(item), ASSESS_SUCCESS));
-				Metric.addAssessValue(context, result, "Availability", 1, itemID);
-			}
-			else
-				request.setAttribute("task_result", new AssessResult("Availability", handle, FAIL_STATUS, null, ASSESS_SUCCESS));	
+	/** User selects delete all assessment data */
+	public static final int DELETE_ASSESS = 15;
+
+	/** assess completed successfully */
+	public static boolean ASSESS_SUCCESS = false;
+
+	/** success status */
+	public static final String SUCCESS_STATUS = "Success";
+
+	/** fail status */
+	public static final String FAIL_STATUS = "Fail";
+
+	/** Logger */
+	// private static Logger log =
+	// Logger.getLogger(EditCommunitiesServlet.class);
+
+	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException, SQLException, AuthorizeException {
+		HttpSession session = request.getSession(false);
+
+		if (session == null) {
+			JSPManager.showInternalError(request, response);
 		}
-		if (assess2Perform.equals("Coherence"))
-		{
-			metricsCounter ++;
+
+		Vector<String> adminAvailAssess = (Vector<String>) session.getAttribute("LOA.adminAvailAssess");
+		int itemID = UIUtil.getIntParameter(request, "item_id");
+		String assess2Perform = request.getParameter("admin_assess");
+		Item item = Item.find(context, itemID);
+		String handle = item.getHandle();
+		double result = -1.0;
+
+		if (assess2Perform == null)
+			JSPManager.showInternalError(request, response);
+
+		if (assess2Perform.equals("Availability")) {
+			result = AvailabilityAssess.perform(item);
+			if (result >= 0.0) {
+				ASSESS_SUCCESS = true;
+				request.setAttribute("task_result", new AssessResult("Availability", handle, SUCCESS_STATUS, new DecimalFormat(
+						"#.##").format(result) + ". " + AvailabilityAssess.getResults(item), ASSESS_SUCCESS));
+				Metric.addAssessValue(context, result, "Availability", 1, itemID);
+			} else
+				request.setAttribute("task_result", new AssessResult("Availability", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
+		}
+		if (assess2Perform.equals("Coherence")) {
 			try {
 				result = CoherenceAssess.perform(item);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (result >= 0.0)
-			{
+			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
-				request.setAttribute("task_result", new AssessResult("Coherence", handle, SUCCESS_STATUS, new DecimalFormat("#.##").format(result) + ". " + CoherenceAssess.getResults(item), ASSESS_SUCCESS));
+				request.setAttribute("task_result", new AssessResult("Coherence", handle, SUCCESS_STATUS, new DecimalFormat(
+						"#.##").format(result) + ". " + CoherenceAssess.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Coherence", 1, itemID);
-			}
-			else
+			} else {
 				request.setAttribute("task_result", new AssessResult("Coherence", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
-		}
-		if (assess2Perform.equals("Completeness"))
-		{
-			metricsCounter ++;
-			result = CompletenessAssess.perform(item);
-			if (result >= 0.0)
-			{
-				ASSESS_SUCCESS = true;		
-				request.setAttribute("task_result", new AssessResult("Completeness", handle, SUCCESS_STATUS, new DecimalFormat("#.##").format(result) + ". " + CompletenessAssess.getResults(item), ASSESS_SUCCESS));
-				Metric.addAssessValue(context, result, "Completeness", 1, itemID);
 			}
-			else
-				request.setAttribute("task_result", new AssessResult("Completeness", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
 		}
-		if (assess2Perform.equals("Consistency"))
-		{
-			metricsCounter ++;
+		if (assess2Perform.equals("Completeness")) {
+			result = CompletenessAssess.perform(item);
+			if (result >= 0.0) {
+				ASSESS_SUCCESS = true;
+				request.setAttribute("task_result", new AssessResult("Completeness", handle, SUCCESS_STATUS, new DecimalFormat(
+						"#.##").format(result) + ". " + CompletenessAssess.getResults(item), ASSESS_SUCCESS));
+				Metric.addAssessValue(context, result, "Completeness", 1, itemID);
+			} else {
+				request.setAttribute("task_result", new AssessResult("Completeness", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
+			}
+		}
+		if (assess2Perform.equals("Consistency")) {
 			try {
 				result = ConsistencyAssess.perform(item);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			if (result >= 0.0)
-			{
+
+			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
-				request.setAttribute("task_result", new AssessResult("Consistency", handle, SUCCESS_STATUS, new DecimalFormat("#.##").format(result) + ". " + ConsistencyAssess.getResults(item), ASSESS_SUCCESS));
+				request.setAttribute("task_result", new AssessResult("Consistency", handle, SUCCESS_STATUS, new DecimalFormat(
+						"#.##").format(result) + ". " + ConsistencyAssess.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Consistency", 1, itemID);
-			}
-			else
+			} else {
 				request.setAttribute("task_result", new AssessResult("Consistency", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
+			}
 		}
-		if (assess2Perform.equals("Reusability"))
-		{
-			metricsCounter ++;
+		if (assess2Perform.equals("Reusability")) {
 			result = ReusabilityAssess.perform(item);
-			if (result >= 0.0)
-			{
+			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
-				request.setAttribute("task_result", new AssessResult("Reusability", handle, SUCCESS_STATUS, new DecimalFormat("#.##").format(result) + ". " + ReusabilityAssess.getResults(item), ASSESS_SUCCESS));
+				request.setAttribute("task_result", new AssessResult("Reusability", handle, SUCCESS_STATUS, new DecimalFormat(
+						"#.##").format(result) + ". " + ReusabilityAssess.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Reusability", 1, itemID);
-			}
-			else
+			} else {
 				request.setAttribute("task_result", new AssessResult("Reusability", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
-		}
-		if (assess2Perform.equals("Visibility"))
-		{
-			metricsCounter ++;
-			result = VisibilityAssess.perform(context, item);
-			if (result >= 0.0)
-			{
-				ASSESS_SUCCESS = true;
-				request.setAttribute("task_result", new AssessResult("Visibility", handle, SUCCESS_STATUS, new DecimalFormat("#.##").format(result) + ". " + VisibilityAssess.getResults(context, item), ASSESS_SUCCESS));
-				Metric.addAssessValue(context, result, "Visibility", 1, itemID);
 			}
-			else
+		}
+		if (assess2Perform.equals("Visibility")) {
+			result = VisibilityAssess.perform(context, item);
+			if (result >= 0.0) {
+				ASSESS_SUCCESS = true;
+				request.setAttribute("task_result", new AssessResult("Visibility", handle, SUCCESS_STATUS, new DecimalFormat(
+						"#.##").format(result) + ". " + VisibilityAssess.getResults(context, item), ASSESS_SUCCESS));
+				Metric.addAssessValue(context, result, "Visibility", 1, itemID);
+			} else {
 				request.setAttribute("task_result", new AssessResult("Visibility", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
+			}
 		}
-		 
-		if (metricsCounter >= assessSize)
-			enableResults = "Y";
-		else
-			enableResults = "N";
-				
+
 		session.setAttribute("LOA.adminAvailAssess", adminAvailAssess);
-		
-		request.setAttribute("enaRstBtn", enableResults);
 		request.setAttribute("item", item);
-		
-		JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");		
-    }
-
-	protected void doDSPost(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {
-		HttpSession session = request.getSession(false);
-    	
-    	if(session==null)
-    		JSPManager.showInternalError(request, response);
-		
-    	int action = UIUtil.getIntParameter(request, "action");
-    	
-    	int itemID = UIUtil.getIntParameter(request,"item_id");
-		Item item = Item.find(context, itemID);
-		
-		switch (action)
-		{
-		
-			case SHOW_RESULTS:
-				
-				double adminIndex, expIndex, stdIndex, totalIndex;
-				boolean metricIsNull = false;
-				
-				Vector assessParamList = AssessItemServlet.loadAssessParam(context, request, response, itemID);
-				Vector results = new Vector();
-				
-				if(assessParamList != null && !assessParamList.isEmpty())
-				{
-					for (int i = 0;i < assessParamList.size(); i++)
-		    		{
-		    			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-		    			
-		    			if (assessParam.getMetricValue() == null)
-		    				metricIsNull = true;
-		    			else{
-		    				String dimensionName, metricName, mtrVal, data = null;
-		    				double metricValue = 0;
-		    				
-		    				dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-							metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-							metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
-							mtrVal = new DecimalFormat("###.##").format(metricValue);
-		    				data = assessParam.getLayerID() + "," + dimensionName + "," + metricName + "," + mtrVal;
-		    				results.addElement(data);
-		    					
-		    				session.setAttribute("LOA.results", results);
-		    			}
-		    		}
-				}
-				
-				request.setAttribute("item", item);
-				
-				if (metricIsNull)
-					JSPManager.showJSP(request, response, "/tools/layer-index-error.jsp");
-				else{
-					adminIndex = calculateLayerIndex(assessParamList, 1);
-					expIndex = calculateLayerIndex(assessParamList, 2);
-					stdIndex = calculateLayerIndex(assessParamList, 3);
-					int indexID = Layer.findIndexByItem(context, itemID);
-					if (indexID > 0)
-					{
-						totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
-						Layer.updateAssessIndexes(context, adminIndex, expIndex, stdIndex, totalIndex, indexID);
-					}else{
-						totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
-						try {
-							Layer.addAssessIndexes(context, itemID, adminIndex, expIndex, stdIndex, totalIndex);
-						} catch (SQLException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					
-					if (adminIndex != 0){
-						adminIndex = adminIndex * 100;
-						String admIndex = new DecimalFormat("###").format(adminIndex);
-						request.setAttribute("adminIndex", admIndex);
-					}
-						
-					if (expIndex != 0)
-					{
-						expIndex = expIndex * 100;
-						String expertIndex = new DecimalFormat("###").format(expIndex);
-						request.setAttribute("expIndex", expertIndex);
-					}
-						
-					if (stdIndex != 0)
-					{
-						stdIndex = stdIndex * 100;
-						String stuIndex = new DecimalFormat("###").format(stdIndex);
-						request.setAttribute("stdIndex", stuIndex);
-					}
-					
-					String totIndex = new DecimalFormat("##.##").format(totalIndex);
-					request.setAttribute("totalIndex", totIndex);
-					
-					JSPManager.showJSP(request, response, "/tools/results-report.jsp");
-				}
-				
-			break;
-			
-			case DELETE_ASSESS:
-				
-				request.setAttribute("item", item);
-
-				if (request.getParameter("submit_no") != null)
-				            JSPManager.showJSP(request, response, "/tools/param-form.jsp");
-				else{
-					int layerDel = Layer.DeleteAssessIndexes(context, itemID);
-					int dimDel = Dimension.DeleteAssessWeights(context, itemID);
-					int metDel = Metric.DeleteAssessValues(context, itemID);
-					
-					if ((layerDel + dimDel + metDel) > 0)
-						JSPManager.showJSP(request, response, "/tools/success-page.jsp");
-				}
-				
-			break;
-			
-		}
-			
-    }
-
-	public double calculateLayerIndex(Vector assessParamList, int layerID)
-	{
-		double metricValue,dimWght;
-		double layerIndex = 0.0;
-		
-		double cont = 0.0;
-		double ctxt = 0.0;
-		double edu = 0.0;
-		double est = 0.0;
-		double fun = 0.0;
-		double met = 0.0;
-		
-		double contSum = 0.0;
-		double ctxtSum = 0.0;
-		double eduSum = 0.0;
-		double estSum = 0.0;
-		double funSum = 0.0;
-		double metSum = 0.0;
-		
-		int contCount = 0;
-		int ctxtCount = 0;
-		int eduCount = 0;
-		int estCount = 0;
-		int funCount = 0;
-		int metCount = 0;
-		
-		if(assessParamList != null && !assessParamList.isEmpty())
-		{
-			for (int i = 0;i < assessParamList.size(); i++)
-    		{
-    			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-    			
-    			if (assessParam.getLayerID() == layerID)
-		    	{
-    				if (layerID == 1)
-    				{
-        				if (assessParam.getDimID() == 2)
-        				{
-        					ctxtCount ++;
-        					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-        					ctxtSum += metricValue;
-        					dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-        					ctxt = (ctxtSum / ctxtCount) * dimWght;
-        				}
-        				if (assessParam.getDimID() == 5)
-        				{
-        					funCount ++;
-        					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-        					funSum += metricValue;
-        					dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-        					fun = (funSum / funCount) * dimWght;
-        				}
-        				if (assessParam.getDimID() == 6)
-        				{
-        					metCount ++;
-        					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-        					metSum += metricValue;
-        					dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-        					met = (metSum / metCount) * dimWght;
-        				}
-        				
-        				layerIndex = ctxt + fun + met;
-    					
-    				}
-    				
-    				if (layerID == 2)
-    				{
-    					if (assessParam.getDimID() == 1)
-    					{
-    						contCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						contSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						cont = (contSum / contCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 3)
-    					{
-    						eduCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						eduSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						edu = (eduSum / eduCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 4)
-    					{
-    						estCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						estSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						est = (estSum / estCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 5)
-    					{
-    						funCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						funSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						fun = (funSum / funCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 6)
-    					{
-    						metCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						metSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						met = (metSum / metCount) * dimWght;
-    					}
-    					
-    					layerIndex = cont + edu + est + fun + met;
-    				
-    				}
-    				
-    				if (layerID == 3)
-    				{
-    					if (assessParam.getDimID() == 2)
-    					{
-    						ctxtCount ++;
-        					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-        					ctxtSum += metricValue;
-        					dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-        					ctxt = (ctxtSum / ctxtCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 3)
-    					{
-    						eduCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						eduSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						edu = (eduSum / eduCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 4)
-    					{
-    						estCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						estSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						est = (estSum / estCount) * dimWght;	
-    					}
-    					if (assessParam.getDimID() == 5)
-    					{
-    						funCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						funSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						fun = (funSum / funCount) * dimWght;
-    					}
-    					if (assessParam.getDimID() == 6)
-    					{
-    						metCount ++;
-    						metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-    						metSum += metricValue;
-    						dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-    						met = (metSum / metCount) * dimWght;
-    					}
-    					
-    					layerIndex = ctxt + edu + est + fun + met;
-    					
-    				}	
-		    	}
-    		}
-		}
-		
-		return layerIndex;
-		
+		JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");
 	}
-	
-	public double calculateTotalIndex(Context context, double adminIndex,
-			double expIndex, double stdIndex, int itemID) {
-		// TODO Auto-generated method stub
+
+	protected void doDSPost(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException, SQLException, AuthorizeException {
+		HttpSession session = request.getSession(false);
+
+		if (session == null) {
+			JSPManager.showInternalError(request, response);
+		}
+
+		int action = UIUtil.getIntParameter(request, "action");
+		int itemID = UIUtil.getIntParameter(request, "item_id");
+		Item item = Item.find(context, itemID);
+
+		switch (action) {
+
+		case SHOW_RESULTS:
+
+			double adminIndex,
+			expIndex,
+			stdIndex,
+			totalIndex;
+
+			Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemID);
+			Vector<String> results = new Vector<String>();
+
+			if (assessParamList != null) {
+				for (int i = 0; i < assessParamList.size(); i++) {
+					AssessParam assessParam = assessParamList.elementAt(i);
+					if (assessParam.getMetricValue() == null || assessParam.getMetricValue().length() == 0) {
+						continue;
+					}
+					String dimensionName;
+					String metricName;
+					String mtrVal;
+					String data;
+					double metricValue = 0;
+					dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
+					metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
+					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
+					mtrVal = new DecimalFormat("###.##").format(metricValue);
+					data = assessParam.getLayerID() + "," + dimensionName + "," + metricName + "," + mtrVal;
+					results.addElement(data);
+				}
+			}
+
+			session.setAttribute("LOA.results", results);
+			request.setAttribute("item", item);
+
+			adminIndex = calculateLayerIndex(assessParamList, 1);
+			expIndex = calculateLayerIndex(assessParamList, 2);
+			stdIndex = calculateLayerIndex(assessParamList, 3);
+			totalIndex = calculateTotalIndex(context, adminIndex, expIndex, stdIndex, itemID);
+			int indexID = Layer.findIndexByItem(context, itemID);
+			if (indexID > 0) {
+				Layer.updateAssessIndexes(context, adminIndex, expIndex, stdIndex, totalIndex, indexID);
+			} else {
+				try {
+					Layer.addAssessIndexes(context, itemID, adminIndex, expIndex, stdIndex, totalIndex);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			DecimalFormat decimalFormat = new DecimalFormat("###");
+			String admIndexString = adminIndex != 0 ? decimalFormat.format(adminIndex * 100) : "";
+			String expIndexString = expIndex != 0 ? decimalFormat.format(expIndex * 100) : "";
+			String stdIndexString = stdIndex != 0 ? decimalFormat.format(stdIndex * 100) : "";
+			Map<String, String> layerIndexes = new HashMap<String, String>();
+			layerIndexes.put("1", admIndexString);
+			layerIndexes.put("2", expIndexString);
+			layerIndexes.put("3", stdIndexString);
+			request.setAttribute("layerIndexes", layerIndexes);
+
+			String totIndex = new DecimalFormat("##.##").format(totalIndex);
+			request.setAttribute("totalIndex", totIndex);
+
+			JSPManager.showJSP(request, response, "/tools/results-report.jsp");
+
+			break;
+
+		case DELETE_ASSESS:
+
+			request.setAttribute("item", item);
+			int layerDel = Layer.DeleteAssessIndexes(context, itemID);
+			int dimDel = Dimension.DeleteAssessWeights(context, itemID);
+			int metDel = Metric.deleteAssessValues(context, itemID);
+
+			if ((layerDel + dimDel + metDel) > 0) {
+				JSPManager.showJSP(request, response, "/tools/success-page.jsp");
+			}
+			break;
+
+		}
+
+	}
+
+	public double calculateLayerIndex(Vector<AssessParam> assessParamList, int layerID) {
+
+		double metricValue, dimWght;
+		double layerIndex = 0.0;
+
+		Map<String, double[]> dimensionData = new HashMap<String, double[]>();
+		dimensionData.put("1", new double[3]);
+		dimensionData.put("2", new double[3]);
+		dimensionData.put("3", new double[3]);
+		dimensionData.put("4", new double[3]);
+		dimensionData.put("5", new double[3]);
+		dimensionData.put("6", new double[3]);
+
+		// work out total value per dimension using weight set by administrator
+		if (assessParamList != null) {
+			for (int i = 0; i < assessParamList.size(); i++) {
+				AssessParam assessParam = assessParamList.elementAt(i);
+				if (assessParam.getLayerID() == layerID) {
+					if (assessParam.getMetricValue() == null || assessParam.getMetricValue().length() == 0) {
+						continue;
+					}
+					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
+					String dimId = String.valueOf(assessParam.getDimID());
+					double values[] = dimensionData.get(dimId);
+					values[0] += 1;
+
+					values[1] += metricValue;
+					dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
+					values[2] = (values[1] / values[0]) * dimWght;
+					dimensionData.put(dimId, values);
+				}
+			}
+
+			for (double[] values : dimensionData.values()) {
+				layerIndex = layerIndex + values[2];
+			}
+		}
+		return layerIndex;
+
+	}
+
+	public double calculateTotalIndex(Context context, double adminIndex, double expIndex, double stdIndex, int itemID) {
 		double totIndex = 0.0;
-		
+
 		if (adminIndex > 0 && expIndex > 0 && stdIndex > 0)
 			totIndex = (adminIndex * 0.5) + (expIndex * 0.3) + (stdIndex * 0.2);
 		else if (adminIndex > 0 && expIndex > 0)
@@ -504,11 +317,10 @@ public class AdminAssessServlet extends DSpaceServlet
 			totIndex = expIndex;
 		else if (stdIndex > 0)
 			totIndex = stdIndex;
-		
+
 		totIndex = totIndex * 10;
-			
+
 		return totIndex;
 	}
 
 }
-  

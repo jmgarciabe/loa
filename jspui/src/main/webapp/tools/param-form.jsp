@@ -72,15 +72,16 @@
 
 			</div>
 			<br>
-			<div class="btn-group pull-left" role="group" aria-label="...">
+			<div class="pull-left">
 				<input class="btn btn-success btn-lg" type="submit" name="send_assess" value="Send" />
 			</div>
 		</form>
 
-		<div class="btn-group pull-left" style="padding-left: 5px;" role="group" aria-label="...">
-			<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
+		<div class="pull-left" style="padding-left: 5px;">
+			<form method="get" action="<%= request.getContextPath() %>/tools/LOAssessment">
+				<input type="hidden" name="item_id" value="<%= item.getID() %>" />
 				<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
-					value="<fmt:message key="jsp.tools.general.cancel"/>" />
+					value="Volver" />
 			</form>
 		</div>
 	</div>

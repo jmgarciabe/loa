@@ -71,7 +71,7 @@
 						<p>How likely is it that learning object does not require additional software or devices
 							when accessing it?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="acs1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="acs1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="acs1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="acs1" value="3">Average
@@ -83,7 +83,7 @@
 						<p>To what extent the resource is working properly and is easy for the user to visualize
 							it from different platforms?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="acs2" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="acs2" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="acs2" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="acs2" value="3">Average
@@ -107,7 +107,7 @@
 					<div class="panel-body">
 						<p>To what extent the metadata actually describes content found?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="acc1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="acc1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="acc1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="acc1" value="3">Average
@@ -132,7 +132,7 @@
 					<div class="panel-body">
 						<p>The metadata describe completely the learning object?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="com1" value="1">Yes
+						<label class="radio-inline"> <input type="radio" name="com1" value="5" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="com1" value="0">No
 						</label>
 						<br>
@@ -152,7 +152,7 @@
 					<div class="panel-body">
 						<p>To what level of clarity has user for using the learning object?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="eou1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="eou1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="eou1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="eou1" value="3">Average
@@ -163,7 +163,7 @@
 						<br><br>
 						<p>How would you rate the relation between needs and help provided?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="eou2" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="eou2" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="eou2" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="eou2" value="3">Average
@@ -189,7 +189,7 @@
 						<p>To what level is possible to identify educational objectives that is intended to reach
 							with the learning object?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="poe1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="poe1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="poe1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="poe1" value="3">Average
@@ -200,7 +200,7 @@
 						<br><br>
 						<p>To what extent object's structure and content are supporting topic's learning?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="poe2" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="poe2" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="poe2" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="poe2" value="3">Average
@@ -224,7 +224,7 @@
 					<div class="panel-body">
 						<p>How likely is it that learning object can be used in various educational contexts?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="reu1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="reu1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="reu1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="reu1" value="3">Average
@@ -234,7 +234,7 @@
 						</label><br><br>
 						<p>To what level learning object is self-contained and does not require any dependencies?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="reu2" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="reu2" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="reu2" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="reu2" value="3">Average
@@ -259,7 +259,7 @@
 						<p>To what level the content that is shown is clear, coherent, complete, impartial and
 							accomplishes with author's rights?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="rar1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="rar1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="rar1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="rar1" value="3">Average
@@ -269,7 +269,7 @@
 						</label><br><br>
 						<p>To what level the content that is shown have ortographic and gramatical errors?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="rar2" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="rar2" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="rar2" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="rar2" value="3">Average
@@ -294,13 +294,13 @@
 						<p>Distribution and size of graphical elements, visual hierarchy, letter design and
 							contrast of colors is appropiate?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="vid1" value="1">Yes
+						<label class="radio-inline"> <input type="radio" name="vid1" value="5" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="vid1" value="0">No
 						</label><br><br>
 						<p>Election of texts, images, sounds or other multimedia elements contributes to learning
 							objectives?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="vid2" value="1">Yes
+						<label class="radio-inline"> <input type="radio" name="vid2" value="5" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="vid2" value="0">No
 						</label><br>
 					</div>

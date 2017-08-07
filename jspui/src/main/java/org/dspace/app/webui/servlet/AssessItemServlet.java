@@ -30,42 +30,27 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.Dimension;
-import org.dspace.loa.Layer;
 import org.dspace.loa.Metric;
 
 /**
  * Servlet for initiate parameters for LOA's assessment
- *
+ * 
  * @author Andres Salazar
  * @version $Revision$
  */
-public class AssessItemServlet extends DSpaceServlet
-{	
-    /** Logger */
-    private static Logger log = Logger.getLogger(AssessItemServlet.class);
+public class AssessItemServlet extends DSpaceServlet {
+	/** Logger */
+	private static Logger log = Logger.getLogger(AssessItemServlet.class);
 
-    
-    protected void doDSGet(Context context, HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException,
-            SQLException, AuthorizeException
-    {   	
-    	try
-		{
-			//Continue if logged in or startAuthentication finds a user;
-			//otherwise it will issue redirect so just return
-			
-			if (context.getCurrentUser() != null ||
-				Authenticate.startAuthentication(context,request,response))
-			{
-				//User is authenticated
-				
-				/*
-				* GET with no parameters displays "find by handle/id" form parameter
-				* item_id -> find and edit item with internal ID item_id parameter
-				* handle -> find and edit corresponding item if internal ID or Handle
-				* are invalid, "find by handle/id" form is displayed again with error
-				* message
-				*/
+	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
+			IOException, SQLException, AuthorizeException {
+		try {
+			// Continue if logged in or startAuthentication finds a user;
+			// otherwise it will issue redirect so just return
+
+			if (context.getCurrentUser() != null || Authenticate.startAuthentication(context, request, response)) {
+				// User is authenticated
+
 				int itemID = UIUtil.getIntParameter(request, "item_id");
 				String handle = request.getParameter("handle");
 				boolean showError = false;
@@ -73,25 +58,19 @@ public class AssessItemServlet extends DSpaceServlet
 				// See if an item ID or Handle was passed in
 				Item itemToAssess = null;
 
-				if (itemID > 0)
-				{
+				if (itemID > 0) {
 					itemToAssess = Item.find(context, itemID);
 
 					showError = (itemToAssess == null);
-				}
-				else if ((handle != null) && !handle.equals(""))
-				{
+				} else if ((handle != null) && !handle.equals("")) {
 					// resolve handle
 					DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
 
 					// make sure it's an ITEM
-					if ((dso != null) && (dso.getType() == Constants.ITEM))
-					{
+					if ((dso != null) && (dso.getType() == Constants.ITEM)) {
 						itemToAssess = (Item) dso;
 						showError = false;
-					}
-					else
-					{
+					} else {
 						showError = true;
 					}
 				}
@@ -99,231 +78,137 @@ public class AssessItemServlet extends DSpaceServlet
 				// Show initial parameters form if appropriate
 				if (itemToAssess != null)
 					showAssessForm(context, request, response, itemToAssess);
-				else
-				{
+				else {
 					if (showError)
 						request.setAttribute("invalid.id", Boolean.TRUE);
 
 					JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
-				}				
-					
+				}
+
 			}
-		}
-		catch (SQLException se)
-		{
-			//log.warn(LogManager.getHeader(context, "database_error", se
-                    //.toString()), se);
+		} catch (SQLException se) {
+			// log.warn(LogManager.getHeader(context, "database_error", se
+			// .toString()), se);
 			JSPManager.showInternalError(request, response);
 		}
-    }
-    
-	public static Vector getDimensions(Context context, Vector assessParamList, int layerId) {
-		// TODO Auto-generated method stub
-		Vector ckDimensions = new Vector();
-		String dimensionName = null;
-		
-		if (assessParamList != null && !assessParamList.isEmpty())
-		{
-			for (int i = 0;i < assessParamList.size();i ++)
-    		{
-    			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-    			if (assessParam.getLayerID() == layerId)
-    			{
-    				try {
-    					dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-    				} catch (SQLException e) {
-    					// TODO Auto-generated catch block
-    					e.printStackTrace();
-    				}
-					
-        			if(!ckDimensions.contains(dimensionName) && dimensionName != null)
-        				ckDimensions.addElement(dimensionName);
-    			}	
-    		}
-		}
-		
-		return ckDimensions;
 	}
-    
-    
-    public static String getListOptions(String option)
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("<option value=\"").append(option).append("\">")
-        .append(option).append("</option>\n");
-		
-		return sb.toString();
-	}
-    
-    public static Vector getMetrics(Context context, Vector assessParamList, int layerId) {
-		// TODO Auto-generated method stub
-		Vector ckmetrics = new Vector();
-		String metricName = null;
-				
-		if (assessParamList != null && !assessParamList.isEmpty())
-		{
-			for (int i = 0;i < assessParamList.size();i ++)
-		    {
-		    	AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-		    	if (assessParam.getLayerID() == layerId)
-		    	{
-		    		try {
-		    			metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-		    		} catch (SQLException e) {
-		    			// TODO Auto-generated catch block
-		    			e.printStackTrace();
-		    		}
-		    				
-		        	if(!ckmetrics.contains(metricName) && metricName != null)
-		        		ckmetrics.addElement(metricName);
-		    	}	
-		    }
-		}
-				
-		return ckmetrics;
-	}
-    
-	/**
-     * Loads assessment parametrization for the item passed, if any
-     *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            the HTTP request containing posted info
-     * @param response
-     *            the HTTP response
-     * @param item ID
-     *            the item id
-     */
-    public static Vector<AssessParam> loadAssessParam(Context context, HttpServletRequest request,
-			HttpServletResponse response, int itemID) throws SQLException
-    {
-    	HttpSession session = request.getSession(false);
-
-    	if(session==null)
-    	{
-    		try {
-    			JSPManager.showInternalError(request, response);
-    		} catch (ServletException e) {
-    			e.printStackTrace();
-    		} catch (IOException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}
-    	}
-
-    	Vector<AssessParam> initParamList = AssessParam.findParam(context, itemID);
-    	session.setAttribute("LOA.initParamList", initParamList);
-    	return initParamList;
-	}
-    
-	
 	
 	/**
-     * Shows the item assessment parametrization form for a particular item
-     *
-     * @param context
-     *            DSpace context
-     * @param request
-     *            the HTTP request containing posted info
-     * @param response
-     *            the HTTP response
-     * @param item
-     *            the item to assess 
-     */
-    private void showAssessForm(Context context, HttpServletRequest request,
-            HttpServletResponse response, Item item) throws ServletException,
-            IOException, SQLException, AuthorizeException
-    { 
-    	HttpSession session = request.getSession(false);
-    	
-    	if(session==null)
-    	{
-    		JSPManager.showInternalError(request, response);
-    	}
-      	
-      	Vector adminAssessOpt = (Vector)session.getAttribute("LOA.adminAssessOpt");
-      	
-      	Vector parameterizedDimensions = (Vector)session.getAttribute("LOA.paramDimensions");
-      	
-      	Vector parameterizedMetrics = (Vector)session.getAttribute("LOA.paraMetrics");
-      	
-      	if (adminAssessOpt == null)
-      		//add first administrator assess options to the front-end
-        	adminAssessOpt = new Vector();
-        else
-        	// if adminassessOpt list has been already invoked 
-        	adminAssessOpt.clear();
-        
-      	String layer = null;
-      	Layer[] layersRetrieved = Layer.findAllLayers(context);
-      	
-      	for (int i = 0;i < layersRetrieved.length;i ++)
-      	{
-      		layer = layersRetrieved[i].getName();
-      		String layerOptions = getListOptions(layer);
-      		if(!adminAssessOpt.contains(layerOptions))
-				adminAssessOpt.addElement(layerOptions);
-      	}
-      	
-      	Vector assessParam = loadAssessParam(context, request, response, item.getID());
-      	request.setAttribute("item", item);
-      	
-		/*
-		*Depending on the group that the authenticated user belongs to, the system
-		*will display the appropiate view. We have three groups by default to verify
-		*the membership of the user (1-Administrator, 2-Expert People, 3-Students group).
-		*/
-		
-		if (AuthorizeManager.isAdmin(context))
-		{
-			//User is a repository administrator
-			session.setAttribute("LOA.adminAssessOpt", adminAssessOpt);
-			JSPManager.showJSP(request, response, "/tools/param-form.jsp");
+	 * Shows the item assessment parametrization form for a particular item
+	 * 
+	 * @param context
+	 *            DSpace context
+	 * @param request
+	 *            the HTTP request containing posted info
+	 * @param response
+	 *            the HTTP response
+	 * @param item
+	 *            the item to assess
+	 */
+	private void showAssessForm(Context context, HttpServletRequest request, HttpServletResponse response, Item item)
+			throws ServletException, IOException, SQLException, AuthorizeException {
+		HttpSession session = request.getSession(false);
+
+		if (session == null) {
+			JSPManager.showInternalError(request, response);
 		}
-		else if (Group.isMember(context, 2))
-		{
-			//User is an expert
-			if(parameterizedDimensions == null)
-				parameterizedDimensions = getDimensions(context, assessParam, 2);
-	        else{
-	        	parameterizedDimensions.clear();
-	        	parameterizedDimensions = getDimensions(context, assessParam, 2);
-	        }
+
+		request.setAttribute("item", item);
 			
+
+		/*
+		 * Depending on the group that the authenticated user belongs to, the
+		 * systemwill display the appropiate view. We have three groups by
+		 * default to verifythe membership of the user (1-Administrator,
+		 * 2-Expert People, 3-Students group).
+		 */
+
+		if (AuthorizeManager.isAdmin(context)) {
+			// User is a repository administrator
+			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 1);
+			Vector<String> parameterizedMetrics = getMetrics(context, assessParam, 1);
+			String processMessage = "";
+			if(parameterizedMetrics.isEmpty()){
+				processMessage = "Parameters must be set prior to assessment process. Please use the link below in order to set parameters for this assessment.";
+			}
+			session.setAttribute("LOA.adminAvailAssess", parameterizedMetrics);
+			session.setAttribute("LOA.processMessage", processMessage);
+			JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");
+			
+		} else if (Group.isMember(context, 2)) {
+			//User is an admin
+			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 2);
+			Vector<String> parameterizedDimensions = getDimensions(context, assessParam, 2);
+
 			if (parameterizedDimensions.isEmpty())
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
-			else{
-				//show expert assessment page
+			else {
+				// show expert assessment page
 				session.setAttribute("LOA.paramDimensions", parameterizedDimensions);
 				JSPManager.showJSP(request, response, "/tools/qualify-expert.jsp");
 			}
-		}
-		else if (Group.isMember(context, 3))
-		{
-			//User is a student
-			if(parameterizedMetrics == null)
-				parameterizedMetrics = getMetrics(context, assessParam, 3);
-	        else{
-	        	parameterizedMetrics.clear();
-	        	parameterizedMetrics = getMetrics(context, assessParam, 3);
-	        }
+		} else if (Group.isMember(context, 3)) {
+			// User is a student
+			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 3);
+			Vector<String> parameterizedMetrics = getMetrics(context, assessParam, 3); 
 			
 			if (parameterizedMetrics.isEmpty())
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
-			else{
-				//show student assessment page
+			else {
+				// show student assessment page
 				session.setAttribute("LOA.paraMetrics", parameterizedMetrics);
 				JSPManager.showJSP(request, response, "/tools/student-survey.jsp");
 			}
-						
+
+		} else {
+			// User doesn't belong to any privileged group that is allowed to
+			// use this function, show a dialog
+			JSPManager.showAuthorizeError(request, response, null);
+			throw new AuthorizeException("Only system admins are allowed to perform item assessment over the site");
 		}
-		else
-		{
-			//User doesn't belong to any privileged group that is allowed to use this function, show a dialog
-            JSPManager.showAuthorizeError(request, response, null);
-            throw new AuthorizeException("Only system admins are allowed to perform item assessment over the site");
+
+	}
+	
+	private Vector<String> getDimensions(Context context, Vector<AssessParam> assessParamList, int layerId) {
+		Vector<String> ckDimensions = new Vector<String>();
+		String dimensionName = null;
+
+		if (assessParamList != null){
+			for (int i = 0; i < assessParamList.size(); i++) {
+				AssessParam assessParam = assessParamList.elementAt(i);
+				if (assessParam.getLayerID() == layerId) {
+					try {
+						dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					if (!ckDimensions.contains(dimensionName))
+						ckDimensions.addElement(dimensionName);
+				}
+			}
 		}
-		
-    }
+
+		return ckDimensions;
+	}
+
+	public static Vector<String> getMetrics(Context context, Vector<AssessParam> assessParamList, int layerId) {
+		Vector<String> ckmetrics = new Vector<String>();
+		String metricName = null;
+		if (assessParamList != null) {
+			for (int i = 0; i < assessParamList.size(); i++) {
+				AssessParam assessParam = assessParamList.elementAt(i);
+				if (assessParam.getLayerID() == layerId) {
+					try {
+						metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+					if (!ckmetrics.contains(metricName))
+						ckmetrics.addElement(metricName);
+				}
+			}
+		}
+		return ckmetrics;
+	}
+
 }

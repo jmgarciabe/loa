@@ -58,27 +58,22 @@ public class Dimension extends DSpaceObject {
 	 */
 	public static void addDimensionWeight(Context context, int dimID, int layID, int itemID, String dimWeight)
 			throws SQLException {
-		try {
-			// Verificar si ya existe la fila y actualizarla o crearla
-			TableRow row;
-			String query = "select * from dimension_weighting where layer_id = ?" + " and dimension_id = ? and item_id = ? ";
+		// Verificar si ya existe la fila y actualizarla o crearla
+		TableRow row;
+		String query = "select * from dimension_weighting where layer_id = ?" + " and dimension_id = ? and item_id = ? ";
 
-			row = DatabaseManager.querySingleTable(context, "dimension_weighting", query, layID, dimID, itemID);
-			if (row == null) {
-				row = DatabaseManager.create(context, "dimension_weighting");
-				row.setColumn("layer_id", layID);
-				row.setColumn("dimension_id", dimID);
-				row.setColumn("item_id", itemID);
+		row = DatabaseManager.querySingleTable(context, "dimension_weighting", query, layID, dimID, itemID);
+		if (row == null) {
+			row = DatabaseManager.create(context, "dimension_weighting");
+			row.setColumn("layer_id", layID);
+			row.setColumn("dimension_id", dimID);
+			row.setColumn("item_id", itemID);
 
-			}
-			row.setColumn("admin_weight", dimWeight);
-			DatabaseManager.update(context, row);
-			// Make sure all changes are committed
-			context.commit();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		row.setColumn("admin_weight", dimWeight);
+		DatabaseManager.update(context, row);
+		// Make sure all changes are committed
+		context.commit();
 
 	}
 
@@ -89,23 +84,33 @@ public class Dimension extends DSpaceObject {
 	 *            DSpace context object
 	 */
 	public static int DeleteAssessWeights(Context context, int itemID) throws SQLException {
-		int rowsAffected = 0;
-
 		String dbquery = "DELETE FROM dimension_weighting " + "WHERE item_id = ? ";
-
-		try {
-			// Deletes rows with data from frontend
-			rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
-
-			// Make sure all changes are committed
-			context.commit();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		// Deletes rows with data from frontend
+		int rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
+		// Make sure all changes are committed
+		context.commit();
 		return rowsAffected;
 	}
+	
+	
+	/**
+	 * Deletes all dimension weightings for a given layer and item
+	 * @param context DSpace Context
+	 * @param itemId item id 
+	 * @param layerId layer id
+	 * @return
+	 * @throws SQLException
+	 */
+	public static int DeleteWeightsById(Context context, int itemId, int layerId) throws SQLException {
+		String dbquery = "DELETE FROM dimension_weighting WHERE item_id = ? AND layer_id = ? ";
+		// Deletes rows with data from frontend
+		int rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemId, layerId);
+		// Make sure all changes are committed
+		context.commit();
+		return rowsAffected;
+	}
+	
+	
 
 	/**
 	 * Finds all dimensions attached to a specific layer - assumes name is
@@ -131,9 +136,9 @@ public class Dimension extends DSpaceObject {
 				TableRow row = dRows.get(i);
 				// First check the cache
 				Dimension fromCache = (Dimension) context.fromCache(Dimension.class, row.getIntColumn("dimension_id"));
-				if (fromCache != null){
+				if (fromCache != null) {
 					dimensions[i] = fromCache;
-				}else{
+				} else {
 					dimensions[i] = new Dimension(context, row);
 				}
 			}
@@ -155,46 +160,12 @@ public class Dimension extends DSpaceObject {
 	 */
 	public static String findNameByID(Context context, int dimID) throws SQLException {
 		String dbquery = "SELECT dimension_name FROM dimension " + "WHERE dimension_id = ? ";
-
 		TableRow row = DatabaseManager.querySingle(context, dbquery, dimID);
-
-		try {
-			String dimensionName = row.getStringColumn("dimension_name");
-			return dimensionName;
-		} finally {
-
-		}
+		String dimensionName = row.getStringColumn("dimension_name");
+		return dimensionName;
 	}
 
-	/**
-	 * updates dimension weight in DB attached to an item
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 * @param dimWghtID
-	 * @param itemID
-	 * @param weight
-	 */
-	public static void updateDimensionWeight(Context context, int dimWghtID, int itemID, String weight) {
-		// TODO Auto-generated method stub
-		String dbquery = "SELECT * FROM dimension_weighting " + "WHERE dimension_weighting_id = ? " + "AND item_id = ? ";
-
-		try {
-			TableRow updateable = DatabaseManager.querySingle(context, dbquery, dimWghtID, itemID);
-			updateable.setTable("dimension_weighting");
-			updateable.setColumn("admin_weight", weight);
-
-			// Save changes to the database
-			DatabaseManager.update(context, updateable);
-
-			// Make sure all changes are committed
-			context.commit();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
+	
 	/**
 	 * updates expert weight in DB attached to a dimension
 	 * 
@@ -215,7 +186,7 @@ public class Dimension extends DSpaceObject {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public int getID() {
 		return ID;
 	}

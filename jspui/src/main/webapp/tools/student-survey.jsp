@@ -70,7 +70,7 @@
 					<div class="panel-body">
 						<p>Can you access to the learning object content?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="ava1" value="1">Yes
+						<label class="radio-inline"> <input type="radio" name="ava1" value="1" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="ava1" value="0">No
 						</label><br>
 					</div>
@@ -89,7 +89,7 @@
 					<div class="panel-body">
 						<p>To what extent the metadata actually describes content found?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="acc1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="acc1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="acc1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="acc1" value="3">Average
@@ -113,7 +113,7 @@
 					<div class="panel-body">
 						<p>How would you rate easiness and clarity when using the learning object?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="eou1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="eou1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="eou1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="eou1" value="3">Average
@@ -137,7 +137,7 @@
 					<div class="panel-body">
 						<p>To what extent content found lets you learn on the subject?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="eff1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="eff1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="eff1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="eff1" value="3">Average
@@ -161,7 +161,7 @@
 					<div class="panel-body">
 						<p>To what extent the learning object motivates you to keep searching on the subject?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="mot1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="mot1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="mot1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="mot1" value="3">Average
@@ -186,7 +186,7 @@
 						<p>To what level this learning object was important for you and was related with your
 							expectations?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="rel1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="rel1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="rel1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="rel1" value="3">Average
@@ -211,7 +211,7 @@
 						<p>To what level the size, color and distribution of elements of learning object are
 							suitable for its purposes?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="vid1" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="vid1" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="vid1" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="vid1" value="3">Average
@@ -223,7 +223,7 @@
 						<p>To what level the texts, images, sounds and other multimedia elements of learning
 							object contribute on learning of the subject?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="vid2" value="1">Very
+						<label class="radio-inline"> <input type="radio" name="vid2" value="1" required>Very
 							Low
 						</label> <label class="radio-inline"> <input type="radio" name="vid2" value="2">Low
 						</label> <label class="radio-inline"> <input type="radio" name="vid2" value="3">Average

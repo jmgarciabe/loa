@@ -51,6 +51,7 @@
 	<br>
 	<br>
 	<div class="row container">
+		<p id="message" style="color: red;"><%= session.getAttribute("LOA.processMessage") %></p>
 		<form class="form-horizontal" method="get"
 			action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
 
@@ -61,16 +62,14 @@
 				<div class="col-md-4 col-lg-3">
 					<select class="form-control" name="admin_assess" id="admin_assess">
 						<%
-							Vector adminAvailAssess = (Vector) session
-										.getAttribute("LOA.adminAvailAssess");
+							Vector adminAvailAssess = (Vector) session.getAttribute("LOA.adminAvailAssess");
 								if (adminAvailAssess != null && !adminAvailAssess.isEmpty()) {
 						%>
 						<%
 							for (int index = 0; index < adminAvailAssess.size(); index++) {
-										String adminMetrics = (String) adminAvailAssess
-												.elementAt(index);
+										String adminMetrics = (String) adminAvailAssess.elementAt(index);
 						%>
-						<%=adminMetrics%>
+						<option value="<%=adminMetrics%>"/><%=adminMetrics%></option>
 						<%
 							}
 						%>
@@ -84,40 +83,33 @@
 			<div class="row"></div>
 			<br>
 			<div class="pull-left">
-			 <input class="btn btn-success btn-lg pull-left" type="submit" name="submit_item_assess"
-				value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
-				</div>
+				<input class="btn btn-success btn-lg pull-left" type="submit" name="submit_item_assess"
+					value="<fmt:message key="jsp.tools.curate.perform.button"/>" />
+			</div>
 
 		</form>
-	<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
-		<div class="pull-left" style="padding-left: 5px;">
-		<input class="btn btn-primary btn-lg" type="submit"
-			name="submit_cancel" value="<fmt:message key="jsp.tools.general.cancel"/>" /></div>
-	</form>
-
-	<%
-		if (enaRstBtn == "Y") {
-	%>
-
-	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
-		<input type="hidden" name="item_id" value="<%=itemID%>" /> 
-		<input type="hidden" name="action"
-			value="<%=AdminAssessServlet.SHOW_RESULTS%>" />
+		
+		<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
 			<div class="pull-left" style="padding-left: 5px;">
-			 <input class="btn btn-info btn-lg" type="submit"
-			name="show_results" value="Show Results"></div>
-	</form>
+				<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
+					value="<fmt:message key="jsp.tools.general.cancel"/>" />
+			</div>
+		</form>
 
-	<%
-		} else {
-	%>
-
-	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
-	<div class="pull-left" style="padding-left: 5px;">
-		<input class="btn btn-info btn-lg disabled" type="submit" name="show_results" value="Show Results"></div>
-	</form>
-	<%
-		}
-	%>
+		<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
+			<input type="hidden" name="item_id" value="<%=itemID%>" /> <input type="hidden" name="action"
+				value="<%=AdminAssessServlet.SHOW_RESULTS%>" />
+			<div class="pull-left" style="padding-left: 5px;">
+				<input class="btn btn-info btn-lg" type="submit" name="show_results" value="Show Results">
+			</div>
+		</form>
+		
+		<form method="get" action="<%=request.getContextPath()%>/tools/LOAssessment/assess-param">
+			<div class="pull-left" style="padding-left: 5px;">
+				<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input type="hidden"
+					name="action" value="3" /> <input class="btn btn-link btn-lg" type="submit"
+					name="submit_cancel" value="Set Parameters" />
+			</div>
+		</form>
 	</div>
 </dspace:layout>

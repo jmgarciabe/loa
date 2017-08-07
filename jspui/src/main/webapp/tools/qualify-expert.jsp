@@ -29,7 +29,24 @@
 <%
 	Item item = (Item) request.getAttribute("item");
 %>
+<script type="text/javascript">
+	function validarNumeros() {
+		var isValid = true;
+		var nodes = document.querySelectorAll(".dim-value");
+		for (var i = 0; i < nodes.length; i++) {
+			if( isNaN(nodes[i].valueAsNumber) || nodes[i].valueAsNumber > 5 || nodes[i].valueAsNumber < 1){
+				isValid = false;
+				break;
+			}
+		}
+		if (isValid) {
+			document.getElementById("modal-button").click();
+		} else {
+			document.getElementById("error-message").innerHTML = "Invalid input, be aware that valid values must rate between 1 and 5";
+		}
 
+	}
+</script>
 <dspace:layout style="submission" title="Learning Object Assessment parameterization" locbar="link"
 	nocache="true">
 
@@ -58,8 +75,7 @@
 			name="action" value="<%=ExpertAssessServlet.DIM_PARAM%>" />
 
 		<%
-			Vector paramDimensions = (Vector) session
-						.getAttribute("LOA.paramDimensions");
+			Vector paramDimensions = (Vector) session.getAttribute("LOA.paramDimensions");
 				if (paramDimensions != null && !paramDimensions.isEmpty()) {
 		%>
 
@@ -71,12 +87,11 @@
 				<div class="col-md-6 col-lg-4">
 					<%
 						for (int index = 0; index < paramDimensions.size(); index++) {
-									String dimensionName = (String) paramDimensions
-											.elementAt(index);
+									String dimensionName = (String) paramDimensions.elementAt(index);
 					%>
 					<div class="form-group">
 						<label for="exp_<%=dimensionName%>">Level of <%=dimensionName%> experience
-						</label> <input type="text" class="form-control" name="exp_<%=dimensionName%>">
+						</label> <input type="number" class="form-control dim-value" name="exp_<%=dimensionName%>" required>
 					</div>
 					<%
 						}
@@ -109,11 +124,13 @@
 				</div>
 			</div>
 		</div>
-
+		
+		<p id="error-message" style="color: red;"></p>
 		<div class="pull-left">
 			<!-- Trigger the modal with a button -->
-			<button type="button" class="btn btn-success btn-lg" data-toggle="modal"
-				data-target="#modalInitParam">Confirm</button>
+			<button type="button" class="btn btn-success btn-lg" onclick="validarNumeros()">Confirm</button>
+			<button type="button" data-toggle="modal" id="modal-button" data-target="#modalInitParam"
+				style="display: none;"></button>
 		</div>
 	</form>
 

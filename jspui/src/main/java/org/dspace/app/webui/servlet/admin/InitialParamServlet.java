@@ -29,6 +29,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.Dimension;
+import org.dspace.loa.Layer;
 import org.dspace.loa.Metric;
 
 /**
@@ -38,6 +39,10 @@ import org.dspace.loa.Metric;
  * @version $Revision$
  */
 public class InitialParamServlet extends DSpaceServlet {
+	
+	/** User start set of parameters*/
+	public static final int START_PARAM = 3;
+	
 	/** User selects layers to be parameterized in assessment */
 	public static final int LAYER_PARAM = 1;
 
@@ -66,28 +71,42 @@ public class InitialParamServlet extends DSpaceServlet {
 		Item item = Item.find(context, UIUtil.getIntParameter(request, "item_id"));
 		String handle = HandleManager.findHandle(context, item);
 
-		Vector dimensionList = (Vector) session.getAttribute("LOA.dimensionList");
-		Vector metricList = (Vector) session.getAttribute("LOA.metricList");
-		Vector checkedDimensions = (Vector) session.getAttribute("LOA.ckDimensionList");
+		
 
 		/*
 		 * Respond to submitted forms. Each form includes an "action" parameter
 		 * indicating what needs to be done (from the constants above.)
 		 */
 
+		String layer = null;
+		
 		switch (action) {
+		
+		case START_PARAM:
+			
+			request.setAttribute("item", item);
+			Vector<String> adminAssessOpt = new Vector<String>();
+			Layer[] layersRetrieved = Layer.findAllLayers(context);
+			for (int i = 0; i < layersRetrieved.length; i++) {
+				layer = layersRetrieved[i].getName();
+				String layerOptions = getListOptions(layer);
+				if (!adminAssessOpt.contains(layerOptions))
+					adminAssessOpt.addElement(layerOptions);
+			}
+			session.setAttribute("LOA.adminAssessOpt", adminAssessOpt);
+			JSPManager.showJSP(request, response, "/tools/param-form.jsp");
 
 		case LAYER_PARAM:
 
-			String layer = request.getParameter("layer_name");
+			layer = request.getParameter("layer_name");
 
 			if (layer == null) {
 				JSPManager.showInternalError(request, response);
 				System.out.println("Selected layer is not valid");
 			}
 
-			dimensionList = setDimensions(context, layer);
-			metricList = setMetrics(context, layer);
+			Vector<Dimension> dimensionList = setDimensions(context, layer);
+			Vector<Metric> metricList = setMetrics(context, layer);
 
 			request.setAttribute("item", item);
 			request.setAttribute("handle", handle);
@@ -101,7 +120,7 @@ public class InitialParamServlet extends DSpaceServlet {
 			break;
 
 		case METRIC_PARAM:
-
+			
 			layer = request.getParameter("layer");
 			int layerId = layer.equals("Administrator") ? 1 : layer.equals("Expert") ? 2 : layer.equals("Student") ? 3 : 0;
 
@@ -120,8 +139,7 @@ public class InitialParamServlet extends DSpaceServlet {
 				ckMetricsID.addElement(lay_id + "," + dimension_id + "," + metric_id);
 			}
 
-			assessParamList = AssessParam.findParam(context, item.getID(), layerId);
-			checkedDimensions = verifyCheckedDimensions(context, ckMetricsID, assessParamList, layer);
+			Vector<String> checkedDimensions = verifyCheckedDimensions(context, ckMetricsID, layer);
 
 			request.setAttribute("item", item);
 			request.setAttribute("handle", handle);
@@ -144,11 +162,11 @@ public class InitialParamServlet extends DSpaceServlet {
 			JSPManager.showInternalError(request, response);
 		}
 
-		int itemID = UIUtil.getIntParameter(request, "item_id");
+		int itemId = UIUtil.getIntParameter(request, "item_id");
 
 		String layer = request.getParameter("layer");
 
-		Item item = Item.find(context, itemID);
+		Item item = Item.find(context, itemId);
 
 		String handle = HandleManager.findHandle(context, item);
 
@@ -156,52 +174,44 @@ public class InitialParamServlet extends DSpaceServlet {
 
 		int layerId = layer.equals("Administrator") ? 1 : layer.equals("Expert") ? 2 : layer.equals("Student") ? 3 : 0;
 
-		// Firstly, we get the values set by user in GUI and check total weight
-		// by layer
 
-		boolean validWeights = validateTotalWeight(context, request, response);
-
-		if (!validWeights) {
-			JSPManager.showInternalError(request, response);
-			System.out.println("Assigned weights must complete 100%!!!");
-		}
-
-		// Later, we check values previously parameterized and update them if
+		// We check values previously parameterized and update them if
 		// necessary
-
-		Dimension[] dimensionsList = Dimension.findByLayer(context, layer);
-		// Buscanos solo los assess params de la capa
-		assessParamList = AssessParam.findParam(context, itemID, layerId);
-		// AssessItemServlet.loadAssessParam(context, request, response,
-		// itemID);
-
-		if (assessParamList != null) {
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
-				Dimension dimension = null;
-				for (Dimension dim : dimensionsList) {
-					if (dim.getID() == assessParam.getDimID()) {
-						dimension = dim;
-						break;
-					}
-
-				}
-				if (request.getParameter(dimension.getName()) != null) {
-					dimWght = request.getParameter(dimension.getName());
-					Dimension.updateDimensionWeight(context, assessParam.getDimWeightID(), itemID, dimWght);
-				}
-
-			}
-		}
-
-		// Saves and updates parameterized metrics assessment for the item
-		// involved and show confirm page
-
+		
 		if (ckMetricsID == null) {
 			JSPManager.showInternalError(request, response);
 			System.out.println("You must select at least a metric!!!");
 		}
 
+		Dimension[] dimensionsList = Dimension.findByLayer(context, layer);
+		
+		// Buscanos solo los assess params de la capa
+		assessParamList = AssessParam.findParam(context, itemId, layerId);
+		
+		//Eliminamos assessments de metricas que existian pero no se seleccionaron
+		if (assessParamList != null) {
+			for (int i = 0; i < assessParamList.size(); i++) {
+				AssessParam assessParam = assessParamList.elementAt(i);
+				boolean delete = true;
+				for (int j = 0; j < ckMetricsID.size(); j++) {
+					String metricInfo = ckMetricsID.elementAt(j).toString();
+					String[] data = metricInfo.split(",");
+					int metricID = Integer.valueOf(data[2]).intValue();
+					if(assessParam.getAssessMetricID() == metricID){
+						delete = false;
+						break;
+					}
+				}
+				if(delete){
+					Metric.deleteAssessMetric(context, assessParam.getAssessMetricID() , itemId);
+				}
+			}
+		}
+		
+		//Eliminamos todos los dimension weigthing previos
+		Dimension.DeleteWeightsById(context, itemId, layerId);
+				
+		//Agregamos dimension weighting y assessment result
 		for (int i = 0; i < ckMetricsID.size(); i++) {
 			try {
 				Dimension dimension = null;
@@ -211,7 +221,7 @@ public class InitialParamServlet extends DSpaceServlet {
 				int dimensionID = Integer.valueOf(data[1]).intValue();
 				int metricID = Integer.valueOf(data[2]).intValue();
 
-				Metric.addAssessMetric(context, metricID, itemID);
+				Metric.addAssessMetric(context, metricID, itemId);
 
 				for (Dimension dim : dimensionsList) {
 					if (dim.getID() == dimensionID) {
@@ -222,7 +232,7 @@ public class InitialParamServlet extends DSpaceServlet {
 
 				if (request.getParameter(dimension.getName()) != null) {
 					weight = request.getParameter(dimension.getName());
-					Dimension.addDimensionWeight(context, dimensionID, layerID, itemID, weight);
+					Dimension.addDimensionWeight(context, dimensionID, layerID, itemId, weight);
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -233,36 +243,18 @@ public class InitialParamServlet extends DSpaceServlet {
 		request.setAttribute("item", item);
 		request.setAttribute("handle", handle);
 
-		if (request.getParameter("submit_yes") != null) {
-			JSPManager.showJSP(request, response, "/tools/param-form.jsp");
-		}
-		if (layer.equals("Administrator")) {
-			// Reload assess param for the layer in order to get all the new
-			// params added from checked metrics
-			assessParamList = AssessParam.findParam(context, itemID, layerId);
-			Vector<String> adminAvailAssess = new Vector<String>();
-			;
-			String criteriaName = "";
-			String assessOptions = "";
-
-			if (assessParamList != null) {
-				for (int i = 0; i < assessParamList.size(); i++) {
-
-					AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-					criteriaName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-					assessOptions = AssessItemServlet.getListOptions(criteriaName);
-
-					if (!adminAvailAssess.contains(assessOptions))
-						adminAvailAssess.addElement(assessOptions);
-				}
-			}
-
-			session.setAttribute("LOA.adminAvailAssess", adminAvailAssess);
-
-			JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");
-		} else
-			JSPManager.showJSP(request, response, "/tools/success-page.jsp");
+		JSPManager.showJSP(request, response, "/tools/param-form.jsp");
+		//JSPManager.showJSP(request, response, "/tools/success-page.jsp");
+		
 	}
+	
+	private String getListOptions(String option) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<option value=\"").append(option).append("\">").append(option).append("</option>\n");
+
+		return sb.toString();
+	}
+
 
 	private Vector<Dimension> setDimensions(Context context, String layer) {
 
@@ -294,54 +286,15 @@ public class InitialParamServlet extends DSpaceServlet {
 		return metricList;
 	}
 
-	private boolean validateTotalWeight(Context context, HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		double dimWeight = 0.0;
-		double totWeight = 0.0;
-
-		String[] dimensions = { "Content", "Contextual", "Educational", "Esthetic", "Functional", "Metadata" };
-		for (String dim : dimensions) {
-			if (request.getParameter(dim) != null) {
-				dimWeight = Double.valueOf(request.getParameter(dim)).doubleValue() / 100.0;
-				totWeight += dimWeight;
-			}
-		}
-
-		// Validation for total dimension weightings
-		if (totWeight > 0.998 && totWeight < 1.002)
-			return true;
-
-		return false;
-	}
-
-	private Vector<String> verifyCheckedDimensions(Context context, Vector<String> checkedMetrics,
-			Vector<AssessParam> assessmentParam, String layer) {
+	private Vector<String> verifyCheckedDimensions(Context context, Vector<String> checkedMetrics, String layer) {
 
 		Vector<String> ckDimensions = new Vector<String>();
 		String dimensionName = null;
 		int layerId = layer.equals("Administrator") ? 1 : layer.equals("Expert") ? 2 : layer.equals("Student") ? 3 : 0;
 
-		// first, we verify metric's dimension previously parameterized
-		if (assessmentParam != null && !assessmentParam.isEmpty() && layerId > 0) {
-			for (int i = 0; i < assessmentParam.size(); i++) {
-				AssessParam assessParam = (AssessParam) assessmentParam.elementAt(i);
-				if (assessParam.getLayerID() == layerId) {
-					try {
-						dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-					} catch (SQLException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-
-				if (!ckDimensions.contains(dimensionName) && dimensionName != null)
-					ckDimensions.addElement(dimensionName);
-			}
-		}
-
 		// Now, we can add dimension from metrics recently checked to item's
 		// assessment
-		if (checkedMetrics != null && !checkedMetrics.isEmpty()) {
+		if (checkedMetrics != null) {
 			for (int i = 0; i < checkedMetrics.size(); i++) {
 				String metricInfo = checkedMetrics.elementAt(i).toString();
 				String[] data = metricInfo.split(",");
@@ -352,11 +305,10 @@ public class InitialParamServlet extends DSpaceServlet {
 					try {
 						dimensionName = Dimension.findNameByID(context, dimensionId);
 					} catch (SQLException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				if (!ckDimensions.contains(dimensionName) && dimensionName != null)
+				if (!ckDimensions.contains(dimensionName))
 					ckDimensions.addElement(dimensionName);
 			}
 		}
