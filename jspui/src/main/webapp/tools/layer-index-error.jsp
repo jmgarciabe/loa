@@ -30,7 +30,7 @@
     EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 %>
 
-<dspace:layout style="submission" titlekey="Learning Object Assessment parameterization"
+<dspace:layout style="submission" titlekey="Learning Object Assessment Parameterization"
                locbar="link"
                nocache="true">
 

@@ -34,17 +34,18 @@ public class VisibilityAssess {
      */
     public static double perform(Context context, DSpaceObject dso) 
     {
-    	double visibility = 0.0;
-    	int itemVisits = 0;
-    	int itemDown = 0;
-    	int collVisits = 0;
-    	int nonCollVisits = 0;
+    	double visibility = 0;
+    	double itemVisits = 0;
+    	double itemDown = 0;
+    	double collVisits = 0;
+    	double nonCollVisits = 0;
+    	double nonCollSum = 0;
     	
     	// Gets the total number of visits by item from Solr index
     	try
         {
             StatisticsListing statListing = new StatisticsListing(
-                                            new StatisticsDataVisits(dso));
+            		new StatisticsDataVisits(dso));
 
             statListing.setTitle("Total Visits");
             statListing.setId("list1");
@@ -54,22 +55,16 @@ public class VisibilityAssess {
             statListing.addDatasetGenerator(dsoAxis);
             Dataset dataset = statListing.getDataset(context);
 
-            dataset = statListing.getDataset();
-
-            if (dataset == null)
-            	dataset = statListing.getDataset(context);
-            else
+            if (dataset != null)
             {
-                String[][] matrix = dataset.getMatrix();
+            	String[][] matrix = dataset.getMatrix();
                 
                 for (int i=0; i<matrix.length; i++){
-        			for (int j=0; j<matrix[i].length; j++){
-        				itemVisits = new Integer(matrix[i][j]).intValue();
-        			}
-        		}
-             
+            		for (int j=0; j<matrix[i].length; j++){
+            			itemVisits = new Integer(matrix[i][j]).doubleValue();
+            		}
+            	}
             }
-
         } catch (Exception e)
         {
 		/*log.error(
@@ -83,30 +78,26 @@ public class VisibilityAssess {
     	try
         {
 
-            StatisticsListing statisticsTable = new StatisticsListing(new StatisticsDataVisits(dso));
+            StatisticsListing statisticsTable = new StatisticsListing(
+            		new StatisticsDataVisits(dso));
 
             statisticsTable.setTitle("File Downloads");
-            statisticsTable.setId("tab1");
+            statisticsTable.setId("list2");
 
             DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
             dsoAxis.addDsoChild(Constants.BITSTREAM, 10, false, -1);
             statisticsTable.addDatasetGenerator(dsoAxis);
-
             Dataset dataset = statisticsTable.getDataset(context);
 
-            dataset = statisticsTable.getDataset();
-
-            if (dataset == null)
-                dataset = statisticsTable.getDataset(context);
-            else
+            if (dataset != null)
             {
-                String[][] matrix = dataset.getMatrix();
+            	String[][] matrix = dataset.getMatrix();
                 
                 for (int i=0; i<matrix.length; i++){
-        			for (int j=0; j<matrix[i].length; j++){
-        				itemDown = new Integer(matrix[i][j]).intValue();
-        			}
-        		}
+            		for (int j=0; j<matrix[i].length; j++){
+            			itemDown = new Integer(matrix[i][j]).doubleValue();
+            		}
+            	}
             }
         }
         catch (Exception e)
@@ -122,33 +113,26 @@ public class VisibilityAssess {
     	try
         {
             StatisticsListing statListing = new StatisticsListing(
-                                            new StatisticsDataVisits(dso.getParentObject()));
+            		new StatisticsDataVisits(dso.getParentObject()));
 
             statListing.setTitle("Total Collection Visits");
-            statListing.setId("list2");
+            statListing.setId("list3");
 
             DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
             dsoAxis.addDsoChild(dso.getParentObject().getType(), 10, false, -1);
             statListing.addDatasetGenerator(dsoAxis);
             Dataset dataset = statListing.getDataset(context);
 
-            dataset = statListing.getDataset();
-
-            if (dataset == null)
-            	dataset = statListing.getDataset(context);
-            else
+            if (dataset != null)
             {
-                String[][] matrix = dataset.getMatrix();
+            	String[][] matrix = dataset.getMatrix();
                 
                 for (int i=0; i<matrix.length; i++){
-        			for (int j=0; j<matrix[i].length; j++){
-        				collVisits = new Integer(matrix[i][j]).intValue();
-        			}
-        		}
-                
+            		for (int j=0; j<matrix[i].length; j++){
+            			collVisits = new Integer(matrix[i][j]).doubleValue();
+            		}
+            	}
             }
-
-
         } catch (Exception e)
         {
 		/*log.error(
@@ -171,29 +155,24 @@ public class VisibilityAssess {
                         new StatisticsDataVisits(nonColl[k]));
     			
     			statListing.setTitle("Total NonInCollection Visits");
-                statListing.setId("list2");
+                statListing.setId("list4");
 
                 DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
                 dsoAxis.addDsoChild(nonColl[k].getType(), 10, false, -1);
                 statListing.addDatasetGenerator(dsoAxis);
                 Dataset dataset = statListing.getDataset(context);
 
-                dataset = statListing.getDataset();
-
-                if (dataset == null)
-                	dataset = statListing.getDataset(context);
-                else
+                if (dataset != null)
                 {
-                    String[][] matrix = dataset.getMatrix();
+                	String[][] matrix = dataset.getMatrix();
                     
                     for (int i=0; i<matrix.length; i++){
-            			for (int j=0; j<matrix[i].length; j++){
-            				nonCollVisits = new Integer(matrix[i][j]).intValue();
-            			}
-            		}
-                    
+                		for (int j=0; j<matrix[i].length; j++){
+                			nonCollVisits = new Integer(matrix[i][j]).doubleValue();
+                			nonCollSum += nonCollVisits;
+                		}
+                	}
                 }
-    			
     		}
         } catch (Exception e)
         {
@@ -203,13 +182,15 @@ public class VisibilityAssess {
                             + " and handle: " + dso.getHandle(), e);*/
         }
     	
-    	if(nonCollVisits > 0)
-        	visibility = (itemVisits + itemDown) / (collVisits + nonCollVisits);
-    	else
-    		visibility = itemVisits / collVisits;
+    	if (collVisits > 0)
+    	{
+    		if(nonCollSum > 0)
+    			visibility = (itemVisits + itemDown) / (collVisits + nonCollSum);
+        	else
+        		visibility = itemVisits / collVisits;		
+    	}
     	
-    	return visibility;
-    	
+    	return visibility;	
     }
     
     public static String getResults(Context context,DSpaceObject dso)
