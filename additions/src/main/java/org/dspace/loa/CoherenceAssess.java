@@ -330,11 +330,11 @@ public class CoherenceAssess {
 			results.append("Item: ").append(item.getHandle());
 
 			try {
-				if (perform(item) >= 0.8)
+				if (perform(item) > 0.7)
 					results.append(" has highly coherent data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
-				if ((perform(item) > 0.3) && (perform(item) < 0.8))
+				if ((perform(item) >= 0.3) && (perform(item) <= 0.7))
 					results.append(" has medium coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
-				if (perform(item) <= 0.3)
+				if (perform(item) < 0.3)
 					results.append(" has low coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

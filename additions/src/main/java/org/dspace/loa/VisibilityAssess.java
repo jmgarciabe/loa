@@ -39,10 +39,8 @@ public class VisibilityAssess {
     	int itemDown = 0;
     	int collVisits = 0;
     	int nonCollVisits = 0;
-    	int nonCollSum = 0;
     	
     	// Gets the total number of visits by item from Solr index
-    	
     	try
         {
             StatisticsListing statListing = new StatisticsListing(
@@ -59,11 +57,8 @@ public class VisibilityAssess {
             dataset = statListing.getDataset();
 
             if (dataset == null)
-            {
             	dataset = statListing.getDataset(context);
-            }
-
-            if (dataset != null)
+            else
             {
                 String[][] matrix = dataset.getMatrix();
                 
@@ -102,11 +97,8 @@ public class VisibilityAssess {
             dataset = statisticsTable.getDataset();
 
             if (dataset == null)
-            {
                 dataset = statisticsTable.getDataset(context);
-            }
-
-            if (dataset != null)
+            else
             {
                 String[][] matrix = dataset.getMatrix();
                 
@@ -143,11 +135,8 @@ public class VisibilityAssess {
             dataset = statListing.getDataset();
 
             if (dataset == null)
-            {
             	dataset = statListing.getDataset(context);
-            }
-
-            if (dataset != null)
+            else
             {
                 String[][] matrix = dataset.getMatrix();
                 
@@ -192,18 +181,14 @@ public class VisibilityAssess {
                 dataset = statListing.getDataset();
 
                 if (dataset == null)
-                {
                 	dataset = statListing.getDataset(context);
-                }
-
-                if (dataset != null)
+                else
                 {
                     String[][] matrix = dataset.getMatrix();
                     
                     for (int i=0; i<matrix.length; i++){
             			for (int j=0; j<matrix[i].length; j++){
             				nonCollVisits = new Integer(matrix[i][j]).intValue();
-            				nonCollSum += nonCollVisits;
             			}
             		}
                     
@@ -218,10 +203,10 @@ public class VisibilityAssess {
                             + " and handle: " + dso.getHandle(), e);*/
         }
     	
-    	if((collVisits + nonCollSum) > 0){
-    		visibility = itemVisits + itemDown;
-        	visibility = visibility / (collVisits + nonCollSum);
-    	}
+    	if(nonCollVisits > 0)
+        	visibility = (itemVisits + itemDown) / (collVisits + nonCollVisits);
+    	else
+    		visibility = itemVisits / collVisits;
     	
     	return visibility;
     	
@@ -239,11 +224,11 @@ public class VisibilityAssess {
             // Appends item's handle to results message
             results.append("Item: ").append(item.getHandle());
             
-			if (perform(context,item) > 0.8)
+			if (perform(context,item) > 0.7)
 				results.append(" is highly popular in the repository");
-			if ((perform(context,item) > 0.3) && (perform(context,item) < 0.8))
+			if ((perform(context,item) >= 0.3) && (perform(context,item) <= 0.7))
 				results.append(" is frequently visited in the repository");
-			if (perform(context,item) <= 0.3) 
+			if (perform(context,item) < 0.3) 
 				results.append(" is not so popular in the repository");
     	}
     	

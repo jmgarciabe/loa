@@ -52,9 +52,6 @@ public class Layer extends DSpaceObject {
 	 */
 	public static void addAssessIndexes(Context context, int itemID, double admIndex, double expIndex, double stdIndex,
 			double totIndex) throws SQLException {
-		String dbquery = "UPDATE assessment_history " + "SET item_id= ?, admin_index= ?, expert_index= ?, "
-				+ "user_index= ?, assess_value= ? " + "WHERE assessment_history_id = ? ";
-
 		Double admin = new Double(admIndex);
 		String adminVal = admin.toString();
 
@@ -68,15 +65,17 @@ public class Layer extends DSpaceObject {
 		String totVal = total.toString();
 
 		// Create a new row, and assign a primary key
-		TableRow newRow = DatabaseManager.create(context, "assessment_history");
-		int rowID = newRow.getIntColumn("assessment_history_id");
-		rowID += 1;
+		TableRow newRow = DatabaseManager.row("assessment_history");
 
 		// Populates the new row with data from frontend
-		int rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID, adminVal, expVal, stdVal, totVal, rowID);
+		newRow.setColumn("item_id", itemID);
+		newRow.setColumn("admin_index", adminVal);
+		newRow.setColumn("expert_index", expVal);
+		newRow.setColumn("user_index", stdVal);
+		newRow.setColumn("assess_value", totVal);
 
 		// Save changes to the database
-		DatabaseManager.update(context, newRow);
+		DatabaseManager.insert(context, newRow);
 
 		// Make sure all changes are committed
 		context.commit();
