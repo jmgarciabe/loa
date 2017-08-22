@@ -93,7 +93,7 @@
 					</div>
 					<%
 						}
-						if (Double.valueOf(val).doubleValue() > 50 && Double.valueOf(val).doubleValue() <= 75) {
+												if (Double.valueOf(val).doubleValue() > 50 && Double.valueOf(val).doubleValue() <= 75) {
 					%>
 					<div class="progress">
 						<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<%=val%>"
@@ -102,7 +102,7 @@
 					</div>
 					<%
 						}
-						if (Double.valueOf(val).doubleValue() > 25 && Double.valueOf(val).doubleValue() <= 50) {
+												if (Double.valueOf(val).doubleValue() > 25 && Double.valueOf(val).doubleValue() <= 50) {
 					%>
 					<div class="progress">
 						<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="<%=val%>"
@@ -111,7 +111,7 @@
 					</div>
 					<%
 						}
-						if (Double.valueOf(val).doubleValue() <= 25) {
+												if (Double.valueOf(val).doubleValue() <= 25) {
 					%>
 					<div class="progress">
 						<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<%=val%>"
@@ -120,9 +120,9 @@
 					</div>
 					<%
 						}
-					}
-				}
-			}
+											}
+										}
+									}
 					%>
 				</div>
 			</div>
@@ -131,12 +131,13 @@
 			}
 				}
 		%>
-		</div>
-		<div class="row">
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
 			<div class="pull-left">
 				<form method="get" action="<%=request.getContextPath()%>/tools/LOAssessment">
-					<input type="hidden" name="item_id" value="<%=item.getID()%>" />
-					<input class="btn btn-success btn-lg" type="submit" name="submit_ok" value="OK" />
+					<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input
+						class="btn btn-success btn-lg" type="submit" name="submit_ok" value="OK" />
 				</form>
 			</div>
 			<div class="pull-left" style="padding-left: 5px;">
@@ -174,5 +175,6 @@
 
 			</form>
 		</div>
+	</div>
 
 </dspace:layout>

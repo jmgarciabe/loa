@@ -92,10 +92,10 @@ public class StudentAssessServlet extends DSpaceServlet {
 				dbValue += request.getParameter(q) != null ? Double.valueOf(request.getParameter(q)).doubleValue() : 0;
 			}
 			if (questIds.length > 0) {
-				dbValue /= questIds.length;
+				dbValue /= (questIds.length*5);
 			}
 			if (formValue > 0) {
-				dbValue = ((dbValue/5) + formValue) / 2;
+				dbValue = (dbValue + formValue) / 2;
 			}
 			if (dbValue > 0) {
 				Metric.addAssessValue(context, dbValue, criteria, 3, itemID);

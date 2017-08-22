@@ -59,33 +59,6 @@ public class ExpertAssessServlet extends DSpaceServlet {
 	/** Map holding old values store in database before update */
 	private Map<String, Double> metricsValues;
 
-	/** Variables to assess content metrics */
-	private int contWght = 0;
-	private int contWghtDb = 0;
-	private double rigor = 0.0;
-
-	/** Variables to assess educational metrics */
-	private int eduWght = 0;
-	private int eduWghtDb = 0;
-	private double effect = 0.0;
-
-	/** Variables to assess esthetic metrics */
-	private int estWght = 0;
-	private int estWghtDb = 0;
-	private double visual = 0.0;
-
-	/** Variables to assess functional metrics */
-	private int funcWght = 0;
-	private int funcWghtDb = 0;
-	private double reuse = 0.0;
-	private double use = 0.0;
-	private double access = 0.0;
-
-	/** Variables to assess metadata metrics */
-	private int metWght = 0;
-	private int metWghtDb = 0;
-	private double complete = 0.0;
-	private double accuracy = 0.0;
 
 	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException, SQLException, AuthorizeException {
@@ -104,6 +77,7 @@ public class ExpertAssessServlet extends DSpaceServlet {
 		int itemId = UIUtil.getIntParameter(request, "item_id");
 		Item item = Item.find(context, itemId);
 		String handle = HandleManager.findHandle(context, item);
+		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
 
 		switch (action) {
 		case DIM_PARAM:
@@ -112,24 +86,21 @@ public class ExpertAssessServlet extends DSpaceServlet {
 			// we check values previously parameterized for this layer (2) and
 			// update them if
 			// necessary.
-			Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
 
-			if (assessParamList != null) {
-				for (int i = 0; i < assessParamList.size(); i++) {
-					AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
-					String dimId = String.valueOf(assessParam.getDimID());
-					String assessMetricId = String.valueOf(assessParam.getAssessMetricID());
-					String weight = request.getParameter(attrId.get(dimId));
-					if (weight == null || weight.length() == 0) {
-						continue;
-					}
-					if (assessParam.getMetricValue() != null && assessParam.getExpWeight() > 0) {
-						oldDimWeights.put(dimId, assessParam.getExpWeight());
-						metricsValues.put(assessMetricId, Double.valueOf(assessParam.getMetricValue()));
-					}
-					dimWeights.put(dimId, Integer.valueOf(weight));
-					Dimension.updateExpertWeight(context, assessParam.getDimWeightID(), itemId, dimWeights.get(dimId));
+			for (int i = 0; i < assessParamList.size(); i++) {
+				AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
+				String dimId = String.valueOf(assessParam.getDimID());
+				String assessMetricId = String.valueOf(assessParam.getAssessMetricID());
+				String weight = request.getParameter(attrId.get(dimId));
+				if (weight == null || weight.length() == 0) {
+					continue;
 				}
+				if (assessParam.getMetricValue() != null && assessParam.getExpWeight() > 0) {
+					oldDimWeights.put(dimId, assessParam.getExpWeight());
+					metricsValues.put(assessMetricId, Double.valueOf(assessParam.getMetricValue()));
+				}
+				dimWeights.put(dimId, Integer.valueOf(weight));
+				Dimension.updateExpertWeight(context, assessParam.getDimWeightID(), itemId, dimWeights.get(dimId));
 			}
 
 			Vector<String> expMetrics = new Vector<String>();
@@ -145,62 +116,49 @@ public class ExpertAssessServlet extends DSpaceServlet {
 
 		case EXP_SURVEY:
 
-
-			
 			Map<String, String> criteriaIds = new HashMap<String, String>();
-			criteriaIds.put("12","Accessibility");
-			criteriaIds.put("14","Accuracy");
-			criteriaIds.put("13","Completeness");
-			criteriaIds.put("11","Ease to use");
-			criteriaIds.put("8" ,"Potential Effectiveness");
-			criteriaIds.put("10","Reusability");
-			criteriaIds.put("7" ,"Rigor and Relevance");
-			criteriaIds.put("9" ,"Visual Design");
+			criteriaIds.put("12", "Accessibility");
+			criteriaIds.put("14", "Accuracy");
+			criteriaIds.put("13", "Completeness");
+			criteriaIds.put("11", "Ease to use");
+			criteriaIds.put("8", "Potential Effectiveness");
+			criteriaIds.put("10", "Reusability");
+			criteriaIds.put("7", "Rigor and Relevance");
+			criteriaIds.put("9", "Visual Design");
+
+			Map<String, String[]> answerIds = new HashMap<String, String[]>();
+			answerIds.put("12", new String[] { "acs1", "acs2" });
+			answerIds.put("14", new String[] { "acc1" });
+			answerIds.put("13", new String[] { "com1" });
+			answerIds.put("11", new String[] { "eou1", "eou2" });
+			answerIds.put("8", new String[] { "poe1", "poe2" });
+			answerIds.put("10", new String[] { "reu1", "reu2" });
+			answerIds.put("7", new String[] { "rar1", "rar2" });
+			answerIds.put("9", new String[] { "vid1", "vid2" });
 			
-			Map<String,String[]> answerIds = new HashMap<String,String[]>();
-			answerIds.put("12", new String [] {"acs1", "acs2"});
-			answerIds.put("14", new String [] {"acc1"});
-			answerIds.put("13", new String [] {"com1"});
-			answerIds.put("11", new String [] {"eou1", "eou2"});
-			answerIds.put("8", new String [] {"poe1", "poe2"});
-			answerIds.put("10", new String [] {"reu1", "reu2"});
-			answerIds.put("7", new String [] {"rar1", "rar2"});
-			answerIds.put("9", new String [] {"vid1", "vid2"});
-			
-			Map<String,String> metricDimension = new HashMap<String,String>();
-			metricDimension.put("12","5");
-			metricDimension.put("14","6");
-			metricDimension.put("13","6");
-			metricDimension.put("11","5");
-			metricDimension.put("8","3");
-			metricDimension.put("10","5");
-			metricDimension.put("7","1");
-			metricDimension.put("9","4");
-			
-			
-			
-			for(Entry<String, String[]> ansIds: answerIds.entrySet()){
+			for(AssessParam param : assessParamList){
 				
 				double result = 0.0;
 				double oldW = 0.0;
 				double newW = 0.0;
 				double value = 0.0;
 				String dimension;
+				String assessMetricId;
 				
-				dimension = metricDimension.get(ansIds.getKey());
+				dimension = String.valueOf(param.getDimID());
+				assessMetricId = String.valueOf(param.getAssessMetricID());
 				oldW = oldDimWeights.get(dimension);
-				newW = dimWeights.get(dimension);;
-				 
-				String[] ids = ansIds.getValue();
-				for(String answer : ids){
-					if(request.getParameter(answer) != null){
+				newW = dimWeights.get(dimension);
+				String[] ids = answerIds.get(assessMetricId);
+				for (String answer : ids) {
+					if (request.getParameter(answer) != null) {
 						value += Double.valueOf(request.getParameter(answer));
 					}
 				}
-				value /= (ids.length*5);
-				result = Double.valueOf(metricsValues.get(ansIds.getKey()));
-				result = (result*oldW  + value*newW) / (oldW + newW);
-				Metric.addAssessValue(context, result, criteriaIds.get(ansIds.getKey()), 2, itemId);
+				value /= (ids.length * 5);
+				result = Double.valueOf(metricsValues.get(assessMetricId));
+				result = (result * oldW + value * newW) / (oldW + newW);
+				Metric.addAssessValue(context, result, criteriaIds.get(assessMetricId), 2, itemId);
 				
 			}
 

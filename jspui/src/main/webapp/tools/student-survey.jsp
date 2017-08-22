@@ -70,7 +70,7 @@
 					<div class="panel-body">
 						<p>Can you access to the learning object content?</p>
 						<!-- Radio group options -->
-						<label class="radio-inline"> <input type="radio" name="ava1" value="1" required>Yes
+						<label class="radio-inline"> <input type="radio" name="ava1" value="5" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="ava1" value="0">No
 						</label><br>
 					</div>

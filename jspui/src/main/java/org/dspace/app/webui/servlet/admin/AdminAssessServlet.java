@@ -79,6 +79,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 		Item item = Item.find(context, itemID);
 		String handle = item.getHandle();
 		double result = -1.0;
+		DecimalFormat format = new DecimalFormat("#.##");
 
 		if (assess2Perform == null)
 			JSPManager.showInternalError(request, response);
