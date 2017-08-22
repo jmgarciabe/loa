@@ -13,7 +13,6 @@ import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
 public class Metric extends DSpaceObject {
-
 	private int ID;
 
 	private String name;
@@ -53,7 +52,6 @@ public class Metric extends DSpaceObject {
 	 *            DSpace context object
 	 */
 	public static void addAssessMetric(Context context, int metricID, int itemID) throws SQLException {
-
 		// Check if the row already exist
 		String query = "SELECT * FROM assessment_result " + "WHERE assessment_metric_id = ? AND item_id = ? ";
 
@@ -64,16 +62,16 @@ public class Metric extends DSpaceObject {
 		}
 
 		// Create a new row, and assign a data
-		TableRow newRow = DatabaseManager.create(context, "assessment_result");
+		TableRow newRow = DatabaseManager.row("assessment_result");
+		
 		newRow.setColumn("assessment_metric_id", metricID);
 		newRow.setColumn("item_id", itemID);
 
 		// Save changes to the database
-		DatabaseManager.update(context, newRow);
+		DatabaseManager.insert(context, newRow);
 
 		// Make sure all changes are committed
 		context.commit();
-
 	}
 
 	/**
@@ -108,7 +106,9 @@ public class Metric extends DSpaceObject {
 	public static void deleteAssessMetric(Context context, int metricID, int itemID) throws SQLException {
 		// Check if the row already exist
 		String query = "DELETE FROM assessment_result WHERE assessment_metric_id = ? AND item_id = ? ";
+		
 		int afectedRows = DatabaseManager.updateQuery(context, query, metricID, itemID);
+		
 		System.out.println("Deleted " + afectedRows + " rows from assessment result");
 		// Make sure all changes are committed
 		context.commit();

@@ -40,7 +40,7 @@
 	}
 %>
 
-<dspace:layout style="submission" title="jsp.dspace-admin.curate.item.title" navbar="admin"
+<dspace:layout style="submission" title="Learning Object Administrator Assessment" navbar="admin"
 	locbar="link" parenttitlekey="jsp.administer" parentlink="/dspace-admin">
 
 	<%@ include file="/tools/admassess-message.jsp"%>

@@ -204,9 +204,9 @@ public class ReusabilityAssess {
 				
             if (perform(item) > 0.7)
 				results.append(" has a high level of reusability");
-            if ((perform(item) > 0.3) && (perform(item) < 0.7))
+            if ((perform(item) >= 0.3) && (perform(item) <= 0.7))
 				results.append(" has a medium level of reusability");
-            if (perform(item) <= 0.3) 
+            if (perform(item) < 0.3) 
 				results.append(" has a low level of reusability");
     	}
     	

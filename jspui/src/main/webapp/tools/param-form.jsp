@@ -81,7 +81,7 @@
 			<form method="get" action="<%= request.getContextPath() %>/tools/LOAssessment">
 				<input type="hidden" name="item_id" value="<%= item.getID() %>" />
 				<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
-					value="Volver" />
+					value="Back" />
 			</form>
 		</div>
 	</div>

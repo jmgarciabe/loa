@@ -157,12 +157,12 @@ public class ConsistencyAssess {
 			results.append("Item: ").append(item.getHandle());
 
 			try {
-				if (perform(item) > 0.8)
-					results.append(" has consistent data in most of metadata fields");
-				if ((perform(item) > 0.3) && (perform(item) < 0.8))
-					results.append(" has consistent data in half of the most important metadata fields");
-				if (perform(item) <= 0.3)
-					results.append(" has inconsistent data in most of metadata fields");
+				if (perform(item) > 0.7)
+					results.append(" has consistent data in most of analyzed metadata fields");
+				if ((perform(item) >= 0.3) && (perform(item) <= 0.7))
+					results.append(" has consistent data in half of analyzed metadata fields");
+				if (perform(item) < 0.3)
+					results.append(" has inconsistent data in most of analyzed metadata fields");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

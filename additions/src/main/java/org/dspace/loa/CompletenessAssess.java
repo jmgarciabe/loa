@@ -100,12 +100,12 @@ public class CompletenessAssess {
             // Appends item's handle to results message
             results.append("Item: ").append(item.getHandle());
             
-            if (perform(item) >= 1)
-            	results.append(" has filled all most important metadata fields");
-            if ((perform(item) >= 0.4) && (perform(item) <= 0.6))
-            	results.append(" has filled half of the most important metadata fields");
-            if (perform(item) == 0)
-            	results.append(" has not filled none of the most important metadata fields");
+            if (perform(item) > 0.7)
+            	results.append(" most of the most important metadata fields has been filled");
+            if ((perform(item) >= 0.3) && (perform(item) <= 0.7))
+            	results.append(" half of the most important metadata fields has been filled");
+            if (perform(item) < 0.3)
+            	results.append(" very few of the most important metadata fields have been filled");
     	}
     	
     	return results.toString();

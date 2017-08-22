@@ -32,7 +32,7 @@
 	Map<String, String> layerIndexes = (Map<String, String>) request.getAttribute("layerIndexes");
 %>
 
-<dspace:layout style="submission" title="Learning Object Assessment parameterization" locbar="link"
+<dspace:layout style="submission" title="Learning Object Assessment Results Report" locbar="link"
 	nocache="true">
 
 	<h1>Assessment result report</h1>

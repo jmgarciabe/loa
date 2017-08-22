@@ -47,7 +47,7 @@
 
 	}
 </script>
-<dspace:layout style="submission" title="Learning Object Assessment parameterization" locbar="link"
+<dspace:layout style="submission" title="Learning Object Expert Survey Parameterization" locbar="link"
 	nocache="true">
 
 	<h1>
