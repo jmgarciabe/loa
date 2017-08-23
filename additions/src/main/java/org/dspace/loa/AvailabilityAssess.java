@@ -107,7 +107,7 @@ public class AvailabilityAssess {
         {
             URL theURL = new URL(url);
             HttpURLConnection connection = (HttpURLConnection)theURL.openConnection();
-            connection.setConnectTimeout(60000);
+            connection.setConnectTimeout(30000);
             int code = connection.getResponseCode();
             connection.disconnect();
 

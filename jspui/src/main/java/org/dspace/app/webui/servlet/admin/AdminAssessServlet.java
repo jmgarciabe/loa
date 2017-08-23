@@ -229,9 +229,9 @@ public class AdminAssessServlet extends DSpaceServlet {
 				}
 			}
 			DecimalFormat decimalFormat = new DecimalFormat("###");
-			String admIndexString = adminIndex < 0 ? decimalFormat.format(adminIndex * 100) : "";
-			String expIndexString = expIndex < 0 ? decimalFormat.format(expIndex * 100) : "";
-			String stdIndexString = stdIndex < 0 ? decimalFormat.format(stdIndex * 100) : "";
+			String admIndexString = adminIndex >= 0 ? decimalFormat.format(adminIndex * 100) : "";
+			String expIndexString = expIndex >= 0 ? decimalFormat.format(expIndex * 100) : "";
+			String stdIndexString = stdIndex >= 0 ? decimalFormat.format(stdIndex * 100) : "";
 			Map<String, String> layerIndexes = new HashMap<String, String>();
 			layerIndexes.put("1", admIndexString);
 			layerIndexes.put("2", expIndexString);
