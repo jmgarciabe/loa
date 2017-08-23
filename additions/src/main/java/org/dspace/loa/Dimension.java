@@ -68,10 +68,13 @@ public class Dimension extends DSpaceObject {
 			row.setColumn("layer_id", layID);
 			row.setColumn("dimension_id", dimID);
 			row.setColumn("item_id", itemID);
+			row.setColumn("admin_weight", dimWeight);
+			DatabaseManager.insert(context, row);
 
+		}else{
+			row.setColumn("admin_weight", dimWeight);
+			DatabaseManager.update(context, row);
 		}
-		row.setColumn("admin_weight", dimWeight);
-		DatabaseManager.insert(context, row);
 		// Make sure all changes are committed
 		context.commit();
 

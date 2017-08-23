@@ -37,6 +37,7 @@ import org.dspace.loa.Layer;
 import org.dspace.loa.Metric;
 import org.dspace.loa.ReusabilityAssess;
 import org.dspace.loa.VisibilityAssess;
+import org.elasticsearch.search.aggregations.HasAggregations;
 
 /**
  * Servlet for perform the assessment logic of each of the administrator layer
@@ -228,9 +229,9 @@ public class AdminAssessServlet extends DSpaceServlet {
 				}
 			}
 			DecimalFormat decimalFormat = new DecimalFormat("###");
-			String admIndexString = adminIndex != 0 ? decimalFormat.format(adminIndex * 100) : "";
-			String expIndexString = expIndex != 0 ? decimalFormat.format(expIndex * 100) : "";
-			String stdIndexString = stdIndex != 0 ? decimalFormat.format(stdIndex * 100) : "";
+			String admIndexString = adminIndex < 0 ? decimalFormat.format(adminIndex * 100) : "";
+			String expIndexString = expIndex < 0 ? decimalFormat.format(expIndex * 100) : "";
+			String stdIndexString = stdIndex < 0 ? decimalFormat.format(stdIndex * 100) : "";
 			Map<String, String> layerIndexes = new HashMap<String, String>();
 			layerIndexes.put("1", admIndexString);
 			layerIndexes.put("2", expIndexString);
@@ -264,6 +265,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 
 		double metricValue, dimWght;
 		double layerIndex = 0.0;
+		boolean hasValues = false;
 
 		Map<String, double[]> dimensionData = new HashMap<String, double[]>();
 		dimensionData.put("1", new double[3]);
@@ -281,6 +283,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 					if (assessParam.getMetricValue() == null || assessParam.getMetricValue().length() == 0) {
 						continue;
 					}
+					hasValues = true;
 					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
 					String dimId = String.valueOf(assessParam.getDimID());
 					double values[] = dimensionData.get(dimId);
@@ -297,6 +300,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 				layerIndex = layerIndex + values[2];
 			}
 		}
+		if(!hasValues) return -1;
 		return layerIndex;
 
 	}
