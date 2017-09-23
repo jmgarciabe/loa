@@ -36,7 +36,6 @@ public class VisibilityAssess {
     {
     	double visibility = 0;
     	double itemVisits = 0;
-    	double itemDown = 0;
     	double collVisits = 0;
     	double nonCollVisits = 0;
     	double nonCollSum = 0;
@@ -72,42 +71,7 @@ public class VisibilityAssess {
                             + dso.getID() + " and type " + dso.getType()
                             + " and handle: " + dso.getHandle(), e);*/
         }
-    	
-    	// Gets the total number of file downloads by item from Solr index
-    	
-    	try
-        {
-
-            StatisticsListing statisticsTable = new StatisticsListing(
-            		new StatisticsDataVisits(dso));
-
-            statisticsTable.setTitle("File Downloads");
-            statisticsTable.setId("list2");
-
-            DatasetDSpaceObjectGenerator dsoAxis = new DatasetDSpaceObjectGenerator();
-            dsoAxis.addDsoChild(Constants.BITSTREAM, 10, false, -1);
-            statisticsTable.addDatasetGenerator(dsoAxis);
-            Dataset dataset = statisticsTable.getDataset(context);
-
-            if (dataset != null)
-            {
-            	String[][] matrix = dataset.getMatrix();
-                
-                for (int i=0; i<matrix.length; i++){
-            		for (int j=0; j<matrix[i].length; j++){
-            			itemDown = new Integer(matrix[i][j]).doubleValue();
-            		}
-            	}
-            }
-        }
-        catch (Exception e)
-        {
-            /*log.error(
-                "Error occurred while creating statistics for dso with ID: "
-                                + dso.getID() + " and type " + dso.getType()
-                                + " and handle: " + dso.getHandle(), e);*/
-        }
-    	
+    	    	
     	// Gets the total number of visits by collection where belongs the item assessed from Solr index
     	
     	try
@@ -182,13 +146,8 @@ public class VisibilityAssess {
                             + " and handle: " + dso.getHandle(), e);*/
         }
     	
-    	if (collVisits > 0)
-    	{
-    		if(nonCollSum > 0)
-    			visibility = (itemVisits + itemDown) / (collVisits + nonCollSum);
-        	else
-        		visibility = itemVisits / collVisits;		
-    	}
+    	if ((collVisits + nonCollSum) > 0)
+    		visibility = itemVisits / (collVisits + nonCollSum);
     	
     	return visibility;	
     }
