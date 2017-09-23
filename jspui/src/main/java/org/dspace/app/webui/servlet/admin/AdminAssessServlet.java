@@ -28,14 +28,14 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.loa.AssessParam;
-import org.dspace.loa.AvailabilityAssess;
-import org.dspace.loa.CoherenceAssess;
-import org.dspace.loa.CompletenessAssess;
-import org.dspace.loa.ConsistencyAssess;
+import org.dspace.loa.AvailabilityAssessCommand;
+import org.dspace.loa.CoherenceAssessCommand;
+import org.dspace.loa.CompletenessAssessCommand;
+import org.dspace.loa.ConsistencyAssessCommand;
 import org.dspace.loa.Dimension;
 import org.dspace.loa.Layer;
 import org.dspace.loa.Metric;
-import org.dspace.loa.ReusabilityAssess;
+import org.dspace.loa.ReusabilityAssessCommand;
 import org.dspace.loa.VisibilityAssess;
 import org.elasticsearch.search.aggregations.HasAggregations;
 
@@ -86,18 +86,18 @@ public class AdminAssessServlet extends DSpaceServlet {
 			JSPManager.showInternalError(request, response);
 
 		if (assess2Perform.equals("Availability")) {
-			result = AvailabilityAssess.perform(item);
+			result = AvailabilityAssessCommand.perform(item);
 			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
 				request.setAttribute("task_result", new AssessResult("Availability", handle, SUCCESS_STATUS, new DecimalFormat(
-						"#.##").format(result) + ". " + AvailabilityAssess.getResults(item), ASSESS_SUCCESS));
+						"#.##").format(result) + ". " + AvailabilityAssessCommand.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Availability", 1, itemID);
 			} else
 				request.setAttribute("task_result", new AssessResult("Availability", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
 		}
 		if (assess2Perform.equals("Coherence")) {
 			try {
-				result = CoherenceAssess.perform(item);
+				result = CoherenceAssessCommand.perform(item);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -105,18 +105,18 @@ public class AdminAssessServlet extends DSpaceServlet {
 			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
 				request.setAttribute("task_result", new AssessResult("Coherence", handle, SUCCESS_STATUS, new DecimalFormat(
-						"#.##").format(result) + ". " + CoherenceAssess.getResults(item), ASSESS_SUCCESS));
+						"#.##").format(result) + ". " + CoherenceAssessCommand.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Coherence", 1, itemID);
 			} else {
 				request.setAttribute("task_result", new AssessResult("Coherence", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
 			}
 		}
 		if (assess2Perform.equals("Completeness")) {
-			result = CompletenessAssess.perform(item);
+			result = CompletenessAssessCommand.perform(item);
 			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
 				request.setAttribute("task_result", new AssessResult("Completeness", handle, SUCCESS_STATUS, new DecimalFormat(
-						"#.##").format(result) + ". " + CompletenessAssess.getResults(item), ASSESS_SUCCESS));
+						"#.##").format(result) + ". " + CompletenessAssessCommand.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Completeness", 1, itemID);
 			} else {
 				request.setAttribute("task_result", new AssessResult("Completeness", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
@@ -124,7 +124,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 		}
 		if (assess2Perform.equals("Consistency")) {
 			try {
-				result = ConsistencyAssess.perform(item);
+				result = ConsistencyAssessCommand.perform(item);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -133,18 +133,18 @@ public class AdminAssessServlet extends DSpaceServlet {
 			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
 				request.setAttribute("task_result", new AssessResult("Consistency", handle, SUCCESS_STATUS, new DecimalFormat(
-						"#.##").format(result) + ". " + ConsistencyAssess.getResults(item), ASSESS_SUCCESS));
+						"#.##").format(result) + ". " + ConsistencyAssessCommand.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Consistency", 1, itemID);
 			} else {
 				request.setAttribute("task_result", new AssessResult("Consistency", handle, FAIL_STATUS, null, ASSESS_SUCCESS));
 			}
 		}
 		if (assess2Perform.equals("Reusability")) {
-			result = ReusabilityAssess.perform(item);
+			result = ReusabilityAssessCommand.perform(item);
 			if (result >= 0.0) {
 				ASSESS_SUCCESS = true;
 				request.setAttribute("task_result", new AssessResult("Reusability", handle, SUCCESS_STATUS, new DecimalFormat(
-						"#.##").format(result) + ". " + ReusabilityAssess.getResults(item), ASSESS_SUCCESS));
+						"#.##").format(result) + ". " + ReusabilityAssessCommand.getResults(item), ASSESS_SUCCESS));
 				Metric.addAssessValue(context, result, "Reusability", 1, itemID);
 			} else {
 				request.setAttribute("task_result", new AssessResult("Reusability", handle, FAIL_STATUS, null, ASSESS_SUCCESS));

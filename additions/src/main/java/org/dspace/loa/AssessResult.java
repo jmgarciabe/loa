@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.webui.util;
+package org.dspace.loa;
 
 
 /**
