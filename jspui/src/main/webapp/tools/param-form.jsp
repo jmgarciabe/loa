@@ -26,8 +26,7 @@
 	Item item = (Item) request.getAttribute("item");
 
 	// Is anyone logged in?
-	EPerson user = (EPerson) request
-			.getAttribute("dspace.current.user");
+	EPerson user = (EPerson) request.getAttribute("dspace.current.user");
 %>
 
 <dspace:layout style="submission" title="Learning Object Assessment Parametrization" navbar="admin"
@@ -52,21 +51,16 @@
 				<label for="selectLayer" class="control-label">Please select the layer to set parameters</label>
 				<select class="form-control" id="selectLayer" name="layer_name">
 					<%
-						Vector adminAssessOpt = (Vector) session
-									.getAttribute("LOA.adminAssessOpt");
-							if (adminAssessOpt != null && !adminAssessOpt.isEmpty()) {
+						Vector adminAssessOpt = (Vector) session.getAttribute("LOA.adminAssessOpt");
+							if (adminAssessOpt != null) {
+								for (int index = 0; index < adminAssessOpt.size(); index++) {
+									String layer = (String) adminAssessOpt.elementAt(index);
 					%>
-					<%
-						for (int index = 0; index < adminAssessOpt.size(); index++) {
-									String layers = (String) adminAssessOpt
-											.elementAt(index);
-					%>
-					<%=layers%>
+					<option value="<%=layer%>"><%=layer%></option>
+
 					<%
 						}
-					%>
-					<%
-						}
+							}
 					%>
 				</select>
 
@@ -78,10 +72,9 @@
 		</form>
 
 		<div class="pull-left" style="padding-left: 5px;">
-			<form method="get" action="<%= request.getContextPath() %>/tools/LOAssessment">
-				<input type="hidden" name="item_id" value="<%= item.getID() %>" />
-				<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
-					value="Back" />
+			<form method="get" action="<%=request.getContextPath()%>/tools/LOAssessment">
+				<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input
+					class="btn btn-primary btn-lg" type="submit" name="submit_cancel" value="Back" />
 			</form>
 		</div>
 	</div>

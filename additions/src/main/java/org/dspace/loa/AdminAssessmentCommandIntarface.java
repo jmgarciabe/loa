@@ -1,6 +1,7 @@
 package org.dspace.loa;
 
 import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 
 public interface AdminAssessmentCommandIntarface {
 	/**
@@ -8,7 +9,7 @@ public interface AdminAssessmentCommandIntarface {
 	 * @param dso - the DSpace item
 	 * @throws AdminAssessmentException - may throw an custom exception
 	 */
-	public void executeAssessment(DSpaceObject dso) throws AdminAssessmentException;
+	public void executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException;
 	/**
 	 * Return object with the assessment result in convenient way with extra data
 	 * @return assessment result object 

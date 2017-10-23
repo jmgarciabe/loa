@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 import com.hp.hpl.jena.assembler.Assembler;
 
@@ -49,7 +50,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 	 *            the DSpace object
 	 * @throws IOException
 	 */
-	public void executeAssessment(DSpaceObject dso) throws AdminAssessmentException {
+	public void executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
 
 		if (dso.getType() != Constants.ITEM) {
 			return;
@@ -189,7 +190,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 			result.append(" has inconsistent data in most of analyzed metadata fields");
 		}
 
-		AssessResult assessResult = new AssessResult("Consistency", handle, status, stringScore + ". " + result,
+		AssessResult assessResult = new AssessResult("Consistency", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		return assessResult;
 	}

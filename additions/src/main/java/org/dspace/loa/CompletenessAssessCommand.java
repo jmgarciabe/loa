@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 /**
  * Completeness assessment compares item metadata with some specific fields
@@ -21,16 +22,16 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 
 	/** Store the assessment result score */
 	private double score = 0.0;
-	
+
 	/** Store assessment result as text adding needed extra information */
 	private StringBuilder result = new StringBuilder();
-	
+
 	/** whether the assessment process has been carried out or not */
 	private boolean assessmentExecuted = false;
-	
+
 	/** The item's handle */
 	private String handle = "";
-	
+
 	/** Weight for Title metadata field value */
 	private final double TITLE = 0.17;
 
@@ -61,7 +62,7 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 	/** Weight for Provenance (Status) metadata field value */
 	private final double STATUS = 0.02;
 
-	public void executeAssessment(DSpaceObject dso) {
+	public void executeAssessment(DSpaceObject dso, Context context) {
 
 		if (dso.getType() != Constants.ITEM) {
 			return;
@@ -120,7 +121,7 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 			result.append(" very few of the most important metadata fields have been filled");
 		}
 
-		AssessResult assessResult = new AssessResult("Completeness", handle, status, stringScore + ". " + result,
+		AssessResult assessResult = new AssessResult("Completeness", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 
 		return assessResult;

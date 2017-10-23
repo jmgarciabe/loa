@@ -11,6 +11,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.Metadatum;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 /**
  * Availability assessment checks that all links stored in
@@ -41,7 +42,7 @@ public class AvailabilityAssessCommand implements AdminAssessmentCommandIntarfac
 	
 	
 	
-	public void executeAssessment(DSpaceObject dso) {
+	public void executeAssessment(DSpaceObject dso, Context context) {
 
 		if (dso.getType() == Constants.ITEM) {
 
@@ -145,7 +146,7 @@ public class AvailabilityAssessCommand implements AdminAssessmentCommandIntarfac
 		// The results that we'll return
 		String status = score > 0.0 ? "Success": "Fail";
 		String stringScore = new DecimalFormat("#.##").format(score);
-		AssessResult  assessResult =  new AssessResult("Availability", handle, status,  stringScore + ". " + result, assessmentExecuted);
+		AssessResult  assessResult =  new AssessResult("Availability", score, handle, status,  stringScore + ". " + result, assessmentExecuted);
 		return assessResult;
 	}
 }

@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 
 /**
  * Reusability assessment takes item type and ispartofseries metadata values and
@@ -18,7 +19,7 @@ import org.dspace.core.Constants;
  * @author Andres Salazar
  */
 
-public class ReusabilityAssessCommand {
+public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface {
 
 	/** Store the assessment result score */
 	private double score = 0.0;
@@ -56,7 +57,7 @@ public class ReusabilityAssessCommand {
 	/** Weight for item's Linear structure */
 	private static final double LINEAR = 0.1;
 
-	public void executeAssessment(DSpaceObject dso) {
+	public void executeAssessment(DSpaceObject dso, Context context) {
 		if (dso.getType() != Constants.ITEM) {
 			return;
 		}
@@ -66,7 +67,7 @@ public class ReusabilityAssessCommand {
 		assessmentExecuted = true;
 		double sum = 0.0;
 		int comparisons = 0;
-		
+
 		if (item.getMetadata("dc.type") != null) {
 			comparisons++;
 			sum += checkStructureRule(item.getMetadata("dc.type"));
@@ -206,7 +207,7 @@ public class ReusabilityAssessCommand {
 			result.append(" has a low level of reusability");
 		}
 
-		AssessResult assessResult = new AssessResult("Reusability", handle, status, stringScore + ". " + result,
+		AssessResult assessResult = new AssessResult("Reusability", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		return assessResult;
 	}
