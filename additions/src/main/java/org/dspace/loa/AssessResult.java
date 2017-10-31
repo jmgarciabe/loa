@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.webui.util;
+package org.dspace.loa;
 
 
 /**
@@ -17,6 +17,9 @@ public class AssessResult
 
     /** the assess identifier*/
     private String task;
+    
+    /** the asses result score  */
+    private double score;
 
     /** the handle of the dspace-object */
     private String handle;
@@ -30,9 +33,10 @@ public class AssessResult
     /** Is the curation success? */
     private boolean isSuccess = false;
 
-    public AssessResult(String assess, String handle, String status, String result, boolean isSuccess)
+    public AssessResult(String assess, double score, String handle, String status, String result, boolean isSuccess)
     {
         this.task = assess;
+        this.score = score;
         this.handle = handle;
         this.status = status;
         this.result = result;
@@ -63,6 +67,34 @@ public class AssessResult
     {
         return isSuccess;
     }
+
+	public double getScore() {
+		return score;
+	}
+
+	public void setScore(double score) {
+		this.score = score;
+	}
+
+	public void setTask(String task) {
+		this.task = task;
+	}
+
+	public void setHandle(String handle) {
+		this.handle = handle;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+	public void setSuccess(boolean isSuccess) {
+		this.isSuccess = isSuccess;
+	}
 
 }
 

@@ -19,8 +19,8 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.AdminAssessServlet"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet"%>
-<%@ page import="org.dspace.app.webui.util.AssessResult"%>
 <%@ page import="java.util.Vector"%>
+<%@page import="org.dspace.loa.AssessResult"%>
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.content.Metadatum"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
@@ -51,7 +51,7 @@
 	<br>
 	<br>
 	<div class="row container">
-		<p id="message" style="color: red;"><%= session.getAttribute("LOA.processMessage") %></p>
+		<p id="message" style="color: red;"><%=session.getAttribute("LOA.processMessage")%></p>
 		<form class="form-horizontal" method="get"
 			action="<%=request.getContextPath()%>/tools/LOAssessment/admin-assess">
 
@@ -69,7 +69,7 @@
 							for (int index = 0; index < adminAvailAssess.size(); index++) {
 										String adminMetrics = (String) adminAvailAssess.elementAt(index);
 						%>
-						<option value="<%=adminMetrics%>"/><%=adminMetrics%></option>
+						<option value="<%=adminMetrics%>" /><%=adminMetrics%></option>
 						<%
 							}
 						%>
@@ -88,7 +88,7 @@
 			</div>
 
 		</form>
-		
+
 		<form method="get" action="<%=request.getContextPath()%>/handle/<%=item.getHandle()%>">
 			<div class="pull-left" style="padding-left: 5px;">
 				<input class="btn btn-primary btn-lg" type="submit" name="submit_cancel"
@@ -103,7 +103,7 @@
 				<input class="btn btn-info btn-lg" type="submit" name="show_results" value="Show Results">
 			</div>
 		</form>
-		
+
 		<form method="get" action="<%=request.getContextPath()%>/tools/LOAssessment/assess-param">
 			<div class="pull-left" style="padding-left: 5px;">
 				<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input type="hidden"

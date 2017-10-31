@@ -71,13 +71,32 @@ public class Dimension extends DSpaceObject {
 			row.setColumn("admin_weight", dimWeight);
 			DatabaseManager.insert(context, row);
 
-		}else{
+		} else {
 			row.setColumn("admin_weight", dimWeight);
 			DatabaseManager.update(context, row);
 		}
 		// Make sure all changes are committed
 		context.commit();
 
+	}
+
+	/**
+	 * Deletes corresponding row in dimension_weighting table for the given data  
+	 * @param context - DSpace context object required for perform database transactions 
+	 * @param layerId - Layer ID of the row 
+	 * @param dimensionId - Dimension ID of the row
+	 * @param itemID - item ID of the row
+	 * @return numbers of rows affected (Must be 0 or 1)
+	 * @throws SQLException
+	 */
+	public static int DeleteDimensionWeighting(Context context, int layerId, int dimensionId, int itemID) throws SQLException {
+		String dbquery = "DELETE FROM dimension_weighting WHERE " + 
+							" layer_id = ? AND dimension_id = ? AND item_id = ? ";
+		// Deletes rows with data 
+		int rowsAffected = DatabaseManager.updateQuery(context, dbquery, layerId, dimensionId, itemID);
+		// Make sure all changes are committed
+		context.commit();
+		return rowsAffected;
 	}
 
 	/**
@@ -94,13 +113,16 @@ public class Dimension extends DSpaceObject {
 		context.commit();
 		return rowsAffected;
 	}
-	
-	
+
 	/**
 	 * Deletes all dimension weightings for a given layer and item
-	 * @param context DSpace Context
-	 * @param itemId item id 
-	 * @param layerId layer id
+	 * 
+	 * @param context
+	 *            DSpace Context
+	 * @param itemId
+	 *            item id
+	 * @param layerId
+	 *            layer id
 	 * @return
 	 * @throws SQLException
 	 */
@@ -112,8 +134,6 @@ public class Dimension extends DSpaceObject {
 		context.commit();
 		return rowsAffected;
 	}
-	
-	
 
 	/**
 	 * Finds all dimensions attached to a specific layer - assumes name is
@@ -168,7 +188,6 @@ public class Dimension extends DSpaceObject {
 		return dimensionName;
 	}
 
-	
 	/**
 	 * updates expert weight in DB attached to a dimension
 	 * 

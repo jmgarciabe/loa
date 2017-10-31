@@ -31,6 +31,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.Dimension;
 import org.dspace.loa.Metric;
+import org.dspace.loa.StartAssessHelper;
 
 /**
  * Servlet for initiate parameters for LOA's assessment
@@ -44,55 +45,32 @@ public class AssessItemServlet extends DSpaceServlet {
 
 	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException, SQLException, AuthorizeException {
-		try {
-			// Continue if logged in or startAuthentication finds a user;
-			// otherwise it will issue redirect so just return
 
-			if (context.getCurrentUser() != null || Authenticate.startAuthentication(context, request, response)) {
-				// User is authenticated
+		// Continue if logged in or startAuthentication finds a user;
+		// otherwise it will issue redirect so just return
+		if (context.getCurrentUser() != null || Authenticate.startAuthentication(context, request, response)) {
 
-				int itemID = UIUtil.getIntParameter(request, "item_id");
-				String handle = request.getParameter("handle");
-				boolean showError = false;
+			int itemID = UIUtil.getIntParameter(request, "item_id");
+			String handle = request.getParameter("handle");
 
-				// See if an item ID or Handle was passed in
-				Item itemToAssess = null;
-
-				if (itemID > 0) {
-					itemToAssess = Item.find(context, itemID);
-
-					showError = (itemToAssess == null);
-				} else if ((handle != null) && !handle.equals("")) {
-					// resolve handle
-					DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
-
-					// make sure it's an ITEM
-					if ((dso != null) && (dso.getType() == Constants.ITEM)) {
-						itemToAssess = (Item) dso;
-						showError = false;
-					} else {
-						showError = true;
-					}
-				}
-
-				// Show initial parameters form if appropriate
-				if (itemToAssess != null)
-					showAssessForm(context, request, response, itemToAssess);
-				else {
-					if (showError)
-						request.setAttribute("invalid.id", Boolean.TRUE);
-
-					JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
-				}
-
+			// See if an item ID or Handle was passed in
+			Item itemToAssess = null;
+			itemToAssess = Item.find(context, itemID);
+			if (itemToAssess == null && (handle != null && handle.length() > 0)) {
+				DSpaceObject dso = HandleManager.resolveToObject(context, handle.trim());
+				itemToAssess = (Item) dso;
 			}
-		} catch (SQLException se) {
-			// log.warn(LogManager.getHeader(context, "database_error", se
-			// .toString()), se);
-			JSPManager.showInternalError(request, response);
+
+			// Show initial parameters form if appropriate
+			if (itemToAssess == null) {
+				request.setAttribute("invalid.id", Boolean.TRUE);
+				JSPManager.showJSP(request, response, "/tools/get-item-id.jsp");
+			}
+			showAssessForm(context, request, response, itemToAssess);
 		}
+
 	}
-	
+
 	/**
 	 * Shows the item assessment parametrization form for a particular item
 	 * 
@@ -107,6 +85,7 @@ public class AssessItemServlet extends DSpaceServlet {
 	 */
 	private void showAssessForm(Context context, HttpServletRequest request, HttpServletResponse response, Item item)
 			throws ServletException, IOException, SQLException, AuthorizeException {
+		
 		HttpSession session = request.getSession(false);
 
 		if (session == null) {
@@ -114,7 +93,6 @@ public class AssessItemServlet extends DSpaceServlet {
 		}
 
 		request.setAttribute("item", item);
-			
 
 		/*
 		 * Depending on the group that the authenticated user belongs to, the
@@ -122,23 +100,23 @@ public class AssessItemServlet extends DSpaceServlet {
 		 * default to verifythe membership of the user (1-Administrator,
 		 * 2-Expert People, 3-Students group).
 		 */
-
+		StartAssessHelper helper = new StartAssessHelper();
 		if (AuthorizeManager.isAdmin(context)) {
 			// User is a repository administrator
 			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 1);
-			Vector<String> parameterizedMetrics = getMetrics(context, assessParam, 1);
+			Vector<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 1);
 			String processMessage = "";
-			if(parameterizedMetrics.isEmpty()){
+			if (parameterizedMetrics.isEmpty()) {
 				processMessage = "Parameters must be set prior to assessment process. Please use the link below in order to set parameters for this assessment.";
 			}
 			session.setAttribute("LOA.adminAvailAssess", parameterizedMetrics);
 			session.setAttribute("LOA.processMessage", processMessage);
 			JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");
-			
+
 		} else if (Group.isMember(context, 2)) {
-			//User is an admin
+			// User is an admin
 			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 2);
-			Vector<String> parameterizedDimensions = getDimensions(context, assessParam, 2);
+			Vector<String> parameterizedDimensions = helper.getDimensions(context, assessParam, 2);
 
 			if (parameterizedDimensions.isEmpty())
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
@@ -150,8 +128,8 @@ public class AssessItemServlet extends DSpaceServlet {
 		} else if (Group.isMember(context, 3)) {
 			// User is a student
 			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 3);
-			Vector<String> parameterizedMetrics = getMetrics(context, assessParam, 3); 
-			
+			Vector<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 3);
+
 			if (parameterizedMetrics.isEmpty())
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
 			else {
@@ -168,47 +146,6 @@ public class AssessItemServlet extends DSpaceServlet {
 		}
 
 	}
+
 	
-	private Vector<String> getDimensions(Context context, Vector<AssessParam> assessParamList, int layerId) {
-		Vector<String> ckDimensions = new Vector<String>();
-		String dimensionName = null;
-
-		if (assessParamList != null){
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
-				if (assessParam.getLayerID() == layerId) {
-					try {
-						dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					if (!ckDimensions.contains(dimensionName))
-						ckDimensions.addElement(dimensionName);
-				}
-			}
-		}
-
-		return ckDimensions;
-	}
-
-	public static Vector<String> getMetrics(Context context, Vector<AssessParam> assessParamList, int layerId) {
-		Vector<String> ckmetrics = new Vector<String>();
-		String metricName = null;
-		if (assessParamList != null) {
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
-				if (assessParam.getLayerID() == layerId) {
-					try {
-						metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					if (!ckmetrics.contains(metricName))
-						ckmetrics.addElement(metricName);
-				}
-			}
-		}
-		return ckmetrics;
-	}
-
 }
