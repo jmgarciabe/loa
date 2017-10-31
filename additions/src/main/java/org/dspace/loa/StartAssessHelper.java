@@ -115,20 +115,6 @@ public class StartAssessHelper {
 	}
 
 	/**
-	 * Retieve layers from database for the given layer
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 * @param layer
-	 *            - layer name
-	 * @return
-	 */
-	public Vector<Metric> getMetrics(Context context, String layer) throws SQLException {
-		Vector<Metric> metricList = Metric.findByLayer(context, layer);
-		return metricList;
-	}
-
-	/**
 	 * Return a list of String with dimension names, using a List of String with
 	 * comma separated values in which the first value is the layer id, and the
 	 * second is the dimension id. Values are filtered to only return the

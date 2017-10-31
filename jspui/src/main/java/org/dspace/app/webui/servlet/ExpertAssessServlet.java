@@ -9,7 +9,9 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
@@ -19,8 +21,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.dspace.app.webui.servlet.AssessItemServlet;
-import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
@@ -28,9 +28,7 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
-import org.dspace.loa.Dimension;
 import org.dspace.loa.ExpertAssessHelper;
-import org.dspace.loa.Metric;
 import org.dspace.loa.StartAssessHelper;
 
 /**
@@ -49,18 +47,7 @@ public class ExpertAssessServlet extends DSpaceServlet {
 	/** Users send their concept for an item through an answered survey */
 	public static final int EXP_SURVEY = 15;
 
-	/** Map holding old weights retrieved from data base */
-	// private Map<String, Integer> oldDimWeights;
-
-	/** Map holding weights assigned by expert */
-	// private Map<String, Integer> dimWeights;
-
-	/** Map holding attributes IDs expected from the client */
-	// private Map<String, String> attrId;
-
-	/** Map holding old values store in database before update */
-	// private Map<String, Double> metricsValues;
-
+	
 	protected void doDSGet(Context context, HttpServletRequest request, HttpServletResponse response) throws ServletException,
 			IOException, SQLException, AuthorizeException {
 
@@ -78,7 +65,7 @@ public class ExpertAssessServlet extends DSpaceServlet {
 		int itemId = UIUtil.getIntParameter(request, "item_id");
 		Item item = Item.find(context, itemId);
 		String handle = HandleManager.findHandle(context, item);
-		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
+		
 
 		switch (action) {
 		case DIM_PARAM:
@@ -104,8 +91,9 @@ public class ExpertAssessServlet extends DSpaceServlet {
 			}
 
 			expertHelper.setExpertWeight(context, expertWeights);
+			Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
 			Vector<String> expMetrics = startHelper.getMetrics(context, assessParamList, 2);
-			request.setAttribute("expertHelper", expertHelper);
+			session.setAttribute("expertHelper", expertHelper);
 			request.setAttribute("item", item);
 			request.setAttribute("handle", handle);
 			session.setAttribute("LOA.expMetrics", expMetrics);
@@ -116,16 +104,7 @@ public class ExpertAssessServlet extends DSpaceServlet {
 
 		case EXP_SURVEY:
 
-			Map<String, String> criteriaIds = new HashMap<String, String>();
-			criteriaIds.put("12", "Accessibility");
-			criteriaIds.put("14", "Accuracy");
-			criteriaIds.put("13", "Completeness");
-			criteriaIds.put("11", "Ease to use");
-			criteriaIds.put("8", "Potential Effectiveness");
-			criteriaIds.put("10", "Reusability");
-			criteriaIds.put("7", "Rigor and Relevance");
-			criteriaIds.put("9", "Visual Design");
-
+			ExpertAssessHelper helper = (ExpertAssessHelper)session.getAttribute("expertHelper");
 			Map<String, String[]> answerIds = new HashMap<String, String[]>();
 			answerIds.put("12", new String[] { "acs1", "acs2" });
 			answerIds.put("14", new String[] { "acc1" });
@@ -135,36 +114,22 @@ public class ExpertAssessServlet extends DSpaceServlet {
 			answerIds.put("10", new String[] { "reu1", "reu2" });
 			answerIds.put("7", new String[] { "rar1", "rar2" });
 			answerIds.put("9", new String[] { "vid1", "vid2" });
-
-			for (AssessParam param : assessParamList) {
-
-				double result = 0.0;
-				double oldW = 0.0;
-				double newW = 0.0;
-				double value = 0.0;
-				String dimension;
-				String assessMetricId;
-
-				dimension = String.valueOf(param.getDimID());
-				assessMetricId = String.valueOf(param.getAssessMetricID());
-				oldW = oldDimWeights.get(dimension);
-				newW = dimWeights.get(dimension);
-				String[] ids = answerIds.get(assessMetricId);
-				for (String answer : ids) {
+			
+			Map<String,List<Double>> responses = new HashMap<String,List<Double>>();
+			
+			for(Entry<String,String[]> entry: answerIds.entrySet()){
+				List<Double> perMetricResponses = new ArrayList<Double>();;
+				for (String answer : entry.getValue()) {
 					if (request.getParameter(answer) != null) {
-						value += Double.valueOf(request.getParameter(answer));
+						perMetricResponses.add(Double.valueOf(request.getParameter(answer)));
 					}
 				}
-				value /= (ids.length * 5);
-				result = Double.valueOf(metricsValues.get(assessMetricId));
-				result = (result * oldW + value * newW) / (oldW + newW);
-				Metric.addAssessValue(context, result, criteriaIds.get(assessMetricId), 2, itemId);
-
+				responses.put(entry.getKey(), perMetricResponses);
 			}
-
+			
+			helper.setExpertAssessment(context, responses);
 			request.setAttribute("item", item);
 			JSPManager.showJSP(request, response, "/tools/success-page.jsp");
-
 			break;
 
 		}

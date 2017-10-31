@@ -36,7 +36,7 @@ public class AssessResult
     public AssessResult(String assess, double score, String handle, String status, String result, boolean isSuccess)
     {
         this.task = assess;
-        this.score = 0.0;
+        this.score = score;
         this.handle = handle;
         this.status = status;
         this.result = result;

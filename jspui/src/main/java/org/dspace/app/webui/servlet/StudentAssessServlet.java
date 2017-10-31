@@ -9,8 +9,11 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -26,6 +29,7 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.Metric;
+import org.dspace.loa.StudentAssessHelper;
 
 /**
  * Servlet for perform the assessment logic of each of the student layer metrics
@@ -49,61 +53,34 @@ public class StudentAssessServlet extends DSpaceServlet {
 		}
 
 		int itemID = UIUtil.getIntParameter(request, "item_id");
-
 		Item item = Item.find(context, itemID);
+		StudentAssessHelper helper = new StudentAssessHelper();
 
-		String handle = HandleManager.findHandle(context, item);
-		
-		// Cargamos solo los asses param de la capa
-		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemID, 3);
-
-		double formValue = 0;
-		double dbValue = 0;
 		// Se crean mapas con información de los variables y ids de las
 		// dimensiones para almacenar respuestas
 		Map<String, String[]> questions = new HashMap<String, String[]>();
-		Map<String, String> criteriaIds = new HashMap<String, String>();
+		Map<String, List<Double>> perMetricResponses = new HashMap<String,List<Double>>();
 
-		questions.put("Availability", new String[] { "ava1" });
-		questions.put("Accuracy", new String[] { "acc1" });
-		questions.put("Ease to use", new String[] { "eou1" });
-		questions.put("Effectiveness", new String[] { "eff1" });
-		questions.put("Motivation", new String[] { "mot1" });
-		questions.put("Relevance", new String[] { "rel1" });
-		questions.put("Visual Design", new String[] { "vid1", "vid2" });
-
-		criteriaIds.put("19", "Availability");
-		criteriaIds.put("21", "Accuracy");
-		criteriaIds.put("20", "Ease to use");
-		criteriaIds.put("17", "Effectiveness");
-		criteriaIds.put("16", "Motivation");
-		criteriaIds.put("15", "Relevance");
-		criteriaIds.put("18", "Visual Design");
-
-		// Recorremos los param para actualizar o guardar el valor de la métrica
-		for (AssessParam param : assessParamList) {
-			if (param.getMetricValue() != null && param.getMetricValue() != "") {
-				formValue = Double.valueOf(param.getMetricValue()).doubleValue();
+		questions.put("19", new String[] { "ava1" });
+		questions.put("21", new String[] { "acc1" });
+		questions.put("20", new String[] { "eou1" });
+		questions.put("17", new String[] { "eff1" });
+		questions.put("16", new String[] { "mot1" });
+		questions.put("15", new String[] { "rel1" });
+		questions.put("18", new String[] { "vid1", "vid2" });
+		
+		for(Entry<String,String[]> entry: questions.entrySet()){
+			List<Double> valores = new ArrayList<Double>();
+			for(String id: entry.getValue()){
+				if(request.getParameter(id) != null){
+					valores.add(Double.valueOf(request.getParameter(id)));
+				}
 			}
-			String metricId = String.valueOf(param.getAssessMetricID());
-			String criteria = criteriaIds.get(metricId);
-			String[] questIds = questions.get(criteria);
-			for (String q : questIds) {
-				dbValue += request.getParameter(q) != null ? Double.valueOf(request.getParameter(q)).doubleValue() : 0;
-			}
-			if (questIds.length > 0) {
-				dbValue /= (questIds.length*5);
-			}
-			if (formValue > 0) {
-				dbValue = (dbValue + formValue) / 2;
-			}
-			if (dbValue > 0) {
-				Metric.addAssessValue(context, dbValue, criteria, 3, itemID);
-			}
-			// Se resetean los valores
-			formValue = 0;
-			dbValue = 0;
+			perMetricResponses.put(entry.getKey(), valores);
 		}
+		
+		helper.setExpertAssessment(context, item.getID(), perMetricResponses);
+
 		request.setAttribute("item", item);
 		JSPManager.showJSP(request, response, "/tools/success-page.jsp");
 	}

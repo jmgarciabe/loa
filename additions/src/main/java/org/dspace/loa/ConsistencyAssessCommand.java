@@ -1,19 +1,25 @@
 package org.dspace.loa;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-
-import com.hp.hpl.jena.assembler.Assembler;
 
 /**
  * Consistency assessment compares some item metadata values with a list of
@@ -65,7 +71,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 		if (item.getMetadata("dc.format.mimetype") != null) {
 			comparisons++;
 
-			String path = CoherenceAssessCommand.class.getResource("/allowedValues/media-types.csv").toString();
+			String path = "allowedValues/media-types.csv";
 			if (compareCSValues(path, item.getMetadata("dc.format.mimetype"))) {
 				sum += 1;
 				score = sum / comparisons;
@@ -94,7 +100,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 		}
 		if (item.getMetadata("dc.subject.ddc") != null) {
 			comparisons++;
-			String path = CoherenceAssessCommand.class.getResource("/allowedValues/ddc.csv").toString();
+			String path = "allowedValues/ddc.csv";
 			if (compareCSValues(path, item.getMetadata("dc.subject.ddc"))) {
 				sum += 1;
 			}
@@ -102,7 +108,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 		}
 		if (item.getMetadata("dc.subject.lcc") != null) {
 			comparisons++;
-			String path = CoherenceAssessCommand.class.getResource("/allowedValues/lcc.csv").toString();
+			String path = "allowedValues/lcc.csv";
 			if (compareCSValues(path, item.getMetadata("dc.subject.lcc"))) {
 				sum += 1;
 			}
@@ -110,7 +116,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 		}
 		if (item.getMetadata("dc.subject.mesh") != null) {
 			comparisons++;
-			String path = CoherenceAssessCommand.class.getResource("/allowedValues/mesh.csv").toString();
+			String path = "allowedValues/mesh.csv";
 			if (compareCSValues(path, item.getMetadata("dc.subject.mesh"))) {
 				sum += 1;
 			}
@@ -151,26 +157,28 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 	 * @throws AdminAssessmentException
 	 *             - may throw an exception loading the CSV file
 	 */
-	private boolean compareCSValues(String filePath, String metadata) throws AdminAssessmentException {
+	private boolean compareCSValues(String path, String metadata) throws AdminAssessmentException {
 
 		boolean result = false;
-		File csvFile = new File(filePath);
-		List<String> lines;
 		try {
-			lines = Files.readAllLines(csvFile.toPath(), StandardCharsets.UTF_8);
+			InputStream in = CoherenceAssessCommand.class.getResourceAsStream(path);
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					String[] array = line.split(",");
+					if ((array[0].length() > 0 && metadata.contains(array[0]))
+							|| (array[1].length() > 0 && metadata.contains(array[1]))) {
+						result = true;
+						break;
+					}
+				}
+			}
 		} catch (IOException ioe) {
 			log.error(ioe.getMessage());
-			throw new AdminAssessmentException("Exception reading format types file");
-		}
-
-		for (String line : lines) {
-			String[] array = line.split(",");
-			if (metadata.contains(array[0]) || metadata.contains(array[1]))
-				result = true;
+			throw new AdminAssessmentException("Exception loading Lang Detect Profiles");
 		}
 
 		return result;
-
 	}
 
 	public AssessResult getResult() {

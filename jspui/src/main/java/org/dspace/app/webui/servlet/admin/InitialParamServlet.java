@@ -70,13 +70,14 @@ public class InitialParamServlet extends DSpaceServlet {
 		int action = UIUtil.getIntParameter(request, "action");
 
 		Item item = Item.find(context, UIUtil.getIntParameter(request, "item_id"));
+		request.setAttribute("item", item);
 		String handle = HandleManager.findHandle(context, item);
 
 		/*
 		 * Respond to submitted forms. Each form includes an "action" parameter
 		 * indicating what needs to be done (from the constants above.)
 		 */
-
+		
 		StartAssessHelper helper = new StartAssessHelper();
 		String layer;
 
@@ -84,6 +85,7 @@ public class InitialParamServlet extends DSpaceServlet {
 
 		case START_PARAM:
 			Vector<String> layers = helper.getLayers(context);
+			
 			session.setAttribute("LOA.adminAssessOpt", layers);
 			JSPManager.showJSP(request, response, "/tools/param-form.jsp");
 			break;
@@ -96,8 +98,7 @@ public class InitialParamServlet extends DSpaceServlet {
 				System.out.println("Selected layer is not valid");
 			}
 			Vector<Dimension> dimensionList = helper.getDimensions(context, layer);
-			Vector<Metric> metricList = helper.getMetrics(context, layer);
-			request.setAttribute("item", item);
+			Vector<Metric> metricList = Metric.findByLayer(context, layer);
 			request.setAttribute("handle", handle);
 			request.setAttribute("layer_name", layer);
 			session.setAttribute("LOA.dimensionList", dimensionList);
@@ -126,7 +127,6 @@ public class InitialParamServlet extends DSpaceServlet {
 
 			Vector<String> checkedDimensions = helper.verifyCheckedDimensions(context, ckMetricsID, layer);
 
-			request.setAttribute("item", item);
 			request.setAttribute("handle", handle);
 			request.setAttribute("layer", layer);
 			session.setAttribute("LOA.ckDimensionList", checkedDimensions);
@@ -190,9 +190,26 @@ public class InitialParamServlet extends DSpaceServlet {
 				}
 			}
 		}
+		
+		
 
-		// Eliminamos todos los dimension weigthing previos
-		Dimension.DeleteWeightsById(context, itemId, layerId);
+		// Eliminamos los dimension weigthing previos que no se vayan a utilizar
+		for(Dimension dimension : dimensionsList){
+			boolean delete = true;
+			String[] data = null;
+			for (int j = 0; j < ckMetricsID.size(); j++) {
+				String metricInfo = ckMetricsID.elementAt(j).toString();
+				data = metricInfo.split(",");
+				int dimId = Integer.valueOf(data[1]).intValue();
+				if (dimension.getID() == dimId) {
+					delete = false;
+					break;
+				}
+			}
+			if (delete) {
+				Dimension.DeleteDimensionWeighting(context, layerId, dimension.getID(), itemId);
+			}
+		}
 
 		// Agregamos dimension weighting y assessment result
 		for (int i = 0; i < ckMetricsID.size(); i++) {

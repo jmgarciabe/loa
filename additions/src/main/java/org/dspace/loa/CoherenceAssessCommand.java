@@ -1,10 +1,12 @@
 package org.dspace.loa;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.InputStreamReader;
 import java.net.JarURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
@@ -22,13 +24,10 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.eperson.Group;
 
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
-import com.hp.hpl.jena.assembler.Assembler;
-import com.hp.hpl.jena.assembler.assemblers.AssemblerGroup;
 
 /**
  * Coherence assessment compares some item metadata values with the values of
@@ -146,8 +145,7 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 			alloweMimeValues.put("Video", new String[] { "audio" });
 			alloweMimeValues.put("Working Paper", new String[] { "app", "text" });
 
-			String path = CoherenceAssessCommand.class.getResource("/allowedValues/media-types.csv").toString();
-			String formaType = searchFormaType(path, item.getMetadata("dc.format.mimetype"));
+			String formaType = searchFormaType(item.getMetadata("dc.format.mimetype"));
 			String type = item.getMetadata("dc.type");
 			String[] formats = alloweMimeValues.get(type);
 
@@ -226,31 +224,49 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 		}
 	}
 
-	private String searchFormaType(String filePath, String metadata) throws AdminAssessmentException {
+	/**
+	 * Search for the type of the given format, checking in the file of valid
+	 * format ah their types
+	 * 
+	 * @param metadata
+	 *            - the format to be checked
+	 * @return - type of the format given (app, video, audio, ...)
+	 * @throws AdminAssessmentException
+	 */
+	private String searchFormaType(String metadata) throws AdminAssessmentException {
 
 		String type = null;
-		File csvFile = new File(filePath);
-		List<String> lines;
 		try {
-			lines = Files.readAllLines(csvFile.toPath(), StandardCharsets.UTF_8);
+			InputStream in = CoherenceAssessCommand.class.getResourceAsStream("allowedValues/media-types.csv");
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+				String line;
+				while ((line = br.readLine()) != null) {
+					String[] array = line.split(",");
+					if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("application/")) {
+						type = "app";
+						break;
+					}
+					if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("audio/")) {
+						type = "audio";
+						break;
+					}
+					if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("image/")) {
+						type = "image";
+						break;
+					}
+					if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("text/")) {
+						type = "text";
+						break;
+					}
+					if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("video/")) {
+						type = "video";
+						break;
+					}
+				}
+			}
 		} catch (IOException ioe) {
-			log.error(ioe.getCause());
 			log.error(ioe.getMessage());
-			throw new AdminAssessmentException("Exception reading formar types files");
-		}
-
-		for (String line : lines) {
-			String[] array = line.split(",");
-			if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("application/"))
-				type = "app";
-			if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("audio/"))
-				type = "audio";
-			if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("image/"))
-				type = "image";
-			if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("text/"))
-				type = "text";
-			if ((metadata.contains(array[0]) || metadata.contains(array[1])) && array[1].contains("video/"))
-				type = "video";
+			throw new AdminAssessmentException("Exception loading Lang Detect Profiles");
 		}
 
 		return type;
@@ -260,7 +276,7 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 	public AssessResult getResult() {
 
 		String status = score > 0.0 ? "Success" : "Fail";
-		String stringScore = new DecimalFormat("#.##").format(result);
+		String stringScore = new DecimalFormat("#.##").format(score);
 		result.append("Item: ").append(handle);
 
 		if (score > 0.7) {

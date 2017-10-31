@@ -2,6 +2,7 @@ package org.dspace.loa;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -24,7 +25,7 @@ public class ExpertAssessHelper {
 	public ExpertAssessHelper(int itemId) {
 
 		this.itemId = itemId;
-		
+
 		oldDimWeights = new HashMap<String, Integer>();
 		oldDimWeights.put("1", 0);
 		oldDimWeights.put("3", 0);
@@ -50,8 +51,20 @@ public class ExpertAssessHelper {
 		metricsValues.put("9", 0.0);
 	}
 
-	public void setExpertWeight(Context context, Map<String,Integer> values) throws SQLException{
-		
+	/**
+	 * Sets or updates expert weights with the given values
+	 * 
+	 * @param context
+	 *            -the DSpace context object to execute data base operations
+	 * @param values
+	 *            - A map with the experts weights values to be set, each entry
+	 *            in the map represents a dimension and the given weight
+	 * @throws SQLException
+	 *             - May throw an SQL Exception while carrying out SQL
+	 *             operations
+	 */
+	public void setExpertWeight(Context context, Map<String, Integer> values) throws SQLException {
+
 		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
 		for (int i = 0; i < assessParamList.size(); i++) {
 			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
@@ -67,6 +80,59 @@ public class ExpertAssessHelper {
 			}
 			dimWeights.put(dimId, weight);
 			Dimension.updateExpertWeight(context, assessParam.getDimWeightID(), itemId, dimWeights.get(dimId));
+		}
+
+	}
+
+	/**
+	 * Sets or updates the set of expert assessment results using the
+	 * given values
+	 * 
+	 * @param context
+	 *            - the DSpace context object to execute data base operations
+	 * @param perMetricValues
+	 *            - A map with the results of the expertAssessment, each entry
+	 *            in the map represents a metric and an List of values for the
+	 *            metric
+	 * @throws SQLException
+	 *             - May throw an SQL Exception while carrying out SQL
+	 *             operations
+	 */
+	public void setExpertAssessment(Context context, Map<String, List<Double>> perMetricValues) throws SQLException {
+
+		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
+		Map<String, String> criteriaIds = new HashMap<String, String>();
+		criteriaIds.put("12", "Accessibility");
+		criteriaIds.put("14", "Accuracy");
+		criteriaIds.put("13", "Completeness");
+		criteriaIds.put("11", "Ease to use");
+		criteriaIds.put("8", "Potential Effectiveness");
+		criteriaIds.put("10", "Reusability");
+		criteriaIds.put("7", "Rigor and Relevance");
+		criteriaIds.put("9", "Visual Design");
+
+		for (AssessParam param : assessParamList) {
+
+			double result = 0.0;
+			double oldW = 0.0;
+			double newW = 0.0;
+			double value = 0.0;
+			String dimension;
+			String assessMetricId;
+
+			dimension = String.valueOf(param.getDimID());
+			assessMetricId = String.valueOf(param.getAssessMetricID());
+			oldW = oldDimWeights.get(dimension);
+			newW = dimWeights.get(dimension);
+			List<Double> valuesEntry = perMetricValues.get(assessMetricId);
+			for (Double answer : valuesEntry) {
+				value += answer;
+			}
+			value /= (valuesEntry.size() * 5);
+			result = Double.valueOf(metricsValues.get(assessMetricId));
+			result = (result * oldW + value * newW) / (oldW + newW);
+			Metric.addAssessValue(context, result, criteriaIds.get(assessMetricId), 2, itemId);
+
 		}
 
 	}
