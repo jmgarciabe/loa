@@ -48,11 +48,6 @@
 		<h1>
 			Item handle: <small><%=item.getHandle()%> </small>
 		</h1>
-
-		<b>
-			<h4>If you have not finished...Please continue with your assessment</h4>
-		</b>
-
 	</div>
 
 	<div class="btn-group" role="group" aria-label="...">
