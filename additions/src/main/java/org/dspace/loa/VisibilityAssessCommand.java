@@ -142,8 +142,12 @@ public class VisibilityAssessCommand implements AdminAssessmentCommandIntarface 
 
 		}
 
-		if ((collVisits + nonCollSum) > 0)
+		if ((collVisits + nonCollSum) > 0){
 			score = itemVisits / (collVisits + nonCollSum);
+			if (score > 1)
+				score = 1.0;
+		}
+			
 
 	}
 
