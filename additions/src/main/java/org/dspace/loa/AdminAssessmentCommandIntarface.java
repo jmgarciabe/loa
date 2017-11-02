@@ -9,10 +9,6 @@ public interface AdminAssessmentCommandIntarface {
 	 * @param dso - the DSpace item
 	 * @throws AdminAssessmentException - may throw an custom exception
 	 */
-	public void executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException;
-	/**
-	 * Return object with the assessment result in convenient way with extra data
-	 * @return assessment result object 
-	 */
-	public AssessResult getResult();
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException;
+
 }

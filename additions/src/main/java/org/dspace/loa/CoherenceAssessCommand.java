@@ -43,34 +43,23 @@ import com.cybozu.labs.langdetect.LangDetectException;
 
 public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 
-	/** Store the assessment result score */
-	private double score = 0.0;
-
-	/** Store assessment result as text adding needed extra information */
-	private StringBuilder result = new StringBuilder();
-
-	/** whether the assessment process has been carried out or not */
-	private boolean assessmentExecuted = false;
-
-	/** The item's handle */
-	private String handle = "";
-
 	/** Log object to send errorr messages to log file */
 	private static final Logger log = Logger.getLogger(CoherenceAssessCommand.class);
 
-	public void executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
-
-		score = 0.0;
-		double sum = 0.0;
-
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
+		
 		if (dso.getType() != Constants.ITEM) {
-			return;
+			return null;
 		}
 
-		assessmentExecuted = true;
-		Item item = (Item) dso;
-		handle = item.getHandle();
+		double score = 0.0;
+		double sum = 0.0;
 		int comparisons = 0;
+		boolean assessmentExecuted = true;
+		StringBuilder result = new StringBuilder();
+		Item item = (Item) dso;
+		String handle = item.getHandle();
+		
 		// load Lang Detect profiles
 		init();
 
@@ -159,9 +148,20 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 			score = sum / comparisons;
 		}
 
-		if (comparisons == 0) {
-			System.out.println("El calculo de esta metrica no esta disponible");
+		//Build assessment result
+		String status = score > 0.0 ? "Success" : "Fail";
+		String stringScore = new DecimalFormat("#.##").format(score);
+		result.append("Item: ").append(handle);
+		if (score > 0.7) {
+			result.append(" has highly coherent data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
 		}
+		if (score > 0.3 && score <= 0.7) {
+			result.append(" has medium coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
+		}
+		if (score < 0.3) {
+			result.append(" has low coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
+		}
+		return new AssessResult("Coherence", score, handle, status, stringScore + ". " + result, assessmentExecuted);
 	}
 
 	/**
@@ -271,25 +271,6 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 
 		return type;
 
-	}
-
-	public AssessResult getResult() {
-
-		String status = score > 0.0 ? "Success" : "Fail";
-		String stringScore = new DecimalFormat("#.##").format(score);
-		result.append("Item: ").append(handle);
-
-		if (score > 0.7) {
-			result.append(" has highly coherent data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
-		}
-		if (score > 0.3 && score <= 0.7) {
-			result.append(" has medium coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
-		}
-		if (score < 0.3) {
-			result.append(" has low coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
-		}
-
-		return new AssessResult("Coherence", score, handle, status, stringScore + ". " + result, assessmentExecuted);
 	}
 
 }

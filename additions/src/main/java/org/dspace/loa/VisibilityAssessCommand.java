@@ -25,29 +25,21 @@ import org.dspace.statistics.content.StatisticsListing;
 
 public class VisibilityAssessCommand implements AdminAssessmentCommandIntarface {
 
-	/** Store the assessment result score */
-	private double score = 0.0;
-
-	/** Store assessment result as text adding needed extra information */
-	private StringBuilder result = new StringBuilder();
-
-	/** whether the assessment process has been carried out or not */
-	private boolean assessmentExecuted = false;
-
-	/** The item's handle */
-	private String handle = "";
-
+	
 	/** Log object to send errorr messages to log file */
 	private static final Logger log = Logger.getLogger(CoherenceAssessCommand.class);
 
-	public void executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
-
-		handle = dso.getHandle();
-		assessmentExecuted = true;
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
+		
+		double score = 0.0;
 		double itemVisits = 0;
 		double collVisits = 0;
 		double nonCollVisits = 0;
 		double nonCollSum = 0;
+		boolean assessmentExecuted = true;
+		StringBuilder result = new StringBuilder();
+		String handle = dso.getHandle();
+		
 
 		// Gets the total number of visits by item from Solr index
 		try {
@@ -147,12 +139,8 @@ public class VisibilityAssessCommand implements AdminAssessmentCommandIntarface 
 			if (score > 1)
 				score = 1.0;
 		}
-			
-
-	}
-
-	public AssessResult getResult() {
-
+		
+		//Build assessment result
 		String status = score > 0.0 ? "Success" : "Fail";
 		String stringScore = new DecimalFormat("#.##").format(score);
 
@@ -170,6 +158,8 @@ public class VisibilityAssessCommand implements AdminAssessmentCommandIntarface 
 		AssessResult assessResult = new AssessResult("Visibility",score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		return assessResult;
+
+
 	}
 
 }

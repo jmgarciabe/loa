@@ -43,8 +43,7 @@ public class AdminAsessHelper {
 			criteriaComand = new VisibilityAssessCommand();
 			break;
 		}
-		criteriaComand.executeAssessment(dso, context);
-		return criteriaComand.getResult();
+		return criteriaComand.executeAssessment(dso, context);		 
 	}
 	
 	/**

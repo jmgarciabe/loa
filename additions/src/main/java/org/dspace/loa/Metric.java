@@ -4,23 +4,18 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-public class Metric extends DSpaceObject {
-	private int ID;
-
+public class Metric {
+	
+	/** Identifier of the metric */
+	private int id;
+	
+	/** Name of the metric */
 	private String name;
-
-	/** The row in the table representing this object */
-	private final TableRow myRow;
-	/** log4j logger */
-	private static final Logger log = Logger.getLogger(Metric.class);
 
 	/**
 	 * Construct a Metric from a given context and tablerow
@@ -29,20 +24,18 @@ public class Metric extends DSpaceObject {
 	 * @param row
 	 */
 	Metric(Context context, TableRow row) throws SQLException {
-		super(context);
 
 		// Ensure that my TableRow is typed.
-		if (null == row.getTable())
+		if (row.getTable() == null){
 			row.setTable("assessment_metric");
+		}
 
-		myRow = row;
-		ID = row.getIntColumn("assessment_metric_id");
+		id = row.getIntColumn("assessment_metric_id");
 		name = row.getStringColumn("criteria_name");
 
 		// Cache ourselves
 		context.cache(this, row.getIntColumn("assessment_metric_id"));
 
-		clearDetails();
 	}
 
 	/**
@@ -198,48 +191,21 @@ public class Metric extends DSpaceObject {
 		}
 	}
 
-	public void setID(int iD) {
-		ID = iD;
+	public String getName() {
+		return name;
 	}
-
+	
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	@Override
-	public int getType() {
-		// TODO Auto-generated method stub
-		return 0;
+	
+	public int getId() {
+		return id;
 	}
 
-	@Override
-	public int getID() {
-		// TODO Auto-generated method stub
-		return ID;
+	public void setId(int id) {
+		this.id = id;
 	}
-
-	@Override
-	public String getHandle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return name;
-	}
-
-	@Override
-	public void update() throws SQLException, AuthorizeException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateLastModified() {
-		// TODO Auto-generated method stub
-
-	}
+	
 
 }

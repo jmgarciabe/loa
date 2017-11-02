@@ -201,13 +201,13 @@ public class InitialParamServlet extends DSpaceServlet {
 				String metricInfo = ckMetricsID.elementAt(j).toString();
 				data = metricInfo.split(",");
 				int dimId = Integer.valueOf(data[1]).intValue();
-				if (dimension.getID() == dimId) {
+				if (dimension.getId() == dimId) {
 					delete = false;
 					break;
 				}
 			}
 			if (delete) {
-				Dimension.DeleteDimensionWeighting(context, layerId, dimension.getID(), itemId);
+				Dimension.DeleteDimensionWeighting(context, layerId, dimension.getId(), itemId);
 			}
 		}
 
@@ -223,7 +223,7 @@ public class InitialParamServlet extends DSpaceServlet {
 			Metric.addAssessMetric(context, metricID, itemId);
 
 			for (Dimension dim : dimensionsList) {
-				if (dim.getID() == dimensionID) {
+				if (dim.getId() == dimensionID) {
 					dimension = dim;
 					break;
 				}

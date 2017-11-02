@@ -27,48 +27,43 @@ import org.dspace.core.Context;
 
 public class AvailabilityAssessCommand implements AdminAssessmentCommandIntarface {
 
-	/** Store the assessment result score */
-	private double score = 0.0;
-	
-	/** Store assessment result as text adding needed extra information */
-	private StringBuilder result = new StringBuilder();
-	
-	/** whether the assessment process has been carried out or not */
-	private boolean assessmentExecuted = false;
-	
-	/** The item's handle */
-	private String handle = "";
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) {
 
-	
-	
-	
-	public void executeAssessment(DSpaceObject dso, Context context) {
-
-		if (dso.getType() == Constants.ITEM) {
-
-			Item item = (Item) dso;
-			handle = getItemHandle(item);
-			result.append("Item: ").append(handle);
-			assessmentExecuted = true;
-
-			// Get the URLs
-			List<String> urls = getURLs(item);
-
-			// Check the URLs
-			for (String url : urls) {
-				boolean ok = checkURL(url);
-
-				if (ok) {
-					score = 1.0;
-					result.append(" - " + url + " = " + getResponseStatus(url) + " - OK");
-				} else {
-					result.append(" - " + url + " = " + getResponseStatus(url) + " - FAILED");
-					return;
-				}
-			}
+		if (dso.getType() != Constants.ITEM) {
+			return null;
 		}
 
-		return;
+		double score = 0.0;
+		boolean assessmentExecuted = true;
+		StringBuilder result = new StringBuilder();
+		Item item = (Item) dso;
+		String handle = item.getHandle();
+		
+		result.append("Item: ").append(handle);
+
+		// Get the URLs
+		List<String> urls = getURLs(item);
+
+		// Check the URLs
+		for (String url : urls) {
+			boolean ok = checkURL(url);
+
+			if (ok) {
+				score = 1.0;
+				result.append(" - " + url + " = " + getResponseStatus(url) + " - OK");
+			} else {
+				result.append(" - " + url + " = " + getResponseStatus(url) + " - FAILED");
+			}
+		}
+		
+		//Build assessment result
+		String status = score > 0.0 ? "Success" : "Fail";
+		String stringScore = new DecimalFormat("#.##").format(score);
+		AssessResult assessResult = new AssessResult("Availability", score, handle, status, stringScore + ". " + result,
+				assessmentExecuted);
+		return assessResult;
+
+
 	}
 
 	/**
@@ -130,23 +125,4 @@ public class AvailabilityAssessCommand implements AdminAssessmentCommandIntarfac
 		}
 	}
 
-	/**
-	 * Internal utitity method to get a description of the handle
-	 * 
-	 * @param item
-	 *            The item to get a description of
-	 * @return The handle, or in workflow
-	 */
-	private String getItemHandle(Item item) {
-		String handle = item.getHandle();
-		return (handle != null) ? handle : " in workflow";
-	}
-
-	public AssessResult getResult() {
-		// The results that we'll return
-		String status = score > 0.0 ? "Success": "Fail";
-		String stringScore = new DecimalFormat("#.##").format(score);
-		AssessResult  assessResult =  new AssessResult("Availability", score, handle, status,  stringScore + ". " + result, assessmentExecuted);
-		return assessResult;
-	}
 }

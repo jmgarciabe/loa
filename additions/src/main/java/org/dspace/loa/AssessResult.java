@@ -30,8 +30,17 @@ public class AssessResult
     /** the result string */
     private String result;
 
-    /** Is the curation success? */
-    private boolean isSuccess = false;
+    /** Is the assessment */
+    private boolean isSuccess;
+    
+    public AssessResult(){
+    	this.task = "";
+        this.score = 0.0;
+        this.handle = "";
+        this.status = "";
+        this.result = "";
+        this.isSuccess = false;
+    }
 
     public AssessResult(String assess, double score, String handle, String status, String result, boolean isSuccess)
     {

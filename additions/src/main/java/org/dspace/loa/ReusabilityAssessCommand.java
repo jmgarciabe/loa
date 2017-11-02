@@ -1,6 +1,5 @@
 package org.dspace.loa;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 
 import org.dspace.content.DSpaceObject;
@@ -20,18 +19,6 @@ import org.dspace.core.Context;
  */
 
 public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface {
-
-	/** Store the assessment result score */
-	private double score = 0.0;
-
-	/** Store assessment result as text adding needed extra information */
-	private StringBuilder result = new StringBuilder();
-
-	/** whether the assessment process has been carried out or not */
-	private boolean assessmentExecuted = false;
-
-	/** The item's handle */
-	private String handle = "";
 
 	/** Weight for high item's granularity */
 	private static final double HIGH = 0.1;
@@ -57,14 +44,18 @@ public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface
 	/** Weight for item's Linear structure */
 	private static final double LINEAR = 0.1;
 
-	public void executeAssessment(DSpaceObject dso, Context context) {
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) {
+
 		if (dso.getType() != Constants.ITEM) {
-			return;
+			return null;
 		}
 
+		double score = 0.0;
+		StringBuilder result = new StringBuilder();
+
 		Item item = (Item) dso;
-		handle = item.getHandle();
-		assessmentExecuted = true;
+		String handle = item.getHandle();
+		boolean assessmentExecuted = true;
 		double sum = 0.0;
 		int comparisons = 0;
 
@@ -82,9 +73,28 @@ public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface
 			comparisons++;
 			sum += checkGranularityRule(item.getMetadata("dc.type"));
 			score = sum / comparisons;
-		} else if (comparisons == 0)
+		} else if (comparisons == 0) {
 			System.out.println("El calculo de esta metrica no esta disponible");
-
+		}
+		
+		//Build assessment result
+		String status = score > 0.0 ? "Success" : "Fail";
+		String stringScore = new DecimalFormat("#.##").format(score);
+		result.append("Item: ").append(handle);
+		if (score > 0.7) {
+			result.append(" has a high level of reusability");
+		}
+		if ((score >= 0.3) && (score <= 0.7)) {
+			result.append(" has a medium level of reusability");
+		}
+		if (score < 0.3) {
+			result.append(" has a low level of reusability");
+		}
+		//Create assessment result with data from the assessment process
+		AssessResult assessResult = new AssessResult("Reusability", score, handle, status, stringScore + ". " + result,
+				assessmentExecuted);
+		
+		return assessResult;
 	}
 
 	private static double checkGranularityRule(String contentType) {
@@ -189,27 +199,6 @@ public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface
 
 		return structure;
 
-	}
-
-	public AssessResult getResult() {
-
-		String status = score > 0.0 ? "Success" : "Fail";
-		String stringScore = new DecimalFormat("#.##").format(score);
-
-		result.append("Item: ").append(handle);
-		if (score > 0.7) {
-			result.append(" has a high level of reusability");
-		}
-		if ((score >= 0.3) && (score <= 0.7)) {
-			result.append(" has a medium level of reusability");
-		}
-		if (score < 0.3) {
-			result.append(" has a low level of reusability");
-		}
-
-		AssessResult assessResult = new AssessResult("Reusability", score, handle, status, stringScore + ". " + result,
-				assessmentExecuted);
-		return assessResult;
 	}
 
 }

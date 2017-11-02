@@ -12,24 +12,18 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-public class AssessParam extends DSpaceObject {
+public class AssessParam{
 
 	private int assessMetricID, itemID, dimWeightID, layerID, dimID, expWeight;
 
 	private String metricValue, admWeight;
 
-	/** The row in the table representing this object */
-	private final TableRow myRow;
-
 	AssessParam(Context context, TableRow row) {
-		// TODO Auto-generated constructor stub
-		super(context);
 
 		// Ensure that my TableRow is typed.
 		if (null == row.getTable())
 			row.setTable("assessment_result");
 
-		myRow = row;
 
 		assessMetricID = row.getIntColumn("assessment_metric_id");
 
@@ -211,42 +205,6 @@ public class AssessParam extends DSpaceObject {
 
 	public void setAdmWeight(String admWeight) {
 		this.admWeight = admWeight;
-	}
-
-	@Override
-	public int getType() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getID() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String getHandle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void update() throws SQLException, AuthorizeException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateLastModified() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

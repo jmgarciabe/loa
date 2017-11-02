@@ -11,16 +11,13 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-public class Dimension extends DSpaceObject {
+public class Dimension{
 
-	private int ID;
+	private int id;
 
 	private String name;
 
-	private int layerID;
-
-	/** The row in the table representing this object */
-	private final TableRow myRow;
+	private int layerId;
 
 	/**
 	 * Construct a Dimension from a given context and tablerow
@@ -29,21 +26,18 @@ public class Dimension extends DSpaceObject {
 	 * @param row
 	 */
 	Dimension(Context context, TableRow row) throws SQLException {
-		super(context);
 
 		// Ensure that my TableRow is typed.
 		if (null == row.getTable())
 			row.setTable("dimension");
 
-		myRow = row;
-		ID = row.getIntColumn("dimension_id");
+		id = row.getIntColumn("dimension_id");
 		name = row.getStringColumn("dimension_name");
-		layerID = row.getIntColumn("layer_id");
+		layerId = row.getIntColumn("layer_id");
 
 		// Cache ourselves
 		context.cache(this, row.getIntColumn("dimension_id"));
 
-		clearDetails();
 	}
 
 	/**
@@ -209,20 +203,20 @@ public class Dimension extends DSpaceObject {
 		}
 	}
 
-	public int getID() {
-		return ID;
+	public int getId() {
+		return id;
 	}
 
-	public void setID(int iD) {
-		ID = iD;
+	public void setId(int iD) {
+		id = iD;
 	}
 
-	public int getLayerID() {
-		return layerID;
+	public int getLayerId() {
+		return layerId;
 	}
 
-	public void setLayerID(int layerID) {
-		this.layerID = layerID;
+	public void setLayerId(int layerID) {
+		this.layerId = layerID;
 	}
 
 	public String getName() {
@@ -231,30 +225,6 @@ public class Dimension extends DSpaceObject {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public int getType() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String getHandle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void update() throws SQLException, AuthorizeException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateLastModified() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

@@ -34,18 +34,6 @@ import org.dspace.core.Context;
 
 public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface {
 
-	/** Store the assessment result score */
-	private double score = 0.0;
-
-	/** Store assessment result as text adding needed extra information */
-	private StringBuilder result = new StringBuilder();
-
-	/** whether the assessment process has been carried out or not */
-	private boolean assessmentExecuted = false;
-
-	/** The item's handle */
-	private String handle = "";
-
 	/** Log object to send errorr messages to log file */
 	private static final Logger log = Logger.getLogger(ConsistencyAssessCommand.class);
 
@@ -56,17 +44,19 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 	 *            the DSpace object
 	 * @throws IOException
 	 */
-	public void executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
 
 		if (dso.getType() != Constants.ITEM) {
-			return;
+			return null;
 		}
-
-		Item item = (Item) dso;
-		handle = item.getHandle();
-		assessmentExecuted = true;
+		
+		double score = 0.0;
 		double sum = 0.0;
 		int comparisons = 0;
+		boolean assessmentExecuted = true;
+		StringBuilder result = new StringBuilder();
+		Item item = (Item) dso;
+		String handle = item.getHandle();
 
 		if (item.getMetadata("dc.format.mimetype") != null) {
 			comparisons++;
@@ -140,10 +130,27 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 				sum += 1;
 			}
 			score = sum / comparisons;
-		} else if (comparisons == 0) {
-			System.out.println("El calculo de esta metrica no esta disponible");
 		}
+		
+		//Build assessment result
+		String status = score > 0.0 ? "Success" : "Fail";
+		String stringScore = new DecimalFormat("#.##").format(score);
+		// Appends item's handle to results message
+		result.append("Item: ").append(handle);
+		if (score > 0.7) {
+			result.append(" has consistent data in most of analyzed metadata fields");
+		}
+		if ((score >= 0.3) && (score <= 0.7)) {
+			result.append(" has consistent data in half of analyzed metadata fields");
+		}
+		if (score < 0.3) {
+			result.append(" has inconsistent data in most of analyzed metadata fields");
+		}
+		AssessResult assessResult = new AssessResult("Consistency", score, handle, status, stringScore + ". " + result,
+				assessmentExecuted);
+		return assessResult;
 	}
+	
 
 	/**
 	 * Loads the file with the supplied path and checks if the given metadata
@@ -179,28 +186,6 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 		}
 
 		return result;
-	}
-
-	public AssessResult getResult() {
-
-		String status = score > 0.0 ? "Success" : "Fail";
-		String stringScore = new DecimalFormat("#.##").format(score);
-
-		// Appends item's handle to results message
-		result.append("Item: ").append(handle);
-		if (score > 0.7) {
-			result.append(" has consistent data in most of analyzed metadata fields");
-		}
-		if ((score >= 0.3) && (score <= 0.7)) {
-			result.append(" has consistent data in half of analyzed metadata fields");
-		}
-		if (score < 0.3) {
-			result.append(" has inconsistent data in most of analyzed metadata fields");
-		}
-
-		AssessResult assessResult = new AssessResult("Consistency", score, handle, status, stringScore + ". " + result,
-				assessmentExecuted);
-		return assessResult;
 	}
 
 }

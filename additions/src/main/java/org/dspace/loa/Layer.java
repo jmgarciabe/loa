@@ -10,38 +10,33 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-public class Layer extends DSpaceObject {
+public class Layer  {
 
-	private int ID;
-
+	/** Identifier of the metric */
+	private int id;
+	
+	/** Name of the metric */
 	private String name;
-
-	/** The row in the table representing this object */
-	private final TableRow myRow;
-
+	
 	/**
 	 * Construct a Layer from a given context and tablerow
 	 * 
 	 * @param context
 	 * @param row
 	 */
-	Layer(Context context, TableRow row) throws SQLException {
-		super(context);
+	public Layer(Context context, TableRow row) throws SQLException {
 
 		// Ensure that my TableRow is typed.
 		if (null == row.getTable())
 			row.setTable("layer");
 
-		myRow = row;
-
-		ID = row.getIntColumn("layer_id");
+		id = row.getIntColumn("layer_id");
 
 		name = row.getStringColumn("layer_name");
 
 		// Cache ourselves
 		context.cache(this, row.getIntColumn("layer_id"));
 
-		clearDetails();
 	}
 
 	/**
@@ -217,13 +212,13 @@ public class Layer extends DSpaceObject {
 			e.printStackTrace();
 		}
 	}
-
-	public int getID() {
-		return ID;
+	
+	public int getId() {
+		return id;
 	}
 
-	public void setID(int iD) {
-		ID = iD;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -232,30 +227,6 @@ public class Layer extends DSpaceObject {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public int getType() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public String getHandle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void update() throws SQLException, AuthorizeException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void updateLastModified() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

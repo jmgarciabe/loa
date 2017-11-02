@@ -87,192 +87,192 @@
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="rigrel"><%=metric.getName()%>
-						</label> <input type="hidden" name="rigrel_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="rigrel_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="rigrel_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="rigrel_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="rigrel_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="rigrel_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Contextual")
-												&& metric.getName().equals("Relevance")) {
+																		&& metric.getName().equals("Relevance")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="relev"><%=metric.getName()%>
-						</label> <input type="hidden" name="relev_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="relev_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="relev_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="relev_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="relev_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="relev_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Contextual")
-												&& metric.getName().equals("Visibility")) {
+																		&& metric.getName().equals("Visibility")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="visib"><%=metric.getName()%>
-						</label> <input type="hidden" name="visib_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="visib_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="visib_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="visib_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="visib_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="visib_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Educational")
-												&& metric.getName().equals("Effectiveness")) {
+																		&& metric.getName().equals("Effectiveness")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="effect"><%=metric.getName()%>
-						</label> <input type="hidden" name="effect_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="effect_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="effect_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="effect_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="effect_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="effect_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Educational")
-												&& metric.getName().equals("Motivation")) {
+																		&& metric.getName().equals("Motivation")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="motiva"><%=metric.getName()%>
-						</label> <input type="hidden" name="motiva_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="motiva_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="motiva_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="motiva_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="motiva_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="motiva_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Educational")
-												&& metric.getName().equals(
-														"Potential Effectiveness")) {
+																		&& metric.getName().equals(
+																				"Potential Effectiveness")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="poteffect"><%=metric.getName()%>
-						</label> <input type="hidden" name="poteffect_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="poteffect_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="poteffect_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="poteffect_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="poteffect_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="poteffect_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Esthetic")
-												&& metric.getName().equals("Visual Design")) {
+																		&& metric.getName().equals("Visual Design")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="visdes"><%=metric.getName()%>
-						</label> <input type="hidden" name="visdes_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="visdes_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="visdes_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="visdes_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="visdes_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="visdes_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Functional")
-												&& metric.getName().equals("Accessibility")) {
+																		&& metric.getName().equals("Accessibility")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="access"><%=metric.getName()%>
-						</label> <input type="hidden" name="access_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="access_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="access_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="access_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="access_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="access_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Functional")
-												&& metric.getName().equals("Availability")) {
+																		&& metric.getName().equals("Availability")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="avail"><%=metric.getName()%>
-						</label> <input type="hidden" name="avail_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="avail_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="avail_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="avail_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="avail_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="avail_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Functional")
-												&& metric.getName().equals("Ease to use")) {
+																		&& metric.getName().equals("Ease to use")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="easeuse"><%=metric.getName()%>
-						</label> <input type="hidden" name="easeuse_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="easeuse_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="easeuse_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="easeuse_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="easeuse_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="easeuse_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Functional")
-												&& metric.getName().equals("Reusability")) {
+																		&& metric.getName().equals("Reusability")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="usable"><%=metric.getName()%>
-						</label> <input type="hidden" name="usable_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="usable_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="usable_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="usable_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="usable_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="usable_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Metadata")
-												&& metric.getName().equals("Accuracy")) {
+																		&& metric.getName().equals("Accuracy")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="accuracy"><%=metric.getName()%>
-						</label> <input type="hidden" name="accuracy_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="accuracy_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="accuracy_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="accuracy_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="accuracy_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="accuracy_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Metadata")
-												&& metric.getName().equals("Coherence")) {
+																		&& metric.getName().equals("Coherence")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="coherence"><%=metric.getName()%>
-						</label> <input type="hidden" name="coherence_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="coherence_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="coherence_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="coherence_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="coherence_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="coherence_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Metadata")
-												&& metric.getName().equals("Completeness")) {
+																		&& metric.getName().equals("Completeness")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="complete"><%=metric.getName()%>
-						</label> <input type="hidden" name="complete_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="complete_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="complete_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="complete_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="complete_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="complete_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}
 					%>
 					<%
 						if (dimension.getName().equals("Metadata")
-												&& metric.getName().equals("Consistency")) {
+																		&& metric.getName().equals("Consistency")) {
 					%>
 					<div class="checkbox col-lg-3 col-md-4 col-sm-6">
 						<label> <input type="checkbox" name="metrics" value="consist"><%=metric.getName()%>
-						</label> <input type="hidden" name="consist_id" value="<%=metric.getID()%>" /> <input type="hidden"
-							name="consist_lay" value="<%=dimension.getLayerID()%>" /> <input type="hidden"
-							name="consist_dim" value="<%=dimension.getID()%>" />
+						</label> <input type="hidden" name="consist_id" value="<%=metric.getId()%>" /> <input type="hidden"
+							name="consist_lay" value="<%=dimension.getLayerId()%>" /> <input type="hidden"
+							name="consist_dim" value="<%=dimension.getId()%>" />
 					</div>
 					<%
 						}

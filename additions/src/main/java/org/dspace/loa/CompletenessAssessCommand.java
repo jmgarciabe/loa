@@ -20,18 +20,6 @@ import org.dspace.core.Context;
 
 public class CompletenessAssessCommand implements AdminAssessmentCommandIntarface {
 
-	/** Store the assessment result score */
-	private double score = 0.0;
-
-	/** Store assessment result as text adding needed extra information */
-	private StringBuilder result = new StringBuilder();
-
-	/** whether the assessment process has been carried out or not */
-	private boolean assessmentExecuted = false;
-
-	/** The item's handle */
-	private String handle = "";
-
 	/** Weight for Title metadata field value */
 	private final double TITLE = 0.17;
 
@@ -62,15 +50,17 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 	/** Weight for Provenance (Status) metadata field value */
 	private final double STATUS = 0.02;
 
-	public void executeAssessment(DSpaceObject dso, Context context) {
+	public AssessResult executeAssessment(DSpaceObject dso, Context context) {
 
 		if (dso.getType() != Constants.ITEM) {
-			return;
+			return null;
 		}
-
+		
+		double score = 0.0;
+		boolean assessmentExecuted = true;
+		StringBuilder result = new StringBuilder();
 		Item item = (Item) dso;
-		handle = item.getHandle();
-		assessmentExecuted = true;
+		String handle = item.getHandle();
 
 		if (item.getMetadata("dc.title") != null) {
 			score = TITLE + score;
@@ -102,11 +92,8 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 		if (item.getMetadata("dc.description.provenance") != null) {
 			score = STATUS + score;
 		}
-
-	}
-
-	public AssessResult getResult() {
-
+		
+		//Build assessment result
 		String status = score > 0.0 ? "Success" : "Fail";
 		String stringScore = new DecimalFormat("#.##").format(score);
 
@@ -125,6 +112,7 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 				assessmentExecuted);
 
 		return assessResult;
-	}
 
+	}
+	
 }
