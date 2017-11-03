@@ -25,7 +25,7 @@ public class Dimension{
 	 * @param context
 	 * @param row
 	 */
-	Dimension(Context context, TableRow row) throws SQLException {
+	public Dimension(Context context, TableRow row) throws SQLException {
 
 		// Ensure that my TableRow is typed.
 		if (null == row.getTable())

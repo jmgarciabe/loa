@@ -11,7 +11,7 @@ import org.dspace.core.Context;
 
 public class AdminAsessHelper {
 
-	private AdminAssessmentCommandIntarface criteriaComand;
+	private AdminAssessmentCommandIntarface criteriaCommand;
 
 	/**
 	 * Carries out the related administration assessment to the given criteria
@@ -25,25 +25,25 @@ public class AdminAsessHelper {
 
 		switch (criteria) {
 		case "Availability":
-			criteriaComand = new AvailabilityAssessCommand();
+			criteriaCommand = new AvailabilityAssessCommand();
 			break;
 		case "Coherence":
-			criteriaComand = new CoherenceAssessCommand();
+			criteriaCommand = new CoherenceAssessCommand();
 			break;
 		case "Completeness":
-			criteriaComand = new CompletenessAssessCommand();
+			criteriaCommand = new CompletenessAssessCommand();
 			break;
 		case "Consistency":
-			criteriaComand = new ConsistencyAssessCommand();
+			criteriaCommand = new ConsistencyAssessCommand();
 			break;
 		case "Reusability":
-			criteriaComand = new ReusabilityAssessCommand();
+			criteriaCommand = new ReusabilityAssessCommand();
 			break;
 		case "Visibility":
-			criteriaComand = new VisibilityAssessCommand();
+			criteriaCommand = new VisibilityAssessCommand();
 			break;
 		}
-		return criteriaComand.executeAssessment(dso, context);		 
+		return criteriaCommand.executeAssessment(dso, context);		 
 	}
 	
 	/**

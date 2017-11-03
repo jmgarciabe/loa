@@ -23,7 +23,7 @@ public class Metric {
 	 * @param context
 	 * @param row
 	 */
-	Metric(Context context, TableRow row) throws SQLException {
+	public Metric(Context context, TableRow row) throws SQLException {
 
 		// Ensure that my TableRow is typed.
 		if (row.getTable() == null){
