@@ -9,8 +9,6 @@ package org.dspace.app.webui.servlet.admin;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -19,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.webui.servlet.AssessItemServlet;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -29,7 +26,6 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.Dimension;
-import org.dspace.loa.Layer;
 import org.dspace.loa.Metric;
 import org.dspace.loa.StartAssessHelper;
 

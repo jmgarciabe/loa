@@ -1,6 +1,5 @@
 package org.dspace.loa;
 
-import java.io.IOException;
 import java.text.DecimalFormat;
 
 import org.dspace.content.DSpaceObject;

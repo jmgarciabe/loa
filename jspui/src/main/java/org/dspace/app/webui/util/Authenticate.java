@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Locale;
-import java.util.logging.Level;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,9 +22,9 @@ import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 
 /**

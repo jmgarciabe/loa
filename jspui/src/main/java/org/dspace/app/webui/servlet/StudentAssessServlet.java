@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,9 +25,6 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
-import org.dspace.loa.AssessParam;
-import org.dspace.loa.Metric;
 import org.dspace.loa.StudentAssessHelper;
 
 /**

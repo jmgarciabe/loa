@@ -2,10 +2,7 @@ package org.dspace.loa;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Vector;
 
-import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;

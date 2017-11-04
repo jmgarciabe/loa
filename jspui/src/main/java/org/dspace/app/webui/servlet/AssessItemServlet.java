@@ -24,13 +24,10 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.loa.AssessParam;
-import org.dspace.loa.Dimension;
-import org.dspace.loa.Metric;
 import org.dspace.loa.StartAssessHelper;
 
 /**
