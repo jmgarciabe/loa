@@ -80,7 +80,7 @@ public class Layer  {
 	 * @param context
 	 *            DSpace context object
 	 */
-	public static int DeleteAssessIndexes(Context context, int itemID) throws SQLException {
+	public static int deleteAssessIndexes(Context context, int itemID) throws SQLException {
 		int rowsAffected = 0;
 
 		String dbquery = "DELETE FROM assessment_history " + "WHERE item_id = ? ";

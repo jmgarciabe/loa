@@ -25,7 +25,7 @@ import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
-import org.dspace.loa.AdminAsessHelper;
+import org.dspace.loa.AdminAssessHelper;
 import org.dspace.loa.AdminAssessmentException;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.AssessResult;
@@ -66,7 +66,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 			JSPManager.showInternalError(request, response);
 		}
 
-		AdminAsessHelper assessHelper = new AdminAsessHelper();
+		AdminAssessHelper assessHelper = new AdminAssessHelper();
 		AssessResult result = null;
 		try {
 			result = assessHelper.assess(assess2Perform, item, context);
@@ -98,7 +98,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 
 		case SHOW_RESULTS:
 
-			AdminAsessHelper helper = new AdminAsessHelper();
+			AdminAssessHelper helper = new AdminAssessHelper();
 			Vector<String> results = helper.getAssessmentResults(itemId, context);
 			session.setAttribute("LOA.results", results);
 			request.setAttribute("item", item);
@@ -137,7 +137,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 		case DELETE_ASSESS:
 
 			request.setAttribute("item", item);
-			int layerDel = Layer.DeleteAssessIndexes(context, itemId);
+			int layerDel = Layer.deleteAssessIndexes(context, itemId);
 			int dimDel = Dimension.DeleteAssessWeights(context, itemId);
 			int metDel = Metric.deleteAssessValues(context, itemId);
 

@@ -9,7 +9,7 @@ import java.util.Vector;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
-public class AdminAsessHelper {
+public class AdminAssessHelper {
 
 	private AdminAssessmentCommandIntarface criteriaCommand;
 
