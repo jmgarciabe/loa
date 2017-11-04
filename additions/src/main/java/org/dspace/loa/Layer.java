@@ -73,6 +73,54 @@ public class Layer  {
 		// Make sure all changes are committed
 		context.commit();
 	}
+	
+	/**
+	 * updates assessment indexes in DB attached to an item
+	 * 
+	 * @param context
+	 *            DSpace context object
+	 * @param adminIndex
+	 * @param expIndex
+	 * @param stdIndex
+	 * @param totIndex
+	 * @param indexID
+	 */
+	public static void updateAssessIndexes(Context context, double adminIndex, double expIndex, double stdIndex, double totIndex,
+			int indexID) {
+		// TODO Auto-generated method stub
+		String dbquery = "SELECT * FROM assessment_history " + "WHERE assessment_history_id = ? ";
+
+		Double admin = new Double(adminIndex);
+		String adminVal = admin.toString();
+
+		Double expert = new Double(expIndex);
+		String expVal = expert.toString();
+
+		Double stud = new Double(stdIndex);
+		String stdVal = stud.toString();
+
+		Double total = new Double(totIndex);
+		String totVal = total.toString();
+
+		try {
+			TableRow updateable = DatabaseManager.querySingle(context, dbquery, indexID);
+			updateable.setTable("assessment_history");
+			updateable.setColumn("admin_index", adminVal);
+			updateable.setColumn("expert_index", expVal);
+			updateable.setColumn("user_index", stdVal);
+			updateable.setColumn("assess_value", totVal);
+
+			// Save changes to the database
+			DatabaseManager.update(context, updateable);
+
+			// Make sure all changes are committed
+			context.commit();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 
 	/**
 	 * Deletes all assessment indexes attached to an item in DB
@@ -164,52 +212,6 @@ public class Layer  {
 		}
 	}
 
-	/**
-	 * updates assessment indexes in DB attached to an item
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 * @param adminIndex
-	 * @param expIndex
-	 * @param stdIndex
-	 * @param totIndex
-	 * @param indexID
-	 */
-	public static void updateAssessIndexes(Context context, double adminIndex, double expIndex, double stdIndex, double totIndex,
-			int indexID) {
-		// TODO Auto-generated method stub
-		String dbquery = "SELECT * FROM assessment_history " + "WHERE assessment_history_id = ? ";
-
-		Double admin = new Double(adminIndex);
-		String adminVal = admin.toString();
-
-		Double expert = new Double(expIndex);
-		String expVal = expert.toString();
-
-		Double stud = new Double(stdIndex);
-		String stdVal = stud.toString();
-
-		Double total = new Double(totIndex);
-		String totVal = total.toString();
-
-		try {
-			TableRow updateable = DatabaseManager.querySingle(context, dbquery, indexID);
-			updateable.setTable("assessment_history");
-			updateable.setColumn("admin_index", adminVal);
-			updateable.setColumn("expert_index", expVal);
-			updateable.setColumn("user_index", stdVal);
-			updateable.setColumn("assess_value", totVal);
-
-			// Save changes to the database
-			DatabaseManager.update(context, updateable);
-
-			// Make sure all changes are committed
-			context.commit();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
 	public int getId() {
 		return id;

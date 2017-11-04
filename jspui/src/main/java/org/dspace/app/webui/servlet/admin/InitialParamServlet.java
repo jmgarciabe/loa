@@ -203,7 +203,7 @@ public class InitialParamServlet extends DSpaceServlet {
 				}
 			}
 			if (delete) {
-				Dimension.DeleteDimensionWeighting(context, layerId, dimension.getId(), itemId);
+				Dimension.deleteDimensionWeighting(context, layerId, dimension.getId(), itemId);
 			}
 		}
 

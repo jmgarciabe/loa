@@ -138,7 +138,7 @@ public class AdminAssessServlet extends DSpaceServlet {
 
 			request.setAttribute("item", item);
 			int layerDel = Layer.deleteAssessIndexes(context, itemId);
-			int dimDel = Dimension.DeleteAssessWeights(context, itemId);
+			int dimDel = Dimension.deleteAssessWeights(context, itemId);
 			int metDel = Metric.deleteAssessValues(context, itemId);
 
 			if ((layerDel + dimDel + metDel) > 0) {

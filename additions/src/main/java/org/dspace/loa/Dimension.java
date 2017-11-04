@@ -80,7 +80,7 @@ public class Dimension{
 	 * @return numbers of rows affected (Must be 0 or 1)
 	 * @throws SQLException
 	 */
-	public static int DeleteDimensionWeighting(Context context, int layerId, int dimensionId, int itemID) throws SQLException {
+	public static int deleteDimensionWeighting(Context context, int layerId, int dimensionId, int itemID) throws SQLException {
 		String dbquery = "DELETE FROM dimension_weighting WHERE " + 
 							" layer_id = ? AND dimension_id = ? AND item_id = ? ";
 		// Deletes rows with data 
@@ -96,7 +96,7 @@ public class Dimension{
 	 * @param context
 	 *            DSpace context object
 	 */
-	public static int DeleteAssessWeights(Context context, int itemID) throws SQLException {
+	public static int deleteAssessWeights(Context context, int itemID) throws SQLException {
 		String dbquery = "DELETE FROM dimension_weighting " + "WHERE item_id = ? ";
 		// Deletes rows with data from frontend
 		int rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
@@ -117,7 +117,7 @@ public class Dimension{
 	 * @return
 	 * @throws SQLException
 	 */
-	public static int DeleteWeightsById(Context context, int itemId, int layerId) throws SQLException {
+	public static int deleteWeightsById(Context context, int itemId, int layerId) throws SQLException {
 		String dbquery = "DELETE FROM dimension_weighting WHERE item_id = ? AND layer_id = ? ";
 		// Deletes rows with data from frontend
 		int rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemId, layerId);
