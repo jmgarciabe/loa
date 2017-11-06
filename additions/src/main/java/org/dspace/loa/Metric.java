@@ -37,96 +37,7 @@ public class Metric {
 		context.cache(this, row.getIntColumn("assessment_metric_id"));
 
 	}
-
-	/**
-	 * Inserts a new assessment metric attached to an item in DB
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 */
-	public static void addAssessMetric(Context context, int metricID, int itemID) throws SQLException {
-		// Check if the row already exist
-		String query = "SELECT * FROM assessment_result " + "WHERE assessment_metric_id = ? AND item_id = ? ";
-
-		TableRow row = DatabaseManager.querySingleTable(context, "assessment_result", query, metricID, itemID);
-
-		if (row != null) {
-			return;
-		}
-
-		// Create a new row, and assign a data
-		TableRow newRow = DatabaseManager.row("assessment_result");
-		
-		newRow.setColumn("assessment_metric_id", metricID);
-		newRow.setColumn("item_id", itemID);
-
-		// Save changes to the database
-		DatabaseManager.insert(context, newRow);
-
-		// Make sure all changes are committed
-		context.commit();
-	}
-
-	/**
-	 * Saves assessment value in DB, obtained via perfom method in each
-	 * assessment class
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 */
-	public static void addAssessValue(Context context, double result, String metric, int layerID, int itemID) throws SQLException {
-		String dbupdate = "UPDATE assessment_result SET metric_value = ? " + "WHERE assessment_metric_id = "
-				+ "( SELECT b.assessment_metric_id "
-				+ "  FROM assessment_metric b INNER JOIN criteria c ON b.criteria_id = c.criteria_id "
-				+ "  WHERE c.criteria_name = ? AND b.layer_id = ? " + ") " + "AND item_id = ? ";
-		String assessVal = String.valueOf(result);
-
-		DatabaseManager.updateQuery(context, dbupdate, assessVal, metric, layerID, itemID);
-		context.commit();
-
-	}
-
-	/**
-	 * Deletes the given assessment result
-	 * 
-	 * @param context
-	 *            dspace context to execute db operation
-	 * @param metricID
-	 *            metric id of the assessment result
-	 * @param itemID
-	 *            item id of the assessment resutl
-	 */
-	public static void deleteAssessMetric(Context context, int metricID, int itemID) throws SQLException {
-		// Check if the row already exist
-		String query = "DELETE FROM assessment_result WHERE assessment_metric_id = ? AND item_id = ? ";
-		
-		int afectedRows = DatabaseManager.updateQuery(context, query, metricID, itemID);
-		
-		System.out.println("Deleted " + afectedRows + " rows from assessment result");
-		// Make sure all changes are committed
-		context.commit();
-	}
-
-	/**
-	 * Deletes all assessment values attached to an item in DB
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 */
-	public static int deleteAssessValues(Context context, int itemID) throws SQLException {
-		int rowsAffected = 0;
-
-		String dbquery = "DELETE FROM assessment_result " + "WHERE item_id = ? ";
-
-		// Deletes rows with data from frontend
-		rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
-
-		// Make sure all changes are committed
-		context.commit();
-
-		return rowsAffected;
-	}
-
+	
 	/**
 	 * Finds all criteria attached to a specific dimension - assumes name is
 	 * unique
@@ -191,6 +102,99 @@ public class Metric {
 		}
 	}
 
+
+	/**
+	 * Inserts a new assessment metric attached to an item in DB
+	 * 
+	 * @param context
+	 *            DSpace context object
+	 */
+	public static void addAssessMetric(Context context, int metricID, int itemID) throws SQLException {
+		// Check if the row already exist
+		String query = "SELECT * FROM assessment_result " + "WHERE assessment_metric_id = ? AND item_id = ? ";
+
+		TableRow row = DatabaseManager.querySingleTable(context, "assessment_result", query, metricID, itemID);
+
+		if (row != null) {
+			return;
+		}
+
+		// Create a new row, and assign a data
+		TableRow newRow = DatabaseManager.row("assessment_result");
+		
+		newRow.setColumn("assessment_metric_id", metricID);
+		newRow.setColumn("item_id", itemID);
+
+		// Save changes to the database
+		DatabaseManager.insert(context, newRow);
+
+		// Make sure all changes are committed
+		context.commit();
+	}
+	
+	/**
+	 * Deletes the given assessment result
+	 * 
+	 * @param context
+	 *            dspace context to execute db operation
+	 * @param metricID
+	 *            metric id of the assessment result
+	 * @param itemID
+	 *            item id of the assessment resutl
+	 */
+	public static void deleteAssessMetric(Context context, int metricID, int itemID) throws SQLException {
+		// Check if the row already exist
+		String query = "DELETE FROM assessment_result WHERE assessment_metric_id = ? AND item_id = ? ";
+		
+		int afectedRows = DatabaseManager.updateQuery(context, query, metricID, itemID);
+		
+		System.out.println("Deleted " + afectedRows + " rows from assessment result");
+		// Make sure all changes are committed
+		context.commit();
+	}
+
+
+	/**
+	 * Saves assessment value in DB, obtained via perfom method in each
+	 * assessment class
+	 * 
+	 * @param context
+	 *            DSpace context object
+	 */
+	public static void addAssessValue(Context context, double result, String metric, int layerID, int itemID) throws SQLException {
+		String dbupdate = "UPDATE assessment_result SET metric_value = ? " + "WHERE assessment_metric_id = "
+				+ "( SELECT b.assessment_metric_id "
+				+ "  FROM assessment_metric b INNER JOIN criteria c ON b.criteria_id = c.criteria_id "
+				+ "  WHERE c.criteria_name = ? AND b.layer_id = ? " + ") " + "AND item_id = ? ";
+		String assessVal = String.valueOf(result);
+
+		DatabaseManager.updateQuery(context, dbupdate, assessVal, metric, layerID, itemID);
+		context.commit();
+
+	}
+
+
+	/**
+	 * Deletes all assessment values attached to an item in DB
+	 * 
+	 * @param context
+	 *            DSpace context object
+	 */
+	public static int deleteAssessValues(Context context, int itemID) throws SQLException {
+		int rowsAffected = 0;
+
+		String dbquery = "DELETE FROM assessment_result " + "WHERE item_id = ? ";
+
+		// Deletes rows with data from frontend
+		rowsAffected = DatabaseManager.updateQuery(context, dbquery, itemID);
+
+		// Make sure all changes are committed
+		context.commit();
+
+		return rowsAffected;
+	}
+
+	
 	public String getName() {
 		return name;
 	}

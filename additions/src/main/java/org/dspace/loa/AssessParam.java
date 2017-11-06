@@ -12,7 +12,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
 
 public class AssessParam{
 
-	private int assessMetricID, itemID, dimWeightID, layerID, dimID, expWeight;
+	private int assessMetricId, itemId, dimWeightId, layerId, dimId, expWeight;
 
 	private String metricValue, admWeight;
 
@@ -23,15 +23,15 @@ public class AssessParam{
 			row.setTable("assessment_result");
 
 
-		assessMetricID = row.getIntColumn("assessment_metric_id");
+		assessMetricId = row.getIntColumn("assessment_metric_id");
 
-		itemID = row.getIntColumn("item_id");
+		itemId = row.getIntColumn("item_id");
 
-		dimWeightID = row.getIntColumn("dimension_weighting_id");
+		dimWeightId = row.getIntColumn("dimension_weighting_id");
 
-		layerID = row.getIntColumn("layer_id");
+		layerId = row.getIntColumn("layer_id");
 
-		dimID = row.getIntColumn("dimension_id");
+		dimId = row.getIntColumn("dimension_id");
 
 		expWeight = row.getIntColumn("expert_weight");
 
@@ -142,43 +142,43 @@ public class AssessParam{
 	}
 
 	public int getAssessMetricID() {
-		return assessMetricID;
+		return assessMetricId;
 	}
 
 	public void setAssessMetricID(int assessMetricID) {
-		this.assessMetricID = assessMetricID;
+		this.assessMetricId = assessMetricID;
 	}
 
 	public int getItemID() {
-		return itemID;
+		return itemId;
 	}
 
 	public void setItemID(int itemID) {
-		this.itemID = itemID;
+		this.itemId = itemID;
 	}
 
 	public int getDimWeightID() {
-		return dimWeightID;
+		return dimWeightId;
 	}
 
 	public void setDimWeightID(int dimWeightID) {
-		this.dimWeightID = dimWeightID;
+		this.dimWeightId = dimWeightID;
 	}
 
 	public int getLayerID() {
-		return layerID;
+		return layerId;
 	}
 
 	public void setLayerID(int layerID) {
-		this.layerID = layerID;
+		this.layerId = layerID;
 	}
 
 	public int getDimID() {
-		return dimID;
+		return dimId;
 	}
 
 	public void setDimID(int dimID) {
-		this.dimID = dimID;
+		this.dimId = dimID;
 	}
 
 	public int getExpWeight() {

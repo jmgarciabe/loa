@@ -36,6 +36,60 @@ public class Dimension{
 		context.cache(this, row.getIntColumn("dimension_id"));
 
 	}
+	
+	/**
+	 * Finds all dimensions attached to a specific layer - assumes name is
+	 * unique
+	 * 
+	 * @param context
+	 * @param layerName
+	 * 
+	 * @return array of all dimensions by a specific layer
+	 */
+	public static Dimension[] findByLayer(Context context, String layerName) throws SQLException {
+		String dbquery = "SELECT d.*,ld.layer_id FROM dimension d "
+				+ "INNER JOIN layer2dimension ld ON ld.dimension_id=d.dimension_id "
+				+ "AND ld.layer_id = (select layer_id from layer where layer_name= ?) ";
+
+		TableRowIterator rows = DatabaseManager.query(context, dbquery, layerName);
+
+		try {
+			List<TableRow> dRows = rows.toList();
+			Dimension[] dimensions = new Dimension[dRows.size()];
+
+			for (int i = 0; i < dRows.size(); i++) {
+				TableRow row = dRows.get(i);
+				// First check the cache
+				Dimension fromCache = (Dimension) context.fromCache(Dimension.class, row.getIntColumn("dimension_id"));
+				if (fromCache != null) {
+					dimensions[i] = fromCache;
+				} else {
+					dimensions[i] = new Dimension(context, row);
+				}
+			}
+
+			return dimensions;
+		} finally {
+			if (rows != null)
+				rows.close();
+		}
+	}
+
+	/**
+	 * Finds dimension name taking into account its ID
+	 * 
+	 * @param context
+	 * @param dimID
+	 * 
+	 * @return dimension name string for a specific dimension ID
+	 */
+	public static String findNameByID(Context context, int dimID) throws SQLException {
+		String dbquery = "SELECT dimension_name FROM dimension " + "WHERE dimension_id = ? ";
+		TableRow row = DatabaseManager.querySingle(context, dbquery, dimID);
+		String dimensionName = row.getStringColumn("dimension_name");
+		return dimensionName;
+	}
+
 
 	/**
 	 * Inserts a new weight in DB attached to a dimension
@@ -69,6 +123,27 @@ public class Dimension{
 		// Make sure all changes are committed
 		context.commit();
 
+	}
+	
+	/**
+	 * updates expert weight in DB attached to a dimension
+	 * 
+	 * @param context
+	 *            DSpace context object
+	 * @param dimWghtID
+	 * @param itemID
+	 * @param weight
+	 */
+	public static void updateExpertWeight(Context context, int dimWghtID, int itemID, int weight) {
+		String dbquery = "update dimension_weighting set expert_weight = ?" + "where dimension_weighting_id = ? "
+				+ "and item_id = ? ";
+		try {
+			DatabaseManager.updateQuery(context, dbquery, weight, dimWghtID, itemID);
+			context.commit();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -126,79 +201,6 @@ public class Dimension{
 		return rowsAffected;
 	}
 
-	/**
-	 * Finds all dimensions attached to a specific layer - assumes name is
-	 * unique
-	 * 
-	 * @param context
-	 * @param layerName
-	 * 
-	 * @return array of all dimensions by a specific layer
-	 */
-	public static Dimension[] findByLayer(Context context, String layerName) throws SQLException {
-		String dbquery = "SELECT d.*,ld.layer_id FROM dimension d "
-				+ "INNER JOIN layer2dimension ld ON ld.dimension_id=d.dimension_id "
-				+ "AND ld.layer_id = (select layer_id from layer where layer_name= ?) ";
-
-		TableRowIterator rows = DatabaseManager.query(context, dbquery, layerName);
-
-		try {
-			List<TableRow> dRows = rows.toList();
-			Dimension[] dimensions = new Dimension[dRows.size()];
-
-			for (int i = 0; i < dRows.size(); i++) {
-				TableRow row = dRows.get(i);
-				// First check the cache
-				Dimension fromCache = (Dimension) context.fromCache(Dimension.class, row.getIntColumn("dimension_id"));
-				if (fromCache != null) {
-					dimensions[i] = fromCache;
-				} else {
-					dimensions[i] = new Dimension(context, row);
-				}
-			}
-
-			return dimensions;
-		} finally {
-			if (rows != null)
-				rows.close();
-		}
-	}
-
-	/**
-	 * Finds dimension name taking into account its ID
-	 * 
-	 * @param context
-	 * @param dimID
-	 * 
-	 * @return dimension name string for a specific dimension ID
-	 */
-	public static String findNameByID(Context context, int dimID) throws SQLException {
-		String dbquery = "SELECT dimension_name FROM dimension " + "WHERE dimension_id = ? ";
-		TableRow row = DatabaseManager.querySingle(context, dbquery, dimID);
-		String dimensionName = row.getStringColumn("dimension_name");
-		return dimensionName;
-	}
-
-	/**
-	 * updates expert weight in DB attached to a dimension
-	 * 
-	 * @param context
-	 *            DSpace context object
-	 * @param dimWghtID
-	 * @param itemID
-	 * @param weight
-	 */
-	public static void updateExpertWeight(Context context, int dimWghtID, int itemID, int weight) {
-		String dbquery = "update dimension_weighting set expert_weight = ?" + "where dimension_weighting_id = ? "
-				+ "and item_id = ? ";
-		try {
-			DatabaseManager.updateQuery(context, dbquery, weight, dimWghtID, itemID);
-			context.commit();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	public int getId() {
 		return id;
