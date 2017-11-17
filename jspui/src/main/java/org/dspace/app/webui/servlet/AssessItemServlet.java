@@ -9,6 +9,7 @@ package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Vector;
 
 import javax.servlet.ServletException;
@@ -100,8 +101,8 @@ public class AssessItemServlet extends DSpaceServlet {
 		StartAssessHelper helper = new StartAssessHelper();
 		if (AuthorizeManager.isAdmin(context)) {
 			// User is a repository administrator
-			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 1);
-			Vector<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 1);
+			List<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 1);
+			List<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 1);
 			String processMessage = "";
 			if (parameterizedMetrics.isEmpty()) {
 				processMessage = "Parameters must be set prior to assessment process. Please use the link below in order to set parameters for this assessment.";
@@ -112,8 +113,8 @@ public class AssessItemServlet extends DSpaceServlet {
 
 		} else if (Group.isMember(context, 2)) {
 			// User is an admin
-			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 2);
-			Vector<String> parameterizedDimensions = helper.getDimensions(context, assessParam, 2);
+			List<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 2);
+			List<String> parameterizedDimensions = helper.getDimensions(context, assessParam, 2);
 
 			if (parameterizedDimensions.isEmpty())
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
@@ -124,8 +125,8 @@ public class AssessItemServlet extends DSpaceServlet {
 			}
 		} else if (Group.isMember(context, 3)) {
 			// User is a student
-			Vector<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 3);
-			Vector<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 3);
+			List<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 3);
+			List<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 3);
 
 			if (parameterizedMetrics.isEmpty())
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");

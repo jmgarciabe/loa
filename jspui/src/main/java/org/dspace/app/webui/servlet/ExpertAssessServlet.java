@@ -91,8 +91,8 @@ public class ExpertAssessServlet extends DSpaceServlet {
 			}
 
 			expertHelper.setExpertWeight(context, expertWeights);
-			Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
-			Vector<String> expMetrics = startHelper.getMetrics(context, assessParamList, 2);
+			List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
+			List<String> expMetrics = startHelper.getMetrics(context, assessParamList, 2);
 			session.setAttribute("expertHelper", expertHelper);
 			request.setAttribute("item", item);
 			request.setAttribute("handle", handle);

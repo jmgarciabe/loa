@@ -2,6 +2,7 @@ package org.dspace.loa;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Vector;
 
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -14,27 +15,15 @@ public class Dimension{
 
 	private String name;
 
-	private int layerId;
-
 	/**
 	 * Construct a Dimension from a given context and tablerow
 	 * 
 	 * @param context
 	 * @param row
 	 */
-	public Dimension(Context context, TableRow row) throws SQLException {
-
-		// Ensure that my TableRow is typed.
-		if (null == row.getTable())
-			row.setTable("dimension");
-
-		id = row.getIntColumn("dimension_id");
-		name = row.getStringColumn("dimension_name");
-		layerId = row.getIntColumn("layer_id");
-
-		// Cache ourselves
-		context.cache(this, row.getIntColumn("dimension_id"));
-
+	public Dimension(int id, String name){
+		this.id = id;
+		this.name = name;
 	}
 	
 	/**
@@ -42,36 +31,34 @@ public class Dimension{
 	 * unique
 	 * 
 	 * @param context
-	 * @param layerName
+	 * @param layerId
 	 * 
 	 * @return array of all dimensions by a specific layer
 	 */
-	public static Dimension[] findByLayer(Context context, String layerName) throws SQLException {
-		String dbquery = "SELECT d.*,ld.layer_id FROM dimension d "
-				+ "INNER JOIN layer2dimension ld ON ld.dimension_id=d.dimension_id "
-				+ "AND ld.layer_id = (select layer_id from layer where layer_name= ?) ";
+	public static List<Dimension> findByLayer(Context context, int layerId) throws SQLException {
+		
+		String dbquery = "SELECT  									" +
+						"dimension_id,								" + 
+						"dimension_name								" +
+						"FROM dimension								" +
+						"WHERE dimension_id IN (Select dimension_id FROM layer2dimension WHERE layer_id = ?) ";
 
-		TableRowIterator rows = DatabaseManager.query(context, dbquery, layerName);
+		TableRowIterator rowsIterator = DatabaseManager.query(context, dbquery, layerId);
 
 		try {
-			List<TableRow> dRows = rows.toList();
-			Dimension[] dimensions = new Dimension[dRows.size()];
-
-			for (int i = 0; i < dRows.size(); i++) {
-				TableRow row = dRows.get(i);
-				// First check the cache
-				Dimension fromCache = (Dimension) context.fromCache(Dimension.class, row.getIntColumn("dimension_id"));
-				if (fromCache != null) {
-					dimensions[i] = fromCache;
-				} else {
-					dimensions[i] = new Dimension(context, row);
-				}
+			
+			List<Dimension> dimensionList = new Vector<Dimension>();
+			while(rowsIterator.hasNext()){
+				TableRow row = rowsIterator.next();
+				Dimension dim = new Dimension(row.getIntColumn("dimension_id"),row.getStringColumn("dimension_name"));
+				dimensionList.add(dim);
+				
 			}
-
-			return dimensions;
+			return dimensionList;
+			
 		} finally {
-			if (rows != null)
-				rows.close();
+			if (rowsIterator != null)
+				rowsIterator.close();
 		}
 	}
 
@@ -101,10 +88,11 @@ public class Dimension{
 	 * @param itemID
 	 * @param dimWeight
 	 */
-	public static void addDimensionWeight(Context context, int dimID, int layID, int itemID, String dimWeight)
+	public static void updateAdminWeight(Context context, int dimID, int layID, int itemID, double dimWeight)
 			throws SQLException {
 		// Verificar si ya existe la fila y actualizarla o crearla
 		TableRow row;
+		String weight = String.valueOf(dimWeight);
 		String query = "select * from dimension_weighting where layer_id = ?" + " and dimension_id = ? and item_id = ? ";
 
 		row = DatabaseManager.querySingleTable(context, "dimension_weighting", query, layID, dimID, itemID);
@@ -113,11 +101,11 @@ public class Dimension{
 			row.setColumn("layer_id", layID);
 			row.setColumn("dimension_id", dimID);
 			row.setColumn("item_id", itemID);
-			row.setColumn("admin_weight", dimWeight);
+			row.setColumn("admin_weight", weight);
 			DatabaseManager.insert(context, row);
 
 		} else {
-			row.setColumn("admin_weight", dimWeight);
+			row.setColumn("admin_weight", weight);
 			DatabaseManager.update(context, row);
 		}
 		// Make sure all changes are committed
@@ -208,14 +196,6 @@ public class Dimension{
 
 	public void setId(int iD) {
 		id = iD;
-	}
-
-	public int getLayerId() {
-		return layerId;
-	}
-
-	public void setLayerId(int layerID) {
-		this.layerId = layerID;
 	}
 
 	public String getName() {

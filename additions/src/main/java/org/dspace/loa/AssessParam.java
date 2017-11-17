@@ -101,7 +101,7 @@ public class AssessParam{
 	 * @return list of assessment parameters
 	 * @throws SQLException
 	 */
-	public static Vector<AssessParam> findParam(Context context, int itemID,
+	public static List<AssessParam> findParam(Context context, int itemID,
 			int layerID) throws SQLException
 
 	{
@@ -127,7 +127,7 @@ public class AssessParam{
 		TableRowIterator rows = DatabaseManager.query(context, dbquery,itemID, layerID);
 		try {
 			List<TableRow> dRows = rows.toList();
-			Vector<AssessParam> params = new Vector<AssessParam>();
+			List<AssessParam> params = new Vector<AssessParam>();
 
 			for (int i = 0; i < dRows.size(); i++) {
 				TableRow row = dRows.get(i);

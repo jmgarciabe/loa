@@ -28,7 +28,7 @@ public class StudentAssessHelper {
 	 *             operations
 	 */
 	public void setExpertAssessment(Context context, int itemId, Map<String, List<Double>> perMetricValues) throws SQLException {
-		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 3);
+		List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 3);
 		double formValue = 0;
 		double dbValue = 0;
 

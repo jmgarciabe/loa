@@ -1,6 +1,8 @@
 package org.dspace.loa;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.dspace.core.Context;
@@ -19,13 +21,13 @@ public class StartAssessHelper {
 	 *            - id of the layer
 	 * @return String list of dimensions
 	 */
-	public Vector<String> getDimensions(Context context, Vector<AssessParam> assessParamList, int layerId) {
+	public List<String> getDimensions(Context context, List<AssessParam> assessParamList, int layerId) {
 		Vector<String> ckDimensions = new Vector<String>();
 		String dimensionName = null;
 
 		if (assessParamList != null) {
 			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
+				AssessParam assessParam = assessParamList.get(i);
 				if (assessParam.getLayerID() == layerId) {
 					try {
 						dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
@@ -53,12 +55,12 @@ public class StartAssessHelper {
 	 *            - id of the layer
 	 * @return
 	 */
-	public Vector<String> getMetrics(Context context, Vector<AssessParam> assessParamList, int layerId) {
+	public List<String> getMetrics(Context context, List<AssessParam> assessParamList, int layerId) {
 		Vector<String> ckmetrics = new Vector<String>();
 		String metricName = null;
 		if (assessParamList != null) {
 			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
+				AssessParam assessParam = assessParamList.get(i);
 				if (assessParam.getLayerID() == layerId) {
 					try {
 						metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
@@ -83,14 +85,8 @@ public class StartAssessHelper {
 	 *             - may throw SQLException while retrieving list from data
 	 *             model
 	 */
-	public Vector<String> getLayers(Context context) throws SQLException {
-		Vector<String> layerList = new Vector<String>();
-		Layer[] layersRetrieved = Layer.findAllLayers(context);
-		for (int i = 0; i < layersRetrieved.length; i++) {
-			String layer = layersRetrieved[i].getName();
-			if (!layerList.contains(layer))
-				layerList.addElement(layer);
-		}
+	public List<Layer> getLayers(Context context) throws SQLException {
+		List<Layer> layerList = Layer.findAllLayers(context);
 		return layerList;
 	}
 
@@ -99,26 +95,18 @@ public class StartAssessHelper {
 	 * 
 	 * @param context
 	 *            - DSpace context object
-	 * @param layer
+	 * @param layerId
 	 *            - the layer name
 	 * @return - List of dimension
 	 */
-	public Vector<Dimension> getDimensions(Context context, String layer) throws SQLException {
+	public List<Dimension> getDimensions(Context context, int layerId) throws SQLException {
 
-		Vector<Dimension> dimensionList = new Vector<Dimension>();
-		Dimension[] dimensions = Dimension.findByLayer(context, layer);
-		for (Dimension dim : dimensions) {
-			dimensionList.add(dim);
-
-		}
+		List<Dimension> dimensionList = Dimension.findByLayer(context, layerId);
 		return dimensionList;
 	}
 
 	/**
-	 * Return a list of String with dimension names, using a List of String with
-	 * comma separated values in which the first value is the layer id, and the
-	 * second is the dimension id. Values are filtered to only return the
-	 * dimension for the given layer
+	 * Return a list of Dimensions contained among the list of AssessmentMetric
 	 * 
 	 * @param context
 	 *            DSpace context object
@@ -129,34 +117,90 @@ public class StartAssessHelper {
 	 *            Layer name
 	 * @return List of dimension names listed in the input
 	 */
-	public Vector<String> verifyCheckedDimensions(Context context, Vector<String> checkedMetrics, String layer) {
+	public List<Dimension> getDimensionsInMetrics(List<AssessmentMetric> checkedMetrics) {
 
-		Vector<String> ckDimensions = new Vector<String>();
-		String dimensionName = null;
-		int layerId = layer.equals("Administrator") ? 1 : layer.equals("Expert") ? 2 : layer.equals("Student") ? 3 : 0;
-
+		List<Dimension> ckDimensions = new Vector<Dimension>();
 		// Now, we can add dimension from metrics recently checked to item's
 		// assessment
-		if (checkedMetrics != null) {
-			for (int i = 0; i < checkedMetrics.size(); i++) {
-				String metricInfo = checkedMetrics.elementAt(i).toString();
-				String[] data = metricInfo.split(",");
-				int tempLayerId = Integer.valueOf(data[0]).intValue();
-				int dimensionId = Integer.valueOf(data[1]).intValue();
-
-				if (tempLayerId == layerId) {
-					try {
-						dimensionName = Dimension.findNameByID(context, dimensionId);
-					} catch (SQLException e) {
-						e.printStackTrace();
+		for (AssessmentMetric metric : checkedMetrics) {
+			if (metric.isChecked()) {
+				boolean contained = false;
+				Dimension dim = metric.getDimension();
+				for (Dimension dimension : ckDimensions) {
+					if (dimension.getId() == dim.getId()) {
+						contained = true;
+						break;
 					}
 				}
-				if (!ckDimensions.contains(dimensionName))
-					ckDimensions.addElement(dimensionName);
+				if (!contained) {
+					ckDimensions.add(dim);
+				}
 			}
 		}
 
 		return ckDimensions;
+	}
+
+	/**
+	 * Creates or deletes the metrics in the given list upon if have been or not
+	 * checked. That is, creates or deletes the corresponding AssessmentResult
+	 * register
+	 * 
+	 * @param context
+	 *            - Dspace context
+	 * @param metrics
+	 *            - List of AssessmentMetrics with the updated information
+	 * @param itemId
+	 *            - the item identifier
+	 * @throws SQLException
+	 */
+	public void updateSelectedMetrics(Context context, List<AssessmentMetric> metrics, int itemId) throws SQLException {
+		for (AssessmentMetric metric : metrics) {
+			if (metric.isChecked()) {
+				Metric.addAssessMetric(context, metric.getId(), itemId);
+			} else {
+				Metric.deleteAssessMetric(context, metric.getId(), itemId);
+			}
+		}
+	}
+
+	/**
+	 * Updates admin weights with values given per dimension for the layer
+	 * passed
+	 * 
+	 * @param context
+	 *            - Dspace context
+	 * @param metrics
+	 *            - List of AssessmentMetrics with the updated information
+	 * @param itemId
+	 *            - the item identifier
+	 * @param layerId
+	 *            - identifier of the layer updated
+	 * @param weightsPerDimension
+	 *            - Map with entries made up of dimension name and corresponding
+	 *            weight
+	 * @throws SQLException
+	 */
+	public void updateAdminWeights(Context context, List<AssessmentMetric> metrics, int itemId, int layerId,
+			Map<String, Double> weightsPerDimension) throws SQLException {
+
+		List<Dimension> dimensionsList = getDimensions(context, layerId);
+
+		for (Dimension dimension : dimensionsList) {
+			boolean delete = true;
+			for (AssessmentMetric metric : metrics) {
+				if (dimension.getId() == metric.getDimension().getId() && metric.isChecked()) {
+					delete = false;
+					break;
+				}
+			}
+			if (delete) {
+				Dimension.deleteDimensionWeighting(context, layerId, dimension.getId(), itemId);
+			} else {
+				Double weight = weightsPerDimension.get(dimension.getName());
+				Dimension.updateAdminWeight(context, dimension.getId(), layerId, itemId, weight);
+			}
+		}
 	}
 
 }

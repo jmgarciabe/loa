@@ -2,39 +2,39 @@ package org.dspace.loa;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Vector;
 
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 
-public class Layer  {
+public class Layer {
 
 	/** Identifier of the metric */
 	private int id;
-	
+
 	/** Name of the metric */
 	private String name;
-	
+
 	/**
 	 * Construct a Layer from a given context and tablerow
 	 * 
 	 * @param context
 	 * @param row
 	 */
-	public Layer(Context context, TableRow row) throws SQLException {
+	public Layer(int id, String name){
 
-		// Ensure that my TableRow is typed.
-		if (null == row.getTable())
-			row.setTable("layer");
-
-		id = row.getIntColumn("layer_id");
-
-		name = row.getStringColumn("layer_name");
-
-		// Cache ourselves
-		context.cache(this, row.getIntColumn("layer_id"));
-
+		this.id = id;
+		this.name = name;
+	}
+	
+	public static Layer findLayer(Context context, int layerId) throws SQLException{
+		String query = "SELECT * FROM layer WHERE layer_id = ?";
+		
+		TableRow row = DatabaseManager.querySingle(context, query, layerId);
+		Layer layer = new Layer(row.getIntColumn("layer_id"), row.getStringColumn("layer_name"));
+		return layer;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class Layer  {
 		// Make sure all changes are committed
 		context.commit();
 	}
-	
+
 	/**
 	 * updates assessment indexes in DB attached to an item
 	 * 
@@ -120,7 +120,6 @@ public class Layer  {
 			e.printStackTrace();
 		}
 	}
-	
 
 	/**
 	 * Deletes all assessment indexes attached to an item in DB
@@ -155,34 +154,23 @@ public class Layer  {
 	 * 
 	 * @return layer objects
 	 */
-	public static Layer[] findAllLayers(Context context) throws SQLException {
+	public static List<Layer> findAllLayers(Context context) throws SQLException {
+		
 		String dbquery = "SELECT l.* FROM layer l ";
 
-		TableRowIterator rows = DatabaseManager.query(context, dbquery);
-
+		TableRowIterator rowsIterator = DatabaseManager.query(context, dbquery);
+		List<Layer> layerList = new Vector<Layer>(); 
+		
 		try {
-			List<TableRow> dRows = rows.toList();
-
-			Layer[] layers = new Layer[dRows.size()];
-
-			for (int i = 0; i < dRows.size(); i++) {
-				TableRow row = dRows.get(i);
-
-				// First check the cache
-				Layer fromCache = (Layer) context.fromCache(Layer.class, row.getIntColumn("layer_id"));
-
-				layers[i] = new Layer(context, row);
-
-				if (fromCache != null)
-					layers[i] = fromCache;
-				else
-					layers[i] = new Layer(context, row);
+			while(rowsIterator.hasNext()){
+				TableRow row = rowsIterator.next();
+				Layer layer = new Layer(row.getIntColumn("layer_id"), row.getStringColumn("layer_name"));
+				layerList.add(layer);
 			}
-
-			return layers;
+			return layerList;
 		} finally {
-			if (rows != null)
-				rows.close();
+			if (rowsIterator != null)
+				rowsIterator.close();
 		}
 
 	}
@@ -212,7 +200,6 @@ public class Layer  {
 		}
 	}
 
-	
 	public int getId() {
 		return id;
 	}

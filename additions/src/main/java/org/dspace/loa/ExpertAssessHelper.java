@@ -65,9 +65,9 @@ public class ExpertAssessHelper {
 	 */
 	public void setExpertWeight(Context context, Map<String, Integer> values) throws SQLException {
 
-		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
+		List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
 		for (int i = 0; i < assessParamList.size(); i++) {
-			AssessParam assessParam = (AssessParam) assessParamList.elementAt(i);
+			AssessParam assessParam = (AssessParam) assessParamList.get(i);
 			String dimId = String.valueOf(assessParam.getDimID());
 			String assessMetricId = String.valueOf(assessParam.getAssessMetricID());
 			Integer weight = values.get(dimId);
@@ -100,7 +100,7 @@ public class ExpertAssessHelper {
 	 */
 	public void setExpertAssessment(Context context, Map<String, List<Double>> perMetricValues) throws SQLException {
 
-		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
+		List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
 		Map<String, String> criteriaIds = new HashMap<String, String>();
 		criteriaIds.put("12", "Accessibility");
 		criteriaIds.put("14", "Accuracy");

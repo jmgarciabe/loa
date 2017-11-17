@@ -12,6 +12,9 @@
   - 
   --%>
 
+<%@page import="org.dspace.loa.Dimension"%>
+<%@page import="java.util.List"%>
+<%@page import="org.dspace.loa.Layer"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -29,7 +32,7 @@
 <%
 	Item item = (Item) request.getAttribute("item");
 	String handle = (String) request.getAttribute("handle");
-	String layer = (String) request.getAttribute("layer");
+	Layer layer = (Layer) request.getAttribute("layer");
 %>
 
 <dspace:layout style="submission" title="Learning Object Assessment Parametrization" navbar="admin"
@@ -46,7 +49,7 @@
 	</h1>
 	<br>
 	<h3>
-		<span class="label label-default"> Please set the weighting in each dimension in <%=layer%>
+		<span class="label label-default"> Please set the weighting in each dimension in <%=layer.getName()%>
 			layer.
 		</span>
 	</h3>
@@ -58,30 +61,22 @@
 		id="param-values-form">
 
 		<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input type="hidden"
-			name="layer" value="<%=layer%>" />
-
-		<%
-			Vector checkedDimensions = (Vector) session
-						.getAttribute("LOA.ckDimensionList");
-				if (checkedDimensions != null && !checkedDimensions.isEmpty()) {
-					if (layer != null) {
-		%>
-
+			name="layerId" value="<%=layer.getId()%>" />
 		<div class="panel panel-info">
 			<div class="panel-heading">
-				<h2 class="panel-title"><%=layer + " Layer"%></h2>
+				<h2 class="panel-title"><%=layer.getName() + " Layer"%></h2>
 			</div>
 			<div class="panel-body">
 				<%
-					for (int index = 0; index < checkedDimensions.size(); index++) {
-									String dimensionName = (String) checkedDimensions
-											.elementAt(index);
+				List<Dimension> checkedDimensions = (List<Dimension>) request.getAttribute("LOA.ckDimensionList");			
+					for (Dimension dim : checkedDimensions) {
+									
 				%>
 				<div class="form-group">
-					<label for="<%=dimensionName%>"><%=dimensionName%></label>
+					<label for="<%=dim.getName()%>"><%=dim.getName()%></label>
 					<div class="input-group">
 						<input type="number" class="form-control dim-value" aria-describedby="percentage"
-							name="<%=dimensionName%>" id="<%=dimensionName%>" required> <span
+							name="<%=dim.getName()%>" id="<%=dim.getName()%>" required> <span
 							class="input-group-addon" id="percentage">%</span>
 					</div>
 				</div>
@@ -90,12 +85,7 @@
 				%>
 			</div>
 		</div>
-		<%
-			}
-		%>
-		<%
-			}
-		%>
+		
 		<script type="text/javascript">
 			function validar() {
 				var sum = 0.0;

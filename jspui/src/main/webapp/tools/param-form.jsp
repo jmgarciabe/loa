@@ -10,6 +10,8 @@
 <%--
   --%>
 
+<%@page import="java.util.List"%>
+<%@page import="org.dspace.loa.Layer"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -17,7 +19,6 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace"%>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.InitialParamServlet"%>
-<%@ page import="java.util.Vector"%>
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.EPerson"%>
@@ -49,14 +50,13 @@
 
 			<div class="form-group">
 				<label for="selectLayer" class="control-label">Please select the layer to set parameters</label>
-				<select class="form-control" id="selectLayer" name="layer_name">
+				<select class="form-control" id="selectLayer" name="layerId">
 					<%
-						Vector adminAssessOpt = (Vector) session.getAttribute("LOA.adminAssessOpt");
-							if (adminAssessOpt != null) {
-								for (int index = 0; index < adminAssessOpt.size(); index++) {
-									String layer = (String) adminAssessOpt.elementAt(index);
+						List<Layer> layerList = (List<Layer>) request.getAttribute("LOA.layerList");
+							if (layerList != null) {
+								for (Layer layer :  layerList) {
 					%>
-					<option value="<%=layer%>"><%=layer%></option>
+					<option value="<%=layer.getId()%>"><%=layer.getName()%></option>
 
 					<%
 						}
