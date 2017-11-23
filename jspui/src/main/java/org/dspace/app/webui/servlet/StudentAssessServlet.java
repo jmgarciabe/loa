@@ -75,7 +75,7 @@ public class StudentAssessServlet extends DSpaceServlet {
 			perMetricResponses.put(entry.getKey(), valores);
 		}
 		
-		helper.setExpertAssessment(context, item.getID(), perMetricResponses);
+		helper.setStudentAssessment(context, item.getID(), perMetricResponses);
 
 		request.setAttribute("item", item);
 		JSPManager.showJSP(request, response, "/tools/success-page.jsp");

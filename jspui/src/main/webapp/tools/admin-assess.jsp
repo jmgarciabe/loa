@@ -1,15 +1,3 @@
-<%--
-
-    The contents of this file are subject to the license and copyright
-    detailed in the LICENSE and NOTICE files at the root of the source
-    tree and available online at
-
-    http://www.dspace.org/license/
-
---%>
-<%--
-  --%>
-
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -19,8 +7,9 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.AdminAssessServlet"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet"%>
-<%@ page import="java.util.Vector"%>
-<%@page import="org.dspace.loa.AssessResult"%>
+<%@ page import="java.util.List"%>
+<%@ page import="org.dspace.loa.AssessResult"%>
+<%@ page import="org.dspace.loa.AssessmentMetric"%>
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.content.Metadatum"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
@@ -29,7 +18,6 @@
 
 <%
 	Item item = (Item) request.getAttribute("item");
-	String enaRstBtn = (String) request.getAttribute("enaRstBtn");
 	int itemID = (item != null ? item.getID() : -1);
 	String title = "Unknown Item";
 	if (item != null) {
@@ -62,19 +50,18 @@
 				<div class="col-md-4 col-lg-3">
 					<select class="form-control" name="admin_assess" id="admin_assess">
 						<%
-							Vector adminAvailAssess = (Vector) session.getAttribute("LOA.adminAvailAssess");
-								if (adminAvailAssess != null && !adminAvailAssess.isEmpty()) {
+							List<AssessmentMetric> metrics = (List<AssessmentMetric>) session.getAttribute("LOA.metricList");
 						%>
 						<%
-							for (int index = 0; index < adminAvailAssess.size(); index++) {
-										String adminMetrics = (String) adminAvailAssess.elementAt(index);
+							for (AssessmentMetric metric : metrics) {
+
+									if (metric.isChecked()) {
 						%>
-						<option value="<%=adminMetrics%>" /><%=adminMetrics%></option>
-						<%
-							}
-						%>
+						<option value="<%=metric.getId()%>"><%=metric.getCriteria().getName()%>
+						</option>
 						<%
 							}
+								}
 						%>
 					</select>
 				</div>

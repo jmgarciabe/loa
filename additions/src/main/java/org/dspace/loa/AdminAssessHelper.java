@@ -21,25 +21,25 @@ public class AdminAssessHelper {
 	 * @return and AssessResult object with the result information
 	 * @throws AdminAssessmentException - may throw a custom exception if something went wrong
 	 */
-	public AssessResult assess(String criteria, DSpaceObject dso, Context context) throws AdminAssessmentException {
+	public AssessResult assess(int metric, DSpaceObject dso, Context context) throws AdminAssessmentException {
 
-		switch (criteria) {
-		case "Availability":
+		switch (metric) {
+		case 2:
 			criteriaCommand = new AvailabilityAssessCommand();
 			break;
-		case "Coherence":
+		case 5:
 			criteriaCommand = new CoherenceAssessCommand();
 			break;
-		case "Completeness":
+		case 3:
 			criteriaCommand = new CompletenessAssessCommand();
 			break;
-		case "Consistency":
+		case 4:
 			criteriaCommand = new ConsistencyAssessCommand();
 			break;
-		case "Reusability":
+		case 1:
 			criteriaCommand = new ReusabilityAssessCommand();
 			break;
-		case "Visibility":
+		case 6:
 			criteriaCommand = new VisibilityAssessCommand();
 			break;
 		}

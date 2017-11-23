@@ -27,21 +27,10 @@ public class StudentAssessHelper {
 	 *             - May throw an SQL Exception while carrying out SQL
 	 *             operations
 	 */
-	public void setExpertAssessment(Context context, int itemId, Map<String, List<Double>> perMetricValues) throws SQLException {
+	public void setStudentAssessment(Context context, int itemId, Map<String, List<Double>> perMetricValues) throws SQLException {
 		List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 3);
 		double formValue = 0;
 		double dbValue = 0;
-
-		// Se crean mapas con información de los variables y ids de las
-		// dimensiones para almacenar respuestas
-		Map<String, String> criteriaIds = new HashMap<String, String>();
-		criteriaIds.put("19", "Availability");
-		criteriaIds.put("21", "Accuracy");
-		criteriaIds.put("20", "Ease to use");
-		criteriaIds.put("17", "Effectiveness");
-		criteriaIds.put("16", "Motivation");
-		criteriaIds.put("15", "Relevance");
-		criteriaIds.put("18", "Visual Design");
 
 		// Recorremos los param para actualizar o guardar el valor de la métrica
 		for (AssessParam param : assessParamList) {
@@ -60,7 +49,9 @@ public class StudentAssessHelper {
 				dbValue = (dbValue + formValue) / 2;
 			}
 			if (answers.size() > 0) {
-				Metric.addAssessValue(context, dbValue, criteriaIds.get(metricId), 3, itemId);
+				AssessmentResult r = new AssessmentResult(param.getAssessMetricID(), itemId);
+				r.setValue(dbValue);
+				AssessmentResultDao.getInstance().addAssessmentResult(context, r);
 			}
 			// Se resetean los valores
 			formValue = 0;

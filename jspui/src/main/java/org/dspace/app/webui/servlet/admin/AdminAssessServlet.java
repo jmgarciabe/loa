@@ -29,6 +29,8 @@ import org.dspace.loa.AdminAssessHelper;
 import org.dspace.loa.AdminAssessmentException;
 import org.dspace.loa.AssessParam;
 import org.dspace.loa.AssessResult;
+import org.dspace.loa.AssessmentResult;
+import org.dspace.loa.AssessmentResultDao;
 import org.dspace.loa.Dimension;
 import org.dspace.loa.Layer;
 import org.dspace.loa.Metric;
@@ -58,24 +60,26 @@ public class AdminAssessServlet extends DSpaceServlet {
 
 		Vector<String> adminAvailAssess = (Vector<String>) session.getAttribute("LOA.adminAvailAssess");
 		int itemID = UIUtil.getIntParameter(request, "item_id");
-		String assess2Perform = request.getParameter("admin_assess");
+		int assess2Perform = (Integer) request.getAttribute("admin_assess");
 		Item item = Item.find(context, itemID);
 		String handle = item.getHandle();
 
-		if (assess2Perform == null) {
+		if (assess2Perform == 0) {
 			JSPManager.showInternalError(request, response);
 		}
 
 		AdminAssessHelper assessHelper = new AdminAssessHelper();
-		AssessResult result = null;
+		AssessResult report = null;
 		try {
-			result = assessHelper.assess(assess2Perform, item, context);
+			report = assessHelper.assess(assess2Perform, item, context);
 		} catch (AdminAssessmentException aae) {
 			System.out.print(aae.getMessage());
 		}
-		Metric.addAssessValue(context, result.getScore(), assess2Perform, 1, itemID);
+		AssessmentResult result = new AssessmentResult(assess2Perform, itemID);
+		result.setValue(report.getScore());
+		AssessmentResultDao.getInstance().addAssessmentResult(context, result);
 
-		request.setAttribute("task_result", result);
+		request.setAttribute("task_result", report);
 		session.setAttribute("LOA.adminAvailAssess", adminAvailAssess);
 		request.setAttribute("item", item);
 		JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");

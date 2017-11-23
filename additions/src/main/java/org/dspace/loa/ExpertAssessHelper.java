@@ -101,15 +101,7 @@ public class ExpertAssessHelper {
 	public void setExpertAssessment(Context context, Map<String, List<Double>> perMetricValues) throws SQLException {
 
 		List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
-		Map<String, String> criteriaIds = new HashMap<String, String>();
-		criteriaIds.put("12", "Accessibility");
-		criteriaIds.put("14", "Accuracy");
-		criteriaIds.put("13", "Completeness");
-		criteriaIds.put("11", "Ease to use");
-		criteriaIds.put("8", "Potential Effectiveness");
-		criteriaIds.put("10", "Reusability");
-		criteriaIds.put("7", "Rigor and Relevance");
-		criteriaIds.put("9", "Visual Design");
+		
 
 		for (AssessParam param : assessParamList) {
 
@@ -131,7 +123,9 @@ public class ExpertAssessHelper {
 			value /= (valuesEntry.size() * 5);
 			result = Double.valueOf(metricsValues.get(assessMetricId));
 			result = (result * oldW + value * newW) / (oldW + newW);
-			Metric.addAssessValue(context, result, criteriaIds.get(assessMetricId), 2, itemId);
+			AssessmentResult r = new AssessmentResult(param.getAssessMetricID(), itemId);
+			r.setValue(result);
+			AssessmentResultDao.getInstance().addAssessmentResult(context, r);
 
 		}
 

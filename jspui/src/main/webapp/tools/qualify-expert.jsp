@@ -12,6 +12,8 @@
   - 
   --%>
 
+<%@page import="java.util.List"%>
+<%@page import="org.dspace.loa.Dimension"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -22,7 +24,6 @@
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.EPerson"%>
-<%@ page import="java.util.Vector"%>
 
 <%@ page session="true"%>
 
@@ -40,7 +41,7 @@
 			}
 		}
 		if (isValid) {
-			document.getElementById("modal-button").click();
+			document.getElementById("expert-dim-weighting").submit();
 		} else {
 			document.getElementById("error-message").innerHTML = "Invalid input, be aware that valid values must rate between 1 and 5";
 		}
@@ -69,14 +70,13 @@
 	<div class="alert alert-warning" role="alert">1 means a low level of experience, while 5
 		means that you are an expert in that field of knowledge</div>
 
-	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/expassess-param">
+	<form method="post" action="<%=request.getContextPath()%>/tools/LOAssessment/expassess-param" id="expert-dim-weighting">
 
 		<input type="hidden" name="item_id" value="<%=item.getID()%>" /> <input type="hidden"
 			name="action" value="<%=ExpertAssessServlet.DIM_PARAM%>" />
 
 		<%
-			Vector paramDimensions = (Vector) session.getAttribute("LOA.paramDimensions");
-				if (paramDimensions != null && !paramDimensions.isEmpty()) {
+			List<Dimension> dimensions = (List<Dimension>) session.getAttribute("LOA.dimensionList");
 		%>
 
 		<div class="panel panel-info">
@@ -86,12 +86,11 @@
 			<div class="panel-body">
 				<div class="col-md-6 col-lg-4">
 					<%
-						for (int index = 0; index < paramDimensions.size(); index++) {
-									String dimensionName = (String) paramDimensions.elementAt(index);
+						for (Dimension dim : dimensions) {
 					%>
 					<div class="form-group">
-						<label for="exp_<%=dimensionName%>">Level of <%=dimensionName%> experience
-						</label> <input type="number" class="form-control dim-value" name="exp_<%=dimensionName%>" required>
+						<label for="exp_<%=dim.getName()%>">Level of <%=dim.getName()%> experience
+						</label> <input type="number" class="form-control dim-value" name="<%=dim.getName()%>" required>
 					</div>
 					<%
 						}
@@ -99,38 +98,10 @@
 				</div>
 			</div>
 		</div>
-		<%
-			}
-		%>
-
-		<!-- Modal -->
-		<div id="modalInitParam" class="modal fade" role="dialog">
-			<div class="modal-dialog">
-
-				<!-- Modal content-->
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Confirm assessment parametrization</h4>
-					</div>
-					<div class="modal-body">
-						<div>
-							<strong>Parameterized weights successfully!</strong> Please continue with your assessment...
-						</div>
-					</div>
-					<div class="modal-footer">
-						<input class="btn btn-success" type="submit" name="submit_ok" value="OK" />
-					</div>
-				</div>
-			</div>
-		</div>
 		
 		<p id="error-message" style="color: red;"></p>
 		<div class="pull-left">
-			<!-- Trigger the modal with a button -->
 			<button type="button" class="btn btn-success btn-lg" onclick="validarNumeros()">Confirm</button>
-			<button type="button" data-toggle="modal" id="modal-button" data-target="#modalInitParam"
-				style="display: none;"></button>
 		</div>
 	</form>
 

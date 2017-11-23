@@ -9,72 +9,7 @@ import org.dspace.core.Context;
 
 public class StartAssessHelper {
 
-	/**
-	 * Retrieve the name of the Dimensions contained in the list of AssessParams
-	 * objects for the given layer
-	 * 
-	 * @param context
-	 *            - DSPace context
-	 * @param assessParamList
-	 *            - List of AssessParams objects
-	 * @param layerId
-	 *            - id of the layer
-	 * @return String list of dimensions
-	 */
-	public List<String> getDimensions(Context context, List<AssessParam> assessParamList, int layerId) {
-		Vector<String> ckDimensions = new Vector<String>();
-		String dimensionName = null;
-
-		if (assessParamList != null) {
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.get(i);
-				if (assessParam.getLayerID() == layerId) {
-					try {
-						dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					if (!ckDimensions.contains(dimensionName))
-						ckDimensions.addElement(dimensionName);
-				}
-			}
-		}
-
-		return ckDimensions;
-	}
-
-	/**
-	 * Retrive metric names contained in the list of AssessParam objects for the
-	 * given layer
-	 * 
-	 * @param context
-	 *            - DSpace context object
-	 * @param assessParamList
-	 *            - List of AssessParams
-	 * @param layerId
-	 *            - id of the layer
-	 * @return
-	 */
-	public List<String> getMetrics(Context context, List<AssessParam> assessParamList, int layerId) {
-		Vector<String> ckmetrics = new Vector<String>();
-		String metricName = null;
-		if (assessParamList != null) {
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.get(i);
-				if (assessParam.getLayerID() == layerId) {
-					try {
-						metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					if (!ckmetrics.contains(metricName))
-						ckmetrics.addElement(metricName);
-				}
-			}
-		}
-		return ckmetrics;
-	}
-
+	
 	/**
 	 * Return a list of layer names
 	 * 
@@ -156,10 +91,11 @@ public class StartAssessHelper {
 	 */
 	public void updateSelectedMetrics(Context context, List<AssessmentMetric> metrics, int itemId) throws SQLException {
 		for (AssessmentMetric metric : metrics) {
+			AssessmentResult result = new AssessmentResult(metric.getId(), itemId);
 			if (metric.isChecked()) {
-				Metric.addAssessMetric(context, metric.getId(), itemId);
+				AssessmentResultDao.getInstance().addAssessmentResult(context, result);
 			} else {
-				Metric.deleteAssessMetric(context, metric.getId(), itemId);
+				AssessmentResultDao.getInstance().deleteAssessmentResult(context, result);
 			}
 		}
 	}
