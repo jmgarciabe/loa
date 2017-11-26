@@ -1,4 +1,5 @@
-# loa
+# loa - Learning Objects Assessment
+
 Customization for assess learning objects stored in DSpace.
 
 This  development was based on a model for the quality assessment of learning objects which gatered together several approaches and considered the viewpoint of three actors, namely, repository administrators, experts and users. The module was integreted to DSpace's JPSUI web app and the implementation was carry out using Maven overlays.
