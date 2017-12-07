@@ -27,7 +27,7 @@ import org.dspace.core.Context;
 
 public class AvailabilityAssessCommand implements AdminAssessmentCommandIntarface {
 
-	public AssessResult executeAssessment(DSpaceObject dso, Context context) {
+	public AdminAssessmentReport executeAssessment(DSpaceObject dso, Context context) {
 
 		if (dso.getType() != Constants.ITEM) {
 			return null;
@@ -59,7 +59,7 @@ public class AvailabilityAssessCommand implements AdminAssessmentCommandIntarfac
 		//Build assessment result
 		String status = score > 0.0 ? "Success" : "Fail";
 		String stringScore = new DecimalFormat("#.##").format(score);
-		AssessResult assessResult = new AssessResult("Availability", score, handle, status, stringScore + ". " + result,
+		AdminAssessmentReport assessResult = new AdminAssessmentReport("Availability", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		return assessResult;
 

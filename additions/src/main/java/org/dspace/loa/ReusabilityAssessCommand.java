@@ -44,7 +44,7 @@ public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface
 	/** Weight for item's Linear structure */
 	private static final double LINEAR = 0.1;
 
-	public AssessResult executeAssessment(DSpaceObject dso, Context context) {
+	public AdminAssessmentReport executeAssessment(DSpaceObject dso, Context context) {
 
 		if (dso.getType() != Constants.ITEM) {
 			return null;
@@ -91,7 +91,7 @@ public class ReusabilityAssessCommand implements AdminAssessmentCommandIntarface
 			result.append(" has a low level of reusability");
 		}
 		//Create assessment result with data from the assessment process
-		AssessResult assessResult = new AssessResult("Reusability", score, handle, status, stringScore + ". " + result,
+		AdminAssessmentReport assessResult = new AdminAssessmentReport("Reusability", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		
 		return assessResult;

@@ -10,7 +10,6 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.hssf.record.DimensionsRecord;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -29,10 +27,8 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.loa.AssessParam;
 import org.dspace.loa.AssessmentMetric;
-import org.dspace.loa.AssessmentMetricDao;
-import org.dspace.loa.Dimension;
+import org.dspace.loa.DimensionWeighting;
 import org.dspace.loa.StartAssessHelper;
 
 /**
@@ -102,10 +98,10 @@ public class AssessItemServlet extends DSpaceServlet {
 		 * default to verifythe membership of the user (1-Administrator,
 		 * 2-Expert People, 3-Students group).
 		 */
-		
+		StartAssessHelper helper = new StartAssessHelper();
 		if (AuthorizeManager.isAdmin(context)) {
 			// User is a repository administrator
-			List<AssessmentMetric> metrics = AssessmentMetricDao.getInstance().getAssessmentMerics(context, item.getID(), 1);
+			List<AssessmentMetric> metrics = helper.getAssessmentMetrics(context, item.getID(), 1);
 			boolean paramsSet = false;
 			for(AssessmentMetric metric : metrics ){
 				if(metric.isChecked()){
@@ -123,20 +119,17 @@ public class AssessItemServlet extends DSpaceServlet {
 
 		} else if (Group.isMember(context, 2)) {
 			// User is an expert
-			StartAssessHelper helper = new StartAssessHelper();
-			List<AssessmentMetric> metrics = AssessmentMetricDao.getInstance().getAssessmentMerics(context, item.getID(), 2);
-			List<Dimension> dimensions = helper.getDimensionsInMetrics(metrics);
+			List<DimensionWeighting> dimensions = helper.getSelectedDimensions(context, 2, item.getID());
 			if (dimensions.size() == 0){
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
 			}else {
 				// show expert assessment page
-				
-				session.setAttribute("LOA.dimensionList", dimensions);
+				session.setAttribute("LOA.dimensionWList", dimensions);
 				JSPManager.showJSP(request, response, "/tools/qualify-expert.jsp");
 			}
 		} else if (Group.isMember(context, 3)) {
 			// User is a student
-			List<AssessmentMetric> metrics = AssessmentMetricDao.getInstance().getAssessmentMerics(context, item.getID(), 3);
+			List<AssessmentMetric> metrics = helper.getAssessmentMetrics(context, item.getID(), 3);
 			boolean paramsSet = false;
 			for(AssessmentMetric metric : metrics ){
 				if(metric.isChecked()){

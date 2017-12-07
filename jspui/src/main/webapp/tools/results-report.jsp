@@ -10,6 +10,9 @@
 <%--
   --%>
 
+<%@page import="org.dspace.loa.AssessmentMetric"%>
+<%@page import="org.dspace.loa.AssessmentResult"%>
+<%@page import="java.util.List"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.Map"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
@@ -19,7 +22,6 @@
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace"%>
 
 <%@ page import="org.dspace.app.webui.servlet.admin.AdminAssessServlet"%>
-<%@ page import="java.util.Vector"%>
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.EPerson"%>
@@ -51,9 +53,9 @@
 		<%
 			for (Entry<String, String> index : layerIndexes.entrySet()) {
 					if (index.getValue() != null && index.getValue().length() > 0) {
-						String idxLayer = index.getKey();
-						String tittle = idxLayer.equals("1") ? "Administrator" : idxLayer.equals("2") ? "Expert" : idxLayer
-								.equals("3") ? "Student" : "";
+						int idxLayer = Integer.valueOf(index.getKey());
+						String tittle = idxLayer == 1 ? "Administrator" : idxLayer == 2 ? "Expert" : idxLayer == 3 ? "Student"
+								: "";
 						tittle += " Layer Index";
 		%>
 		<div class="col-xs-6 col-md-4">
@@ -69,59 +71,37 @@
 				</div>
 				<div class="panel-body">
 					<%
-						Vector results = (Vector) session.getAttribute("LOA.results");
-									if (results != null && !results.isEmpty()) {
-										for (int i = 0; i < results.size(); i++) {
-											String resultsInfo = results.elementAt(i).toString();
-											String[] data = resultsInfo.split(",");
-											String layer = data[0];
-											String dimension = data[1];
-											String metric = data[2];
-											String val = data[3];
-											if (layer.equals(idxLayer)) {
+						List<AssessmentResult> results = (List<AssessmentResult>) session.getAttribute("LOA.results");
+									for (AssessmentResult res : results) {
+										AssessmentMetric m = res.getAssessmentMetric();
+										String progresBarType = "";
+
+										if (m.getLayer().getId() == idxLayer && res.getValue() != null) {
 					%>
 					<h4>
-						<small><%=dimension%>: <%=metric%></small>
+						<small><%=m.getDimension().getName() %>: <%=m.getCriteria().getName()%></small>
 					</h4>
 					<%
-						if (Double.valueOf(val).doubleValue() > 75) {
-					%>
-					<div class="progress">
-						<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<%=val%>"
-							aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: <%=val%>%;"><%=val%>%
-						</div>
-					</div>
-					<%
-						}
-												if (Double.valueOf(val).doubleValue() > 50 && Double.valueOf(val).doubleValue() <= 75) {
-					%>
-					<div class="progress">
-						<div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<%=val%>"
-							aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: <%=val%>%;"><%=val%>%
-						</div>
-					</div>
-					<%
-						}
-												if (Double.valueOf(val).doubleValue() > 25 && Double.valueOf(val).doubleValue() <= 50) {
-					%>
-					<div class="progress">
-						<div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="<%=val%>"
-							aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: <%=val%>%;"><%=val%>%
-						</div>
-					</div>
-					<%
-						}
-												if (Double.valueOf(val).doubleValue() <= 25) {
-					%>
-					<div class="progress">
-						<div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<%=val%>"
-							aria-valuemin="0" aria-valuemax="100" style="min-width: 2em; width: <%=val%>%;"><%=val%>%
-						</div>
-					</div>
-					<%
-						}
+						double val = res.getValue()*100;
+						if (val > 75) {
+												progresBarType = "progress-bar-success";
+											} else if (val > 50 && val <= 75) {
+												progresBarType = "progress-bar-info";
+											} else if (val > 25 && val <= 50) {
+												progresBarType = "progress-bar-warning";
+											} else if (val <= 25) {
+												progresBarType = "progress-bar-danger";
 											}
-										}
+					%>
+					<div class="progress">
+						<div class="progress-bar <%=progresBarType%>" role="progressbar"
+							aria-valuenow="<%=val%>" aria-valuemin="0" aria-valuemax="100"
+							style="min-width: 2em; width: <%=val%>%;"><%=val%>%
+						</div>
+					</div>
+
+					<%
+						}
 									}
 					%>
 				</div>

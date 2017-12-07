@@ -8,7 +8,7 @@
 <%@ page import="org.dspace.app.webui.servlet.admin.AdminAssessServlet"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet"%>
 <%@ page import="java.util.List"%>
-<%@ page import="org.dspace.loa.AssessResult"%>
+<%@ page import="org.dspace.loa.AdminAssessmentReport"%>
 <%@ page import="org.dspace.loa.AssessmentMetric"%>
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.content.Metadatum"%>
@@ -23,7 +23,7 @@
 	if (item != null) {
 		Metadatum[] dcvs = item.getMetadataByMetadataString("dc.title");
 		if (dcvs != null && dcvs.length > 0) {
-			title = dcvs[0].value;
+	title = dcvs[0].value;
 		}
 	}
 %>
@@ -46,9 +46,9 @@
 			<input type="hidden" name="item_id" value="<%=itemID%>" />
 
 			<div class="form-group">
-				<label class="col-md-4 col-lg-3" for="admin_assess">Select assessment:</label>
+				<label class="col-md-4 col-lg-3" for="assessment-metric">Select assessment:</label>
 				<div class="col-md-4 col-lg-3">
-					<select class="form-control" name="admin_assess" id="admin_assess">
+					<select class="form-control" name="assessment-metric" id="assessment-metric">
 						<%
 							List<AssessmentMetric> metrics = (List<AssessmentMetric>) session.getAttribute("LOA.metricList");
 						%>

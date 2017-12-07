@@ -1,17 +1,29 @@
 package org.dspace.loa;
 
-public class AssessmentHistory {
+/**
+ * Mapping of personal_assessment DB table
+ * @author JavierG
+ *
+ */
+public class PersonalAssessment {
 	
+	/** Personal assessment **/
 	private int id;
-	private int resultId;
-	private int personId;
-	private double value;
 	
-	public AssessmentHistory(){
+	/** Assessment result id **/
+	private int resultId;
+	
+	/** Eperson ID **/
+	private int personId;
+	
+	/** Value of assessment history **/
+	private Double value;
+	
+	public PersonalAssessment(){
 		
 	}
 	
-	public AssessmentHistory(int resultId, int personId){
+	public PersonalAssessment(int resultId, int personId){
 		this.resultId = resultId;
 		this.personId = personId;
 	}
@@ -34,10 +46,10 @@ public class AssessmentHistory {
 	public void setPersonId(int personId) {
 		this.personId = personId;
 	}
-	public double getValue() {
+	public Double getValue() {
 		return value;
 	}
-	public void setValue(double value) {
+	public void setValue(Double value) {
 		this.value = value;
 	}
 	

@@ -12,8 +12,8 @@
   - 
   --%>
 
+<%@page import="org.dspace.loa.DimensionWeighting"%>
 <%@page import="java.util.List"%>
-<%@page import="org.dspace.loa.Dimension"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -76,7 +76,7 @@
 			name="action" value="<%=ExpertAssessServlet.DIM_PARAM%>" />
 
 		<%
-			List<Dimension> dimensions = (List<Dimension>) session.getAttribute("LOA.dimensionList");
+			List<DimensionWeighting> dimensions = (List<DimensionWeighting>) session.getAttribute("LOA.dimensionWList");
 		%>
 
 		<div class="panel panel-info">
@@ -86,11 +86,11 @@
 			<div class="panel-body">
 				<div class="col-md-6 col-lg-4">
 					<%
-						for (Dimension dim : dimensions) {
+						for (DimensionWeighting dim : dimensions) {
 					%>
 					<div class="form-group">
-						<label for="exp_<%=dim.getName()%>">Level of <%=dim.getName()%> experience
-						</label> <input type="number" class="form-control dim-value" name="<%=dim.getName()%>" required>
+						<label for="exp_<%=dim.getId() %>">Level of <%=dim.getDimension().getName()%> experience
+						</label> <input type="number" class="form-control dim-value" name="<%=dim.getId()%>" required>
 					</div>
 					<%
 						}

@@ -35,7 +35,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 	 *            the DSpace object
 	 * @throws IOException
 	 */
-	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
+	public AdminAssessmentReport executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
 
 		if (dso.getType() != Constants.ITEM) {
 			return null;
@@ -137,7 +137,7 @@ public class ConsistencyAssessCommand implements AdminAssessmentCommandIntarface
 		if (score < 0.3) {
 			result.append(" has inconsistent data in most of analyzed metadata fields");
 		}
-		AssessResult assessResult = new AssessResult("Consistency", score, handle, status, stringScore + ". " + result,
+		AdminAssessmentReport assessResult = new AdminAssessmentReport("Consistency", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		return assessResult;
 	}

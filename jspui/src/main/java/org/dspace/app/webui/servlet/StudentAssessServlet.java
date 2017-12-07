@@ -72,7 +72,9 @@ public class StudentAssessServlet extends DSpaceServlet {
 					valores.add(Double.valueOf(request.getParameter(id)));
 				}
 			}
-			perMetricResponses.put(entry.getKey(), valores);
+			if(valores.size() > 0){
+				perMetricResponses.put(entry.getKey(), valores);
+			}
 		}
 		
 		helper.setStudentAssessment(context, item.getID(), perMetricResponses);

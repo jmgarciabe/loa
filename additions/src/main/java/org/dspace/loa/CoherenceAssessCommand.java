@@ -43,7 +43,7 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 	/** Log object to send errorr messages to log file */
 	private static final Logger log = Logger.getLogger(CoherenceAssessCommand.class);
 
-	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
+	public AdminAssessmentReport executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
 		
 		if (dso.getType() != Constants.ITEM) {
 			return null;
@@ -158,7 +158,7 @@ public class CoherenceAssessCommand implements AdminAssessmentCommandIntarface {
 		if (score < 0.3) {
 			result.append(" has low coherence data in these metadata fields: dc.language.iso, dc.type and dc.format.mimetype");
 		}
-		return new AssessResult("Coherence", score, handle, status, stringScore + ". " + result, assessmentExecuted);
+		return new AdminAssessmentReport("Coherence", score, handle, status, stringScore + ". " + result, assessmentExecuted);
 	}
 
 	/**
