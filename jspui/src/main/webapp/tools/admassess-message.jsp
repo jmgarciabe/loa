@@ -8,7 +8,7 @@
 
 --%>
 <%
-	AssessResult result = (AssessResult) request.getAttribute("task_result");
+	AdminAssessmentReport result = (AdminAssessmentReport) request.getAttribute("task_result");
     if (result != null)
     {
         boolean isSuccess = result.isSuccess();

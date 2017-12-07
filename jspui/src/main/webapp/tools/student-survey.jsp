@@ -10,6 +10,8 @@
 <%--
   --%>
 
+<%@page import="org.dspace.loa.AssessmentMetric"%>
+<%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -50,15 +52,13 @@
 				</h2>
 			</div>
 			<%
-				Vector metrics = (Vector) session
-							.getAttribute("LOA.paraMetrics");
-					if (metrics != null && !metrics.isEmpty()) {
-						for (int index = 0; index < metrics.size(); index++) {
-							String metricName = (String) metrics.elementAt(index);
+				List<AssessmentMetric> metrics = (List<AssessmentMetric>) session.getAttribute("LOA.metricList");
+					for (AssessmentMetric metric : metrics) {
+						String metricName = (String) metric.getCriteria().getName();
 			%>
 			<div class="panel-body">
 				<%
-					if (metricName.equals("Availability")) {
+					if (metricName.equals("Availability") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -77,7 +77,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Accuracy")) {
+							if (metricName.equals("Accuracy") && metric.isChecked() ) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -101,7 +101,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Ease to use")) {
+							if (metricName.equals("Ease to use") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -125,7 +125,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Effectiveness")) {
+							if (metricName.equals("Effectiveness") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -149,7 +149,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Motivation")) {
+							if (metricName.equals("Motivation") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -173,7 +173,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Relevance")) {
+							if (metricName.equals("Relevance") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -198,7 +198,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Visual Design")) {
+							if (metricName.equals("Visual Design") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -218,8 +218,8 @@
 						</label> <label class="radio-inline"> <input type="radio" name="vid1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="vid1" value="5">Very
 							High
-						</label>
-						<br><br>
+						</label> <br>
+						<br>
 						<p>To what level the texts, images, sounds and other multimedia elements of learning
 							object contribute on learning of the subject?</p>
 						<!-- Radio group options -->
@@ -239,7 +239,6 @@
 			</div>
 			<%
 				}
-					}
 			%>
 		</div>
 
@@ -254,6 +253,6 @@
 				value="<fmt:message key="jsp.tools.general.cancel"/>" />
 		</div>
 	</form>
-	
+
 
 </dspace:layout>

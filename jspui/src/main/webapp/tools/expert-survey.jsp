@@ -10,6 +10,8 @@
 <%--
   --%>
 
+<%@page import="org.dspace.loa.AssessmentMetric"%>
+<%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -20,7 +22,6 @@
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.EPerson"%>
-<%@ page import="java.util.Vector"%>
 
 <%@ page session="true"%>
 
@@ -50,15 +51,13 @@
 				</h2>
 			</div>
 			<%
-				Vector metrics = (Vector) session
-							.getAttribute("LOA.expMetrics");
-					if (metrics != null && !metrics.isEmpty()) {
-						for (int index = 0; index < metrics.size(); index++) {
-							String metricName = (String) metrics.elementAt(index);
+				List<AssessmentMetric> metrics = (List<AssessmentMetric>) session.getAttribute("LOA.expMetrics");
+					for (AssessmentMetric metric : metrics) {
+						String metricName = metric.getCriteria().getName();
 			%>
 			<div class="panel-body">
 				<%
-					if (metricName.equals("Accessibility")) {
+					if (metricName.equals("Accessibility") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -78,8 +77,8 @@
 						</label> <label class="radio-inline"> <input type="radio" name="acs1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="acs1" value="5">Very
 							High
-						</label>
-						<br><br>
+						</label> <br>
+						<br>
 						<p>To what extent the resource is working properly and is easy for the user to visualize
 							it from different platforms?</p>
 						<!-- Radio group options -->
@@ -95,7 +94,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Accuracy")) {
+							if (metricName.equals("Accuracy") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -114,13 +113,12 @@
 						</label> <label class="radio-inline"> <input type="radio" name="acc1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="acc1" value="5">Very
 							High
-						</label>
-						<br>
+						</label> <br>
 					</div>
 				</div>
 				<%
 					}
-								if (metricName.equals("Completeness")) {
+							if (metricName.equals("Completeness") && metric.isChecked() ) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -134,13 +132,12 @@
 						<!-- Radio group options -->
 						<label class="radio-inline"> <input type="radio" name="com1" value="5" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="com1" value="0">No
-						</label>
-						<br>
+						</label> <br>
 					</div>
 				</div>
 				<%
 					}
-								if (metricName.equals("Ease to use")) {
+							if (metricName.equals("Ease to use") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -159,8 +156,8 @@
 						</label> <label class="radio-inline"> <input type="radio" name="eou1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="eou1" value="5">Very
 							High
-						</label>
-						<br><br>
+						</label> <br>
+						<br>
 						<p>How would you rate the relation between needs and help provided?</p>
 						<!-- Radio group options -->
 						<label class="radio-inline"> <input type="radio" name="eou2" value="1" required>Very
@@ -170,13 +167,12 @@
 						</label> <label class="radio-inline"> <input type="radio" name="eou2" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="eou2" value="5">Very
 							High
-						</label>
-						<br>
+						</label> <br>
 					</div>
 				</div>
 				<%
 					}
-								if (metricName.equals("Potential Effectiveness")) {
+							if (metricName.equals("Potential Effectiveness") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -196,8 +192,8 @@
 						</label> <label class="radio-inline"> <input type="radio" name="poe1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="poe1" value="5">Very
 							High
-						</label>
-						<br><br>
+						</label> <br>
+						<br>
 						<p>To what extent object's structure and content are supporting topic's learning?</p>
 						<!-- Radio group options -->
 						<label class="radio-inline"> <input type="radio" name="poe2" value="1" required>Very
@@ -212,7 +208,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Reusability")) {
+							if (metricName.equals("Reusability") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -231,7 +227,8 @@
 						</label> <label class="radio-inline"> <input type="radio" name="reu1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="reu1" value="5">Very
 							High
-						</label><br><br>
+						</label><br>
+						<br>
 						<p>To what level learning object is self-contained and does not require any dependencies?</p>
 						<!-- Radio group options -->
 						<label class="radio-inline"> <input type="radio" name="reu2" value="1" required>Very
@@ -246,7 +243,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Rigor and Relevance")) {
+							if (metricName.equals("Rigor and Relevance") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -266,7 +263,8 @@
 						</label> <label class="radio-inline"> <input type="radio" name="rar1" value="4">High
 						</label> <label class="radio-inline"> <input type="radio" name="rar1" value="5">Very
 							High
-						</label><br><br>
+						</label><br>
+						<br>
 						<p>To what level the content that is shown have ortographic and gramatical errors?</p>
 						<!-- Radio group options -->
 						<label class="radio-inline"> <input type="radio" name="rar2" value="1" required>Very
@@ -281,7 +279,7 @@
 				</div>
 				<%
 					}
-								if (metricName.equals("Visual Design")) {
+							if (metricName.equals("Visual Design") && metric.isChecked()) {
 				%>
 				<div class="panel panel-info">
 					<div class="panel-heading">
@@ -296,7 +294,8 @@
 						<!-- Radio group options -->
 						<label class="radio-inline"> <input type="radio" name="vid1" value="5" required>Yes
 						</label> <label class="radio-inline"> <input type="radio" name="vid1" value="0">No
-						</label><br><br>
+						</label><br>
+						<br>
 						<p>Election of texts, images, sounds or other multimedia elements contributes to learning
 							objectives?</p>
 						<!-- Radio group options -->
@@ -311,7 +310,6 @@
 			</div>
 			<%
 				}
-					}
 			%>
 		</div>
 

@@ -72,10 +72,12 @@ public class StudentAssessServlet extends DSpaceServlet {
 					valores.add(Double.valueOf(request.getParameter(id)));
 				}
 			}
-			perMetricResponses.put(entry.getKey(), valores);
+			if(valores.size() > 0){
+				perMetricResponses.put(entry.getKey(), valores);
+			}
 		}
 		
-		helper.setExpertAssessment(context, item.getID(), perMetricResponses);
+		helper.setStudentAssessment(context, item.getID(), perMetricResponses);
 
 		request.setAttribute("item", item);
 		JSPManager.showJSP(request, response, "/tools/success-page.jsp");

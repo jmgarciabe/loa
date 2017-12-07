@@ -1,15 +1,3 @@
-<%--
-
-    The contents of this file are subject to the license and copyright
-    detailed in the LICENSE and NOTICE files at the root of the source
-    tree and available online at
-
-    http://www.dspace.org/license/
-
---%>
-<%--
-  --%>
-
 <%@ page contentType="text/html;charset=UTF-8"%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
@@ -19,8 +7,9 @@
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.AdminAssessServlet"%>
 <%@ page import="org.dspace.app.webui.servlet.admin.EditCommunitiesServlet"%>
-<%@ page import="java.util.Vector"%>
-<%@page import="org.dspace.loa.AssessResult"%>
+<%@ page import="java.util.List"%>
+<%@ page import="org.dspace.loa.AdminAssessmentReport"%>
+<%@ page import="org.dspace.loa.AssessmentMetric"%>
 <%@ page import="org.dspace.content.Item"%>
 <%@ page import="org.dspace.content.Metadatum"%>
 <%@ page import="org.dspace.core.ConfigurationManager"%>
@@ -29,13 +18,12 @@
 
 <%
 	Item item = (Item) request.getAttribute("item");
-	String enaRstBtn = (String) request.getAttribute("enaRstBtn");
 	int itemID = (item != null ? item.getID() : -1);
 	String title = "Unknown Item";
 	if (item != null) {
 		Metadatum[] dcvs = item.getMetadataByMetadataString("dc.title");
 		if (dcvs != null && dcvs.length > 0) {
-			title = dcvs[0].value;
+	title = dcvs[0].value;
 		}
 	}
 %>
@@ -58,23 +46,22 @@
 			<input type="hidden" name="item_id" value="<%=itemID%>" />
 
 			<div class="form-group">
-				<label class="col-md-4 col-lg-3" for="admin_assess">Select assessment:</label>
+				<label class="col-md-4 col-lg-3" for="assessment-metric">Select assessment:</label>
 				<div class="col-md-4 col-lg-3">
-					<select class="form-control" name="admin_assess" id="admin_assess">
+					<select class="form-control" name="assessment-metric" id="assessment-metric">
 						<%
-							Vector adminAvailAssess = (Vector) session.getAttribute("LOA.adminAvailAssess");
-								if (adminAvailAssess != null && !adminAvailAssess.isEmpty()) {
+							List<AssessmentMetric> metrics = (List<AssessmentMetric>) session.getAttribute("LOA.metricList");
 						%>
 						<%
-							for (int index = 0; index < adminAvailAssess.size(); index++) {
-										String adminMetrics = (String) adminAvailAssess.elementAt(index);
+							for (AssessmentMetric metric : metrics) {
+
+									if (metric.isChecked()) {
 						%>
-						<option value="<%=adminMetrics%>" /><%=adminMetrics%></option>
+						<option value="<%=metric.getId()%>"><%=metric.getCriteria().getName()%>
+						</option>
 						<%
 							}
-						%>
-						<%
-							}
+								}
 						%>
 					</select>
 				</div>

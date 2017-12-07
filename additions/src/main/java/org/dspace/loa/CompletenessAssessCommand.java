@@ -49,7 +49,7 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 	/** Weight for Provenance (Status) metadata field value */
 	private final double STATUS = 0.02;
 
-	public AssessResult executeAssessment(DSpaceObject dso, Context context) {
+	public AdminAssessmentReport executeAssessment(DSpaceObject dso, Context context) {
 
 		if (dso.getType() != Constants.ITEM) {
 			return null;
@@ -107,7 +107,7 @@ public class CompletenessAssessCommand implements AdminAssessmentCommandIntarfac
 			result.append(" very few of the most important metadata fields have been filled");
 		}
 
-		AssessResult assessResult = new AssessResult("Completeness", score, handle, status, stringScore + ". " + result,
+		AdminAssessmentReport assessResult = new AdminAssessmentReport("Completeness", score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 
 		return assessResult;

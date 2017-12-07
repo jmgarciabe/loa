@@ -29,7 +29,7 @@ public class VisibilityAssessCommand implements AdminAssessmentCommandIntarface 
 	/** Log object to send errorr messages to log file */
 	private static final Logger log = Logger.getLogger(CoherenceAssessCommand.class);
 
-	public AssessResult executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
+	public AdminAssessmentReport executeAssessment(DSpaceObject dso, Context context) throws AdminAssessmentException {
 		
 		double score = 0.0;
 		double itemVisits = 0;
@@ -155,7 +155,7 @@ public class VisibilityAssessCommand implements AdminAssessmentCommandIntarface 
 			result.append(" is not so popular in the repository");
 		}
 
-		AssessResult assessResult = new AssessResult("Visibility",score, handle, status, stringScore + ". " + result,
+		AdminAssessmentReport assessResult = new AdminAssessmentReport("Visibility",score, handle, status, stringScore + ". " + result,
 				assessmentExecuted);
 		return assessResult;
 

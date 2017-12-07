@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,12 +26,9 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.loa.AssessParam;
 import org.dspace.loa.AssessmentMetric;
-import org.dspace.loa.AssessmentMetricDao;
 import org.dspace.loa.Dimension;
 import org.dspace.loa.Layer;
-import org.dspace.loa.Metric;
 import org.dspace.loa.StartAssessHelper;
 
 /**
@@ -90,7 +86,7 @@ public class InitialParamServlet extends DSpaceServlet {
 			layerId = Integer.valueOf(request.getParameter("layerId"));
 			int itemId = item.getID();
 			List<Dimension> dimenisons = helper.getDimensions(context, layerId);
-			List<AssessmentMetric> metrics = AssessmentMetricDao.getInstance().getAssessmentMerics(context, itemId, layerId);
+			List<AssessmentMetric> metrics = helper.getAssessmentMetrics(context, itemId, layerId);
 			request.setAttribute("handle", handle);
 			request.setAttribute("layerId", layerId);
 			request.setAttribute("LOA.dimensionList", dimenisons);
@@ -101,7 +97,7 @@ public class InitialParamServlet extends DSpaceServlet {
 		case METRIC_PARAM:
 
 			layerId = Integer.valueOf(request.getParameter("layerId"));
-			Layer layer = Layer.findLayer(context, layerId);
+			Layer layer = helper.findLayer(context, layerId);
 			String[] ckMetrics = request.getParameterValues("metrics");
 			List<AssessmentMetric> metricList = (List<AssessmentMetric>) session.getAttribute("LOA.metricList");
 			// Actualizamos las métricas que fueron seleccionadas
@@ -145,17 +141,16 @@ public class InitialParamServlet extends DSpaceServlet {
 		// necessary
 		List<AssessmentMetric> metrics = (List<AssessmentMetric>) session.getAttribute("LOA.metricList");
 		helper.updateSelectedMetrics(context, metrics, itemId);
-		
+
 		List<Dimension> dimensionsList = helper.getDimensions(context, layerId);
-		Map<String,Double> weightsPerDimension = new HashMap<String, Double>();
+		Map<String, Double> weightsPerDimension = new HashMap<String, Double>();
 		for (Dimension dimension : dimensionsList) {
 			String value = request.getParameter(dimension.getName());
-			if(value != null && value.length() > 0){
+			if (value != null && value.length() > 0) {
 				weightsPerDimension.put(dimension.getName(), Double.valueOf(value));
 			}
 		}
-		helper.updateAdminWeights(context, metrics, itemId, layerId, weightsPerDimension);
-		
+		helper.updateWeights(context, metrics, itemId, layerId, weightsPerDimension);
 
 		request.setAttribute("item", item);
 		request.setAttribute("handle", handle);

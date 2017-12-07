@@ -1,8 +1,17 @@
 package org.dspace.loa;
 
+/**
+ * Mapping of criteria DB table
+ * 
+ * @author JavierG
+ * 
+ */
 public class Criteria {
 
-	private int id;	
+	/** criteria ID */
+	private int id;
+	
+	/** criteria name */
 	private String name;
 	
 	public Criteria(int id, String name){

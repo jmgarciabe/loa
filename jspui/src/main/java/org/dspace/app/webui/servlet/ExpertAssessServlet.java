@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
-import org.dspace.loa.AssessParam;
+import org.dspace.loa.AssessmentMetric;
+import org.dspace.loa.DimensionWeighting;
 import org.dspace.loa.ExpertAssessHelper;
 import org.dspace.loa.StartAssessHelper;
 
@@ -72,28 +72,23 @@ public class ExpertAssessServlet extends DSpaceServlet {
 
 			// we check values previously parameterized for this layer (2) and
 			// update them if necessary.
-			ExpertAssessHelper expertHelper = new ExpertAssessHelper(itemId);
+			ExpertAssessHelper expertHelper = new ExpertAssessHelper();
 			StartAssessHelper startHelper = new StartAssessHelper();
 
 			Map<String, Integer> expertWeights = new HashMap<String, Integer>();
-			Map<String, String> ids = new HashMap<String, String>();
-			ids.put("1", "exp_Content");
-			ids.put("3", "exp_Educational");
-			ids.put("4", "exp_Esthetic");
-			ids.put("5", "exp_Functional");
-			ids.put("6", "exp_Metadata");
-			for (Entry<String, String> entry : ids.entrySet()) {
-				String weight = request.getParameter(entry.getValue());
+			List<DimensionWeighting> expertDimensions = (List<DimensionWeighting>) session.getAttribute("LOA.dimensionWList");
+			
+			for (DimensionWeighting dim : expertDimensions) {
+				String weight = request.getParameter(String.valueOf(dim.getId()));
 				if (weight == null || weight.length() == 0) {
 					weight = "0";
 				}
-				expertWeights.put(entry.getKey(), Integer.valueOf(weight));
+				expertWeights.put(String.valueOf(dim.getId()), Integer.valueOf(weight));
 			}
 
 			expertHelper.setExpertWeight(context, expertWeights);
-			List<AssessParam> assessParamList = AssessParam.findParam(context, itemId, 2);
-			List<String> expMetrics = startHelper.getMetrics(context, assessParamList, 2);
-			session.setAttribute("expertHelper", expertHelper);
+			List<AssessmentMetric> expMetrics = startHelper.getAssessmentMetrics(context, item.getID(), 2);
+			session.removeAttribute("LOA.dimensionWList");
 			request.setAttribute("item", item);
 			request.setAttribute("handle", handle);
 			session.setAttribute("LOA.expMetrics", expMetrics);
@@ -104,7 +99,7 @@ public class ExpertAssessServlet extends DSpaceServlet {
 
 		case EXP_SURVEY:
 
-			ExpertAssessHelper helper = (ExpertAssessHelper)session.getAttribute("expertHelper");
+			ExpertAssessHelper helper = new ExpertAssessHelper();
 			Map<String, String[]> answerIds = new HashMap<String, String[]>();
 			answerIds.put("12", new String[] { "acs1", "acs2" });
 			answerIds.put("14", new String[] { "acc1" });
@@ -124,10 +119,12 @@ public class ExpertAssessServlet extends DSpaceServlet {
 						perMetricResponses.add(Double.valueOf(request.getParameter(answer)));
 					}
 				}
-				responses.put(entry.getKey(), perMetricResponses);
+				if(perMetricResponses.size() > 0){
+					responses.put(entry.getKey(), perMetricResponses);
+				}
 			}
 			
-			helper.setExpertAssessment(context, responses);
+			helper.setExpertAssessment(context, responses, itemId);
 			request.setAttribute("item", item);
 			JSPManager.showJSP(request, response, "/tools/success-page.jsp");
 			break;

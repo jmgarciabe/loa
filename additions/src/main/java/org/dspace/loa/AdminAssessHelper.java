@@ -3,6 +3,7 @@ package org.dspace.loa;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -15,128 +16,130 @@ public class AdminAssessHelper {
 
 	/**
 	 * Carries out the related administration assessment to the given criteria
-	 * @param criteria - the criteria or name of assessment to be executed
-	 * @param dso - the DSpace object upon which assessment should be executed
-	 * @param context - execution context needed for carrying out some assessments
+	 * 
+	 * @param criteria
+	 *            - the criteria or name of assessment to be executed
+	 * @param dso
+	 *            - the DSpace object upon which assessment should be executed
+	 * @param context
+	 *            - execution context needed for carrying out some assessments
 	 * @return and AssessResult object with the result information
-	 * @throws AdminAssessmentException - may throw a custom exception if something went wrong
+	 * @throws AdminAssessmentException
+	 *             - may throw a custom exception if something went wrong
 	 */
-	public AssessResult assess(String criteria, DSpaceObject dso, Context context) throws AdminAssessmentException {
+	public AdminAssessmentReport assess(int metric, DSpaceObject dso, Context context) throws AdminAssessmentException {
 
-		switch (criteria) {
-		case "Availability":
+		switch (metric) {
+		case 2:
 			criteriaCommand = new AvailabilityAssessCommand();
 			break;
-		case "Coherence":
+		case 5:
 			criteriaCommand = new CoherenceAssessCommand();
 			break;
-		case "Completeness":
+		case 3:
 			criteriaCommand = new CompletenessAssessCommand();
 			break;
-		case "Consistency":
+		case 4:
 			criteriaCommand = new ConsistencyAssessCommand();
 			break;
-		case "Reusability":
+		case 1:
 			criteriaCommand = new ReusabilityAssessCommand();
 			break;
-		case "Visibility":
+		case 6:
 			criteriaCommand = new VisibilityAssessCommand();
 			break;
 		}
-		return criteriaCommand.executeAssessment(dso, context);		 
+		return criteriaCommand.executeAssessment(dso, context);
 	}
-	
+
+	/**
+	 * Saves the admin assessment in the database
+	 * 
+	 * @param context
+	 *            - Dspace context object
+	 * @param metricId
+	 *            - Id of the assessment metric which result is going to be
+	 *            added or updated
+	 * @param itemId
+	 *            - item for which the update id going to be carry out
+	 * @param score
+	 *            - score of the assessment
+	 * @throws SQLException
+	 */
+	public void saveAssessmnetResult(Context context, int metricId, int itemId, double score) throws SQLException {
+		AssessmentResult result = new AssessmentResult(metricId, itemId);
+		result.setValue(score);
+		AssessmentResultDao.getInstance().saveAssesmentResult(context, result);
+	}
+
 	/**
 	 * Returns assessment result per item of criteria that has been assessed
-	 * @param itemId - item of which the results are required
-	 * @param context - DSpace Context object
+	 * 
+	 * @param itemId
+	 *            - item of which the results are required
+	 * @param context
+	 *            - DSpace Context object
 	 * @return List of results
-	 * @throws SQLException - May throw an exception when look for results up in DB
+	 * @throws SQLException
+	 *             - May throw an exception when look for results up in DB
 	 */
-	public Vector<String> getAssessmentResults(int itemId, Context context) throws SQLException{
-
-		DecimalFormat formater = new DecimalFormat("###.##");
-		Vector<AssessParam> assessParamList = AssessParam.findParam(context, itemId);
-		Vector<String> results = new Vector<String>();
-
-		if (assessParamList != null) {
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
-				if (assessParam.getMetricValue() == null || assessParam.getMetricValue().length() == 0) {
-					continue;
-				}
-				String dimensionName;
-				String metricName;
-				String mtrVal;
-				String data;
-				double metricValue = 0;
-				dimensionName = Dimension.findNameByID(context, assessParam.getDimID());
-				metricName = Metric.findNameByID(context, assessParam.getAssessMetricID());
-				metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue() * 100;
-				mtrVal = formater.format(metricValue);
-				data = assessParam.getLayerID() + "," + dimensionName + "," + metricName + "," + mtrVal;
-				results.addElement(data);
-			}
-		}
-		
-		return results;
+	public List<AssessmentResult> getAssessmentResults(Context context, int itemId) throws SQLException {
+		return AssessmentResultDao.getInstance().getAssessmentResultsByItem(context, itemId);
 	}
-	
+
 	/**
-	 * It calculates the layer index, which is the weighted value for the layer, its final score
-	 * @param assessParamList - List of the Assess Params
-	 * @param layerID - the id of the layer
-	 * @return final score for the layer worked out from performed assessments so far
+	 * It calculates the layer index, which is the weighted value for the layer,
+	 * its final score
+	 * 
+	 * @param assessParamList
+	 *            - List of the Assess Params
+	 * @param layerId
+	 *            - the id of the layer
+	 * @return final score for the layer worked out from performed assessments
+	 *         so far
 	 */
-	public double calculateLayerIndex(Vector<AssessParam> assessParamList, int layerID) {
+	public double calculateLayerIndex(Context context, List<AssessmentResult> results, int itemId, int layerId)
+			throws SQLException {
 
-		double metricValue, dimWght;
+		List<DimensionWeighting> dimensions = DimensionWeightingDao.getInstance().getAssignedDimension(context, itemId, layerId);
 		double layerIndex = 0.0;
-		boolean hasValues = false;
-
-		Map<String, double[]> dimensionData = new HashMap<String, double[]>();
-		dimensionData.put("1", new double[3]);
-		dimensionData.put("2", new double[3]);
-		dimensionData.put("3", new double[3]);
-		dimensionData.put("4", new double[3]);
-		dimensionData.put("5", new double[3]);
-		dimensionData.put("6", new double[3]);
+		boolean hasResults = false;
 
 		// work out total value per dimension using weight set by administrator
-		if (assessParamList != null) {
-			for (int i = 0; i < assessParamList.size(); i++) {
-				AssessParam assessParam = assessParamList.elementAt(i);
-				if (assessParam.getLayerID() == layerID) {
-					if (assessParam.getMetricValue() == null || assessParam.getMetricValue().length() == 0) {
-						continue;
-					}
-					hasValues = true;
-					metricValue = Double.valueOf(assessParam.getMetricValue()).doubleValue();
-					String dimId = String.valueOf(assessParam.getDimID());
-					double values[] = dimensionData.get(dimId);
-					values[0] += 1;
-					values[1] += metricValue;
-					dimWght = Double.valueOf(assessParam.getAdmWeight()).doubleValue() / 100;
-					values[2] = (values[1] / values[0]) * dimWght;
-					dimensionData.put(dimId, values);
+		for (DimensionWeighting dim : dimensions) {
+
+			double dimResultsSum = 0.0;
+			int dimResultsCount = 0;
+
+			for (AssessmentResult res : results) {
+				if (res.getAssessmentMetric().getLayer().getId() != layerId) {
+					continue;
+				}
+				if (res.getAssessmentMetric().getDimension().getId() == dim.getDimension().getId() && res.getValue() != null) {
+					dimResultsSum += res.getValue();
+					dimResultsCount++;
+					hasResults = true;
 				}
 			}
-
-			for (double[] values : dimensionData.values()) {
-				layerIndex = layerIndex + values[2];
+			if (dimResultsCount > 0) {
+				dimResultsSum /= dimResultsCount;
 			}
+			layerIndex += dimResultsSum * dim.getAdminWeight();
 		}
-		if (!hasValues)
-			return -1;
-		return layerIndex;
+		return hasResults ? layerIndex/10 : -1;
 
 	}
-	
+
 	/**
-	 * Work out the final score or index of the assessment process based on score by layers
-	 * @param adminIndex - administrators layer final score or index
-	 * @param expIndex - experts layer final score or index
-	 * @param stdIndex - students layer final score or index
+	 * Work out the final score or index of the assessment process based on
+	 * score by layers
+	 * 
+	 * @param adminIndex
+	 *            - administrators layer final score or index
+	 * @param expIndex
+	 *            - experts layer final score or index
+	 * @param stdIndex
+	 *            - students layer final score or index
 	 * @return
 	 */
 	public double calculateTotalIndex(double adminIndex, double expIndex, double stdIndex) {
@@ -156,11 +159,26 @@ public class AdminAssessHelper {
 			totIndex = expIndex;
 		else if (stdIndex > 0)
 			totIndex = stdIndex;
-
-		totIndex = totIndex * 10;
-
+		
 		return totIndex;
 	}
-	
-	
+
+	/**
+	 * Encapsulates the deletion of all the expert weights, admin weights,
+	 * individual results and overall results for the given item id, that is,
+	 * deletes all the information stored on DB for the given item
+	 * 
+	 * @param context
+	 *            DSpace context object
+	 * @param itemId
+	 *            item ID
+	 * @throws SQLException
+	 */
+	public void deleteAllByItem(Context context, int itemId) throws SQLException {
+		ExpertWeightingDao.getInstance().deleteAllByItem(context, itemId);
+		DimensionWeightingDao.getInstance().deleteAllByItem(context, itemId);
+		PersonalAssessmentDao.getInstance().deleteAllByItem(context, itemId);
+		AssessmentResultDao.getInstance().deleteAllByItem(context, itemId);
+	}
+
 }

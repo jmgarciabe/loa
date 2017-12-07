@@ -10,7 +10,6 @@ package org.dspace.app.webui.servlet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +27,8 @@ import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.loa.AssessParam;
+import org.dspace.loa.AssessmentMetric;
+import org.dspace.loa.DimensionWeighting;
 import org.dspace.loa.StartAssessHelper;
 
 /**
@@ -101,38 +101,47 @@ public class AssessItemServlet extends DSpaceServlet {
 		StartAssessHelper helper = new StartAssessHelper();
 		if (AuthorizeManager.isAdmin(context)) {
 			// User is a repository administrator
-			List<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 1);
-			List<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 1);
+			List<AssessmentMetric> metrics = helper.getAssessmentMetrics(context, item.getID(), 1);
+			boolean paramsSet = false;
+			for(AssessmentMetric metric : metrics ){
+				if(metric.isChecked()){
+					paramsSet = true;
+					break;
+				}
+			}
 			String processMessage = "";
-			if (parameterizedMetrics.isEmpty()) {
+			if (!paramsSet) {
 				processMessage = "Parameters must be set prior to assessment process. Please use the link below in order to set parameters for this assessment.";
 			}
-			session.setAttribute("LOA.adminAvailAssess", parameterizedMetrics);
+			session.setAttribute("LOA.metricList", metrics);
 			session.setAttribute("LOA.processMessage", processMessage);
 			JSPManager.showJSP(request, response, "/tools/admin-assess.jsp");
 
 		} else if (Group.isMember(context, 2)) {
-			// User is an admin
-			List<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 2);
-			List<String> parameterizedDimensions = helper.getDimensions(context, assessParam, 2);
-
-			if (parameterizedDimensions.isEmpty())
+			// User is an expert
+			List<DimensionWeighting> dimensions = helper.getSelectedDimensions(context, 2, item.getID());
+			if (dimensions.size() == 0){
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
-			else {
+			}else {
 				// show expert assessment page
-				session.setAttribute("LOA.paramDimensions", parameterizedDimensions);
+				session.setAttribute("LOA.dimensionWList", dimensions);
 				JSPManager.showJSP(request, response, "/tools/qualify-expert.jsp");
 			}
 		} else if (Group.isMember(context, 3)) {
 			// User is a student
-			List<AssessParam> assessParam = AssessParam.findParam(context, item.getID(), 3);
-			List<String> parameterizedMetrics = helper.getMetrics(context, assessParam, 3);
-
-			if (parameterizedMetrics.isEmpty())
+			List<AssessmentMetric> metrics = helper.getAssessmentMetrics(context, item.getID(), 3);
+			boolean paramsSet = false;
+			for(AssessmentMetric metric : metrics ){
+				if(metric.isChecked()){
+					paramsSet = true;
+					break;
+				}
+			}
+			if (!paramsSet)
 				JSPManager.showJSP(request, response, "/tools/init-param-error.jsp");
 			else {
 				// show student assessment page
-				session.setAttribute("LOA.paraMetrics", parameterizedMetrics);
+				session.setAttribute("LOA.metricList", metrics);
 				JSPManager.showJSP(request, response, "/tools/student-survey.jsp");
 			}
 

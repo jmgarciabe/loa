@@ -1,18 +1,10 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 package org.dspace.loa;
 
 
 /**
- *
- * @author Keiji Suzuki (adapted by Andres Salazar)
+ * Object used to store info about the result of an administration assessment
  */
-public class AssessResult
+public class AdminAssessmentReport
 {
 
     /** the assess identifier*/
@@ -33,7 +25,7 @@ public class AssessResult
     /** Is the assessment */
     private boolean isSuccess;
     
-    public AssessResult(){
+    public AdminAssessmentReport(){
     	this.task = "";
         this.score = 0.0;
         this.handle = "";
@@ -42,7 +34,7 @@ public class AssessResult
         this.isSuccess = false;
     }
 
-    public AssessResult(String assess, double score, String handle, String status, String result, boolean isSuccess)
+    public AdminAssessmentReport(String assess, double score, String handle, String status, String result, boolean isSuccess)
     {
         this.task = assess;
         this.score = score;

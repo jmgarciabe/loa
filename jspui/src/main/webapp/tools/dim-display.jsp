@@ -30,7 +30,6 @@
 <%@ page import="org.dspace.core.ConfigurationManager"%>
 <%@ page import="org.dspace.eperson.EPerson"%>
 <%@ page import="org.dspace.loa.Dimension"%>
-<%@ page import="org.dspace.loa.Metric"%>
 <%@ page import="java.util.Vector"%>
 
 <%@ page session="true"%>
